@@ -40,6 +40,7 @@ print('path :', visualization_path)
 for idx, cls in enumerate(os.listdir(visualization_path)) :
     print(idx, cls)
     ax = summary_class.add_subplot(10, 10, idx+1)
+    print(os.path.join(visualization_path, '/', cls, '/'))
     file_name = os.listdir(os.path.join(visualization_path, '/', cls, '/'))
     print(file_name)
     break
