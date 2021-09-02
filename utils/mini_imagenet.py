@@ -11,7 +11,7 @@ import PIL.Image as image
 
 fix_randomness(42)
 
-src_data_path = '/home/NAS_mount/sjlee/ILSVRC/Data/CLS-LOC'
+src_data_path = '/home/NAS_mount/sjlee/ILSVRC/Data/CLS-LOC/'
 dst_data_path = '/home/NAS_mount/sjlee/Mini_ImageNet/'
 
 if not os.path.isdir(dst_data_path) :
