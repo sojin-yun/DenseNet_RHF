@@ -45,4 +45,4 @@ for idx, cls in enumerate(sampled_classes) :
     img = image.open(visualization_path+'/'+cls+'/'+file_name[0])
     ax.imshow(img)
     ax.axis('off')
-summary_class.savefig('class_sample.png')
+summary_class.savefig(src_data_path+'/'+'class_sample.png')
