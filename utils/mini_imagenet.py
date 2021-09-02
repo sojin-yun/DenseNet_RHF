@@ -42,4 +42,4 @@ for idx, cls in os.listdir(visualization_path) :
     img = image.open(os.path.join(src_data_path, 'val', cls))
     ax.imshow(img)
     ax.axis('off')
-plt.savefig('class_sample.png')
+summary_class.savefig('class_sample.png')
