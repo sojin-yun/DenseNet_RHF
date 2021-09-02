@@ -42,7 +42,7 @@ for idx, cls in enumerate(sampled_classes) :
     ax = summary_class.add_subplot(10, 10, idx+1)
     print(visualization_path+'/'+cls+'/')
     file_name = os.listdir(visualization_path+'/'+cls+'/')
-    n_index = random.randint(0, len(file_name))
+    n_index = random.randint(0, len(file_name)-1)
     img = image.open(visualization_path+'/'+cls+'/'+file_name[n_index])
     ax.imshow(img)
     ax.axis('off')
