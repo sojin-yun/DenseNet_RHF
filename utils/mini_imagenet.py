@@ -1,4 +1,5 @@
 import os, sys
+sys.path.append(os.getcwd())
 sys.path.append(os.getcwd()+'utils/')
 import random
 from utils.random_seed import fix_randomness
