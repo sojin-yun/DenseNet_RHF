@@ -36,7 +36,7 @@ class_txt.close()
 
 summary_class = plt.figure(figsize=(20, 20))
 visualization_path = os.path.join(src_data_path, 'val/')
-print('path :', visualization_path)
+
 for idx, cls in enumerate(sampled_classes) :
     print(idx, cls)
     ax = summary_class.add_subplot(10, 10, idx+1)
@@ -45,4 +45,4 @@ for idx, cls in enumerate(sampled_classes) :
     img = image.open(visualization_path+'/'+cls+'/'+file_name[0])
     ax.imshow(img)
     ax.axis('off')
-summary_class.savefig(src_data_path+'/'+'class_sample.png')
+summary_class.savefig(dst_data_path+'/'+'class_sample.png')
