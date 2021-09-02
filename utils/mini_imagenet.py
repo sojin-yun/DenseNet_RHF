@@ -42,9 +42,7 @@ for idx, cls in enumerate(os.listdir(visualization_path)) :
     ax = summary_class.add_subplot(10, 10, idx+1)
     print(visualization_path+'/'+cls+'/')
     file_name = os.listdir(visualization_path+'/'+cls+'/')
-    print(file_name[0])
-    break
-    img = image.open(os.path.join(visualization_path, cls, '/', file_name[0]))
+    img = image.open(visualization_path+'/'+cls+'/'+file_name[0])
     ax.imshow(img)
     ax.axis('off')
-#summary_class.savefig('class_sample.png')
+summary_class.savefig('class_sample.png')
