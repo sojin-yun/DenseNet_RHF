@@ -39,7 +39,7 @@ visualization_path = os.path.join(src_data_path, 'val/')
 print(visualization_path)
 for idx, cls in enumerate(os.listdir(visualization_path)) :
     print(idx, cls)
-    ax = summary_class.add_subplot(10, 10, idx)
+    ax = summary_class.add_subplot(10, 10, int(idx))
     file_name = os.listdir(os.path.join(visualization_path, cls))
     img = image.open(os.path.join(src_data_path, 'val/', cls))
     ax.imshow(img)
