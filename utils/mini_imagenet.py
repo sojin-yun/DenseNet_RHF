@@ -17,5 +17,5 @@ sampled_classes = random.sample(total_classes, 100)
 for mode in ['train/', 'valid/'] :
     for idx, f in enumerate(sampled_classes) :
         if not os.path.isdir(dst_data_path+mode+f+'/') :
-            shutil.copy2(src_data_path+f+'/', dst_data_path+mode+f+'/')
+            shutil.copytree(src_data_path+f+'/', dst_data_path+mode+f+'/')
             print(idx, f, 'copy complete')
