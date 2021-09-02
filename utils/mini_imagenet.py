@@ -1,4 +1,6 @@
-import os
+import os, sys
+sys.path.append('/home/sjlee/recovering_hfc')
+sys.path.append('/home/sjlee/recovering_hfc/DenseNet_RHF')
 import random
 from utils.random_seed import fix_randomness
 
