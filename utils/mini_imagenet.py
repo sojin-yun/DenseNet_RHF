@@ -16,6 +16,8 @@ dst_data_path = '/home/NAS_mount/sjlee/Mini_ImageNet2/'
 
 if not os.path.isdir(dst_data_path) :
     os.mkdir(dst_data_path)
+    os.mkdir(dst_data_path + 'train/')
+    os.mkdir(dst_data_path + 'val/')
 
 total_classes = os.listdir('/home/NAS_mount/sjlee/ILSVRC/Data/CLS-LOC/train/')
 sampled_classes = random.sample(total_classes, 100)
