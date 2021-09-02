@@ -27,7 +27,8 @@ for mode in ['train/', 'val/'] :
             os.mkdir(dst_data_path+mode+f+'/')
         for n in os.listdir(src_data_path+mode+f+'/') :
             shutil.copyfile(src_data_path+mode+f+'/'+n, dst_data_path+mode+f+'/'+n)
-        print(idx/len(sampled_classes))
+        if idx % 5 == 0 :
+            print(idx/len(sampled_classes)*100+'% is completed.')
 
 class_txt = open(dst_data_path+'class_label.txt', 'w')
 for f in sampled_classes :
