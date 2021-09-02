@@ -21,13 +21,13 @@ total_classes = os.listdir('/home/NAS_mount/sjlee/ILSVRC/Data/CLS-LOC/train/')
 sampled_classes = random.sample(total_classes, 100)
 sampled_classes.sort()
 
-# for mode in ['train/', 'val/'] :
-#     for idx, f in enumerate(sampled_classes) :
-#         if not os.path.isdir(dst_data_path+mode+f+'/') :
-#             os.mkdir(dst_data_path+mode+f+'/')
-#         for n in os.listdir(src_data_path+mode+f+'/') :
-#             shutil.copyfile(src_data_path+mode+f+'/'+n, dst_data_path+mode+f+'/'+n)
-#         print(idx/len(sampled_classes))
+for mode in ['train/', 'val/'] :
+    for idx, f in enumerate(sampled_classes) :
+        if not os.path.isdir(dst_data_path+mode+f+'/') :
+            os.mkdir(dst_data_path+mode+f+'/')
+        for n in os.listdir(src_data_path+mode+f+'/') :
+            shutil.copyfile(src_data_path+mode+f+'/'+n, dst_data_path+mode+f+'/'+n)
+        print(idx/len(sampled_classes))
 
 class_txt = open(dst_data_path+'class_label.txt', 'w')
 for f in sampled_classes :
