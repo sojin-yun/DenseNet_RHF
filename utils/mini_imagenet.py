@@ -20,4 +20,4 @@ for mode in ['train/', 'valid/'] :
             os.mkdir(dst_data_path+mode+f+'/')
         for n in os.listdir(src_data_path+f+'/') :
             shutil.copyfile(src_data_path+f+'/'+n, dst_data_path+mode+f+'/'+n)
-        print(idx/len(random.sample))
+        print(idx/len(sampled_classes))
