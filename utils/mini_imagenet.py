@@ -36,6 +36,7 @@ class_txt.close()
 
 summary_class = plt.figure(figsize=(20, 20))
 visualization_path = os.path.join(dst_data_path, 'val')
+print(visualization_path)
 for idx, cls in os.listdir(visualization_path) :
     print(idx, cls)
     ax = summary_class.add_subplot(10, 10, idx)
