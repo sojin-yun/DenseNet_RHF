@@ -19,5 +19,5 @@ for mode in ['train/', 'valid/'] :
         if not os.path.isdir(dst_data_path+mode+f+'/') :
             os.mkdir(dst_data_path+mode+f+'/')
         for n in os.listdir(src_data_path+f+'/') :
-            shutil.copy2(src_data_path+f+'/'+n, dst_data_path+mode+f+'/'+n)
+            shutil.copyfile(src_data_path+f+'/'+n, dst_data_path+mode+f+'/'+n)
         print(idx/len(random.sample))
