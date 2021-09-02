@@ -8,11 +8,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import PIL.Image as image
 
-
-fix_randomness(42)
+random_seed = 123
+fix_randomness(random_seed)
 
 src_data_path = '/home/NAS_mount/sjlee/ILSVRC/Data/CLS-LOC/'
-dst_data_path = '/home/NAS_mount/sjlee/Mini_ImageNet/'
+dst_data_path = '/home/NAS_mount/sjlee/Mini_ImageNet2/'
 
 if not os.path.isdir(dst_data_path) :
     os.mkdir(dst_data_path)
@@ -33,6 +33,7 @@ for mode in ['train/', 'val/'] :
 class_txt = open(dst_data_path+'class_label.txt', 'w')
 for f in sampled_classes :
     class_txt.write(f+'\n')
+class_txt.write('random_seed : ' + str(random_seed))
 class_txt.close()
 
 summary_class = plt.figure(figsize=(20, 20))
