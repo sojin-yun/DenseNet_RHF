@@ -207,7 +207,6 @@ class ResNet_ensemble(nn.Module):
         x = self.layer4(x)
 
         x_f = x
-        print('x : ', x.shape)
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
         x = self.fc(x)
@@ -216,14 +215,12 @@ class ResNet_ensemble(nn.Module):
         b = self.boundary_forward()
 
         b_f = b
-        print('b : ', b.shape)
         b = self.avgpool(b)
         b = b.view(b.size(0), -1)
         b = self.boundary_fc(b)
 
         ensemble = torch.cat([x_f, b_f], dim = 1)
         ensemble = self.ensemble_relu(ensemble)
-        print('ensemble : ', ensemble.shape)
 
         ensemble = self.avgpool(ensemble)
         ensemble = ensemble.view(ensemble.size(0), -1)
