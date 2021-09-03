@@ -98,6 +98,13 @@ class TrainingEnsemble :
             avg_boundary_valid_acc = valid_boundary_acc/len(self.valid_loader)
             avg_ensemble_valid_acc = valid_ensemble_acc/len(self.valid_loader)
 
-            self.model.scheduler.step()
-            print('epoch.{0:3d} \t train_ac : {1:.4f}% \t  valid_ac : {2:.4f}% \t bdr_train : {3:.4f}% \t bdr_valid : {4:.4f}% \t ens_train : {5:.4f}% \t ens_valid : {6:.4f}%'.format(i+1, avg_train_acc, avg_valid_acc, avg_boundary_train_acc, avg_boundary_valid_acc, avg_ensemble_train_acc, avg_ensemble_valid_acc))     
+            curr_lr = self.model.optimizer.param_groups[0]['lr']
 
+            self.model.scheduler.step()
+
+            if avg_valid_acc < best_valid_acc : best_valid_acc = avg_valid_acc
+            if avg_boundary_valid_acc < best_boundary_valid_acc : best_boundary_valid_acc = avg_boundary_valid_acc
+            if avg_ensemble_valid_acc < best_ensemble_valid_acc : best_ensemble_valid_acc = avg_boundary_valid_acc
+
+            print('epoch.{0:3d} \t train_ac : {1:.4f}% \t  valid_ac : {2:.4f}% \t bdr_train : {3:.4f}% \t bdr_valid : {4:.4f}% \t ens_train : {5:.4f}% \t ens_valid : {6:.4f}% \t lr : {7:.6f}'.format(i+1, avg_train_acc, avg_valid_acc, avg_boundary_train_acc, avg_boundary_valid_acc, avg_ensemble_train_acc, avg_ensemble_valid_acc, curr_lr))     
+        print('Best valid acc : {0:.4f}% \t Best boundary acc : {1:.4f}% \t Best ensemble acc : {2:.4f}%'.format(avg_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc))

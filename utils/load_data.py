@@ -2,6 +2,7 @@ import os
 import torchvision
 from torchvision import transforms, datasets
 from torch.utils.data import DataLoader
+from torchvision.transforms.transforms import RandomResizedCrop
 
 class CustomDataLoader() :
     def __init__(self, args : list) :
@@ -30,6 +31,7 @@ class CustomDataLoader() :
 
         train_transformer = transforms.Compose([
             transforms.Resize((image_size, image_size)),
+            transforms.RandomCrop(size = (image_size, image_size), padding = 4),
             transforms.RandomHorizontalFlip(0.5),
             transforms.ToTensor(),
             transforms.Normalize(data_mean, data_std),
