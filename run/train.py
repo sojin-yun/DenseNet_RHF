@@ -31,7 +31,7 @@ class TrainingEnsemble :
             ensemble_loss, valid_ensemble_loss = 0.0, 0.0
             ensemble_acc, valid_ensemble_acc = 0.0, 0.0
 
-            print('------------[Epoch:{}]-------------'.format(i))
+            print('------------[Epoch:{}]-------------'.format(i+1))
             self.model.train()
 
             for train_data, train_target in tqdm(self.train_loader, desc="{:17s}".format('Training State'), mininterval=0.01) :
