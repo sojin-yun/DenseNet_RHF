@@ -58,8 +58,8 @@ class CustomDataLoader() :
     def DataLoader(self) :
         datasets = self.Dataset()
 
-        train_loader = DataLoader(dataset = datasets[0], batch_size = self.args['batch_size'], shuffle = True)
-        valid_loader = DataLoader(dataset = datasets[1], batch_size = self.args['batch_size'], shuffle = False)
+        train_loader = DataLoader(dataset = datasets[0], batch_size = self.args['batch_size'], shuffle = True, num_workers=0)
+        valid_loader = DataLoader(dataset = datasets[1], batch_size = self.args['batch_size'], shuffle = False, num_workers=0)
 
         return train_loader, valid_loader
 
