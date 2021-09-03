@@ -91,5 +91,13 @@ class TrainingEnsemble :
                     valid_boundary_acc += (torch.sum(v_boundary_pred == valid_target.data)).item()*(100.0 / batch_size)
                     valid_ensemble_acc += (torch.sum(v_ensemble_pred == valid_target.data)).item()*(100.0 / batch_size)
 
+            avg_train_acc = train_acc/len(self.train_loader)
+            avg_boundary_train_acc = boundary_acc/len(self.train_loader)
+            avg_ensemble_train_acc = ensemble_acc/len(self.train_loader)
+            avg_valid_acc = valid_acc/len(self.valid_loader)
+            avg_boundary_valid_acc = valid_boundary_acc/len(self.valid_loader)
+            avg_ensemble_valid_acc = valid_ensemble_acc/len(self.valid_loader)
+
             self.model.scheduler.step()
-            print(' ')
+            print('epoch.{0:3d} \t train_ls : {1:.6f} \t train_ac : {2:.4f}% \t valid_ls : {3:.6f} \t valid_ac : {4:.4f}% \t lr : {5:.5f} \t bdr_train : {6:.4f}% \t bdr_valid : {7:.4f}% \t ens_train : {8:.4f}% \t ens_valid : {9:.4f}%'.format(i+1, avg_train_loss, avg_train_acc, avg_valid_loss, avg_valid_acc, curr_lr, avg_boundary_train_acc, avg_boundary_valid_acc, avg_ensemble_train_acc, avg_ensemble_valid_acc))     
+
