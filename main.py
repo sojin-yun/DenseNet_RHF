@@ -15,7 +15,7 @@ def drive(args) :
     device = torch.device(flags['device'])
     data_loader = CustomDataLoader(flags)()
     model = ResNet_ensemble(block = BasicBlock_ensemble, layers = [2, 2, 2, 2], boundary_layers = [128, 256, 512], num_classes = 100, device = device)
-    TrainingEnsemble(flags, model ,data_loader)()
+    TrainingEnsemble(flags, model ,data_loader, device)()
 
 if __name__ == '__main__' :
     drive(sys.argv)
