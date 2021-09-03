@@ -25,7 +25,7 @@ class CustomDataLoader() :
 
     
     def Transformer(self) :
-
+        print('Transformer')
         image_size = self.transformer_components[self.data]['image_size']
         data_mean, data_std = self.transformer_components[self.data]['mean'], self.transformer_components[self.data]['std']
 
@@ -45,7 +45,7 @@ class CustomDataLoader() :
         return train_transformer, valid_transformer
 
     def Dataset(self) :
-
+        print('Dataset')
         transforms = self.Transformer()
 
         if self.data == 'cifar100' :
@@ -58,7 +58,7 @@ class CustomDataLoader() :
         return train_dataset, valid_dataset
 
     def DataLoader(self) :
-
+        print('DataLoader')
         datasets = self.Dataset()
 
         train_loader = DataLoader(dataset = datasets[0], batch_size = self.args['batch_size'], shuffle = True)
