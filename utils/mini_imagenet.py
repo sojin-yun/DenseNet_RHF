@@ -8,9 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import PIL.Image as image
 
-random_seed = 123
-fix_randomness(random_seed)
-
+# Use your data path, which ImageNet1k is saved
 src_data_path = '/home/NAS_mount/sjlee/ILSVRC/Data/CLS-LOC/'
 dst_data_path = '/home/NAS_mount/sjlee/Mini_ImageNet2/'
 
