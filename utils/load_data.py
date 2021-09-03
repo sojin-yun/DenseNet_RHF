@@ -25,7 +25,6 @@ class CustomDataLoader() :
 
     
     def Transformer(self) :
-        print('1')
         image_size = self.transformer_components[self.data]['image_size']
         data_mean, data_std = self.transformer_components[self.data]['mean'], self.transformer_components[self.data]['std']
 
@@ -45,14 +44,11 @@ class CustomDataLoader() :
         return train_transformer, valid_transformer
 
     def Dataset(self) :
-        print('2')
         transforms = self.Transformer()
 
         if self.data == 'cifar100' :
-            print('4')
             train_dataset = self.dataset_components[self.data]['data'](root = self.dataset_components[self.data]['path'], download = True, train = True, transform = transforms[0])
             valid_dataset = self.dataset_components[self.data]['data'](root = self.dataset_components[self.data]['path'], download = True, train = False, transform = transforms[1])
-            print('5')
         else :
             train_dataset = self.dataset_components[self.data]['data'](root = os.path.join(self.dataset_components[self.data]['path'], 'train/'), transform = transforms[0])
             valid_dataset = self.dataset_components[self.data]['data'](root = os.path.join(self.dataset_components[self.data]['path'], 'val/'), transform = transforms[1])
@@ -60,7 +56,6 @@ class CustomDataLoader() :
         return train_dataset, valid_dataset
 
     def DataLoader(self) :
-        print('3')
         datasets = self.Dataset()
 
         train_loader = DataLoader(dataset = datasets[0], batch_size = self.args['batch_size'], shuffle = True)
