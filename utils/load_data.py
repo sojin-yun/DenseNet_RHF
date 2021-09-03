@@ -49,8 +49,10 @@ class CustomDataLoader() :
         transforms = self.Transformer()
 
         if self.data == 'cifar100' :
+            print('4')
             train_dataset = self.dataset_components[self.data]['data'](root = self.dataset_components[self.data]['path'], download = True, train = True, transform = transforms[0])
             valid_dataset = self.dataset_components[self.data]['data'](root = self.dataset_components[self.data]['path'], download = True, train = False, transform = transforms[1])
+            print('5')
         else :
             train_dataset = self.dataset_components[self.data]['data'](root = os.path.join(self.dataset_components[self.data]['path'], 'train/'), transform = transforms[0])
             valid_dataset = self.dataset_components[self.data]['data'](root = os.path.join(self.dataset_components[self.data]['path'], 'val/'), transform = transforms[1])
