@@ -121,7 +121,7 @@ class ResNet_ensemble(nn.Module):
         self.boundary_loss = nn.CrossEntropyLoss()
         self.ensemble_loss = nn.CrossEntropyLoss()
         #self.scheduler = StepLR(self.optimizer, step_size=15, gamma=0.5)
-        self.scheduler = MultiStepLR(self.optimizer, milestones=[60, 120, 160, 200], gamma = 0.2)
+        self.scheduler = MultiStepLR(self.optimizer, milestones=[40, 80, 100, 120, 140], gamma = 0.2)
 
         # weight initialization
         for idx, m in enumerate(self.modules()):
