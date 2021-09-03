@@ -13,12 +13,12 @@ def drive(args) :
     flags = Parsing_Args(args)
 
     device = torch.device(flags['device'])
-
+    print('1')
     data_loader = CustomDataLoader(flags)()
-
+    print('2')
     model = ResNet_ensemble(block = BasicBlock_ensemble, layers = [2, 2, 2, 2], boundary_layers = [128, 256, 512], num_classes = 100, device = 'cpu')
-
+    print('3')
     TrainingEnsemble(flags, model ,data_loader)()
-
+    print('4')
 if __name__ == '__main__' :
     drive(sys.argv)
