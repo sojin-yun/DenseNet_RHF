@@ -30,7 +30,7 @@ class TrainingEnsemble :
             boundary_acc, valid_boundary_acc = 0.0, 0.0
             ensemble_loss, valid_ensemble_loss = 0.0, 0.0
             ensemble_acc, valid_ensemble_acc = 0.0, 0.0
-            best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc = 100., 100., 100.
+            best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc = 0., 0., 0.
 
             print('------------[Epoch:{}]-------------'.format(i+1))
             self.model.train()
