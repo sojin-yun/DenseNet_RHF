@@ -116,7 +116,8 @@ class ResNet_ensemble(nn.Module):
 
         self.ensemble_relu = nn.ReLU(inplace=True)
 
-        self.optimizer = optim.SGD(self.parameters(), lr = 1e-1, momentum = 0.9, weight_decay=1e-3)
+        self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0015)
+        #self.optimizer = optim.SGD(self.parameters(), lr = 1e-1, momentum = 0.9, weight_decay=1e-3)
         self.loss = nn.CrossEntropyLoss()
         self.boundary_loss = nn.CrossEntropyLoss()
         self.ensemble_loss = nn.CrossEntropyLoss()
