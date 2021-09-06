@@ -1,4 +1,5 @@
 import argparse
+import time
 
 def str_to_bool(in_str) :
     
@@ -40,6 +41,11 @@ def Parsing_Args(args) :
     parser.add_argument(
         '--baseline', type = str_to_bool, default = False,
         help = 'select whether baseline or target model'
+    )
+    now = time.localtime()
+    parser.add_argument(
+        '--dst', type = str, default = '{:02d}/{:02d}/{:02d}-{:02d}:{:02d}:{:02d}'.format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec),
+        help = 'folder that save model parameter and log.txt'
     )
 
     return vars(parser.parse_known_args(args)[0])

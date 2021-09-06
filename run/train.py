@@ -1,6 +1,7 @@
 import torch
 from torch.utils import data
 from tqdm import tqdm
+import os
 import time
 
 class TrainingEnsemble :
@@ -9,9 +10,12 @@ class TrainingEnsemble :
 
         self.args = args
         self.epoch = args['epoch']
+        self.save_path = args['path']
         self.model = model
         self.device = device
         self.train_loader, self.valid_loader = data_loader
+        if self.args['data'] == 'cifar100' : self.default_path = '/home/NAS_mount/sjlee/Save_parameters/cifar100/'
+        elif self.args['data'] == 'mini_imagenet' : self.default_path = '/home/NAS_mount/sjlee/Save_parameters/mini_imagenet/'
 
         if self.device != None : 
             self.device = device
@@ -21,6 +25,12 @@ class TrainingEnsemble :
         self.run()
 
     def run(self) :
+
+        if not os.path.isfile(os.path.join(self.default_path, 'log.txt')) : 
+            f = open(os.path.join(self.default_path, 'log.txt'), 'w')
+        now = time.localtime()
+        f.write("{:%04d}/{:%02d}/{:%02d}---{:%02d}:{:%02d}:{:%02d}\n\n".format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec))
+        print('Make log.txt and log training result')
 
         for i in range(self.epoch) :
             
@@ -106,6 +116,9 @@ class TrainingEnsemble :
             if avg_valid_acc > best_valid_acc : best_valid_acc = avg_valid_acc
             if avg_boundary_valid_acc > best_boundary_valid_acc : best_boundary_valid_acc = avg_boundary_valid_acc
             if avg_ensemble_valid_acc > best_ensemble_valid_acc : best_ensemble_valid_acc = avg_ensemble_valid_acc
-
-            print('epoch.{0:3d} \t train_ac : {1:.4f}% \t  valid_ac : {2:.4f}% \t bdr_train : {3:.4f}% \t bdr_valid : {4:.4f}% \t ens_train : {5:.4f}% \t ens_valid : {6:.4f}% \t lr : {7:.6f}'.format(i+1, avg_train_acc, avg_valid_acc, avg_boundary_train_acc, avg_boundary_valid_acc, avg_ensemble_train_acc, avg_ensemble_valid_acc, curr_lr))     
+            
+            training_result = 'epoch.{0:3d} \t train_ac : {1:.4f}% \t  valid_ac : {2:.4f}% \t bdr_train : {3:.4f}% \t bdr_valid : {4:.4f}% \t ens_train : {5:.4f}% \t ens_valid : {6:.4f}% \t lr : {7:.6f}'.format(i+1, avg_train_acc, avg_valid_acc, avg_boundary_train_acc, avg_boundary_valid_acc, avg_ensemble_train_acc, avg_ensemble_valid_acc, curr_lr)
+            f.write(training_result)
+            print(training_result)
+        f.close()
         print('Best valid acc : {0:.4f}% \t Best boundary acc : {1:.4f}% \t Best ensemble acc : {2:.4f}%'.format(best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc))
