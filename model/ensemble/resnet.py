@@ -81,7 +81,7 @@ class BasicBlock_ensemble(nn.Module):
         return out
 
 class ResNet_ensemble(nn.Module):
-    def __init__(self, block, layers, boundary_layers, num_classes = 55, norm_layer = None, device = None) :
+    def __init__(self, block, layers, boundary_layers, num_classes = 100, norm_layer = None, device = None) :
         super(ResNet_ensemble, self).__init__()
 
         self.device = device

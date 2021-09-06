@@ -241,6 +241,6 @@ class TrainingBaseline :
             print(training_result)
 
         # Training is finished.
-        f.write('\nBest valid acc : {0:.4f}% \t Best valid loss : {1:.4f}% \n'.format(best_valid_acc, best_valid_loss))
+        f.write('\nBest valid acc : {0:.4f}% \t Best valid loss : {1:.6f} \n'.format(best_valid_acc, best_valid_loss))
         f.close()
         print('Best valid acc : {0:.4f}% \t Best valid loss : {1:.4f}% \n'.format(best_valid_acc, best_valid_loss))

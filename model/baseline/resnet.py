@@ -47,7 +47,7 @@ class BasicBlock(nn.Module):
         return out
 
 class ResNet(nn.Module):
-    def __init__(self, block, layers, num_classes = 55, norm_layer = None) :
+    def __init__(self, block, layers, num_classes = 100, norm_layer = None) :
         super(ResNet, self).__init__()
 
         if norm_layer is None:
