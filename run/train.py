@@ -3,6 +3,7 @@ from torch.utils import data
 from tqdm import tqdm
 import os
 import time
+from torchsummary import summary
 
 class TrainingEnsemble :
 
@@ -14,8 +15,12 @@ class TrainingEnsemble :
         self.model = model
         self.device = device
         self.train_loader, self.valid_loader = data_loader
-        if self.args['data'] == 'cifar100' : self.default_path = '/home/NAS_mount/sjlee/Save_parameters/cifar100/'
-        elif self.args['data'] == 'mini_imagenet' : self.default_path = '/home/NAS_mount/sjlee/Save_parameters/mini_imagenet/'
+        if self.args['data'] == 'cifar100' : 
+            self.default_path = '/home/NAS_mount/sjlee/Save_parameters/cifar100/'
+            self.model_size = (3, 32, 32)
+        elif self.args['data'] == 'mini_imagenet' : 
+            self.default_path = '/home/NAS_mount/sjlee/Save_parameters/mini_imagenet/'
+            self.model_size = (3, 224, 224)
 
         if self.device != None : 
             self.device = device
@@ -28,6 +33,9 @@ class TrainingEnsemble :
         
         if not os.path.isdir(os.path.join(self.default_path, self.save_path)) :
             os.mkdir(os.path.join(self.default_path, self.save_path))
+        s = open(os.path.join(self.default_path, self.save_path, 'model_summary.txt'), 'w')
+        s.write(summary(self.model, self.model_size, device = self.device))
+        print('Make model_summary.txt and log model summary')
         f = open(os.path.join(self.default_path, self.save_path, 'log.txt'), 'w')
         print(os.path.join(self.default_path, self.save_path, 'log.txt'))
         now = time.localtime()
@@ -122,7 +130,7 @@ class TrainingEnsemble :
             training_result = 'epoch.{0:3d} \t train_ac : {1:.4f}% \t  valid_ac : {2:.4f}% \t bdr_train : {3:.4f}% \t bdr_valid : {4:.4f}% \t ens_train : {5:.4f}% \t ens_valid : {6:.4f}% \t lr : {7:.6f}\n'.format(i+1, avg_train_acc, avg_valid_acc, avg_boundary_train_acc, avg_boundary_valid_acc, avg_ensemble_train_acc, avg_ensemble_valid_acc, curr_lr)
             f.write(training_result)
             print(training_result)
-            
+
         # Training is finished.
         f.write('\nBest valid acc : {0:.4f}% \t Best boundary acc : {1:.4f}% \t Best ensemble acc : {2:.4f}%\n'.format(best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc))
         f.close()
