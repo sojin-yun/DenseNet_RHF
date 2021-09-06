@@ -31,7 +31,7 @@ class TrainingEnsemble :
         if not os.path.isfile(os.path.join(self.default_path, self.save_path, 'log.txt')) : 
             f = open(os.path.join(self.default_path, self.save_path, 'log.txt'), 'w')
         now = time.localtime()
-        f.write("{:%04d}/{:%02d}/{:%02d}---{:%02d}:{:%02d}:{:%02d}\n\n".format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec))
+        f.write("{:04d}/{:02d}/{:02d}---{:02d}:{:02d}:{:02d}\n\n".format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec))
         print('Make log.txt and log training result')
 
         for i in range(self.epoch) :
