@@ -34,7 +34,7 @@ class TrainingEnsemble :
         if not os.path.isdir(os.path.join(self.default_path, self.save_path)) :
             os.mkdir(os.path.join(self.default_path, self.save_path))
         s = open(os.path.join(self.default_path, self.save_path, 'model_summary.txt'), 'w')
-        s.write(summary(self.model.to('cpu'), self.model_size, batch_size = 1, device = 'cpu'))
+        s.write(summary(self.model.to('cpu'), self.model_size, batch_size = 1, device = 'cuda'))
         s.close()
         print('Make model_summary.txt and log model summary')
         f = open(os.path.join(self.default_path, self.save_path, 'log.txt'), 'w')
