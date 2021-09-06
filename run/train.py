@@ -152,6 +152,7 @@ class TrainingBaseline :
         self.args = args
         self.epoch = args['epoch']
         self.save_path = args['dst']
+        self.save_file = args['file']
         self.model = model
         self.device = device
         self.train_loader, self.valid_loader = data_loader
