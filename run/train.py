@@ -24,7 +24,7 @@ class TrainingEnsemble :
 
         if self.device != None : 
             self.device = device
-            self.model = self.model.to(device)
+            self.model = self.model.to(self.device)
 
     def __call__(self) :
         self.run()
