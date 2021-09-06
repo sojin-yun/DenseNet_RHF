@@ -12,6 +12,7 @@ class TrainingEnsemble :
         self.args = args
         self.epoch = args['epoch']
         self.save_path = args['dst']
+        self.save_file = args['file']
         self.model = model
         self.device = device
         self.train_loader, self.valid_loader = data_loader
@@ -126,8 +127,15 @@ class TrainingEnsemble :
 
             if avg_valid_acc > best_valid_acc : best_valid_acc = avg_valid_acc
             if avg_boundary_valid_acc > best_boundary_valid_acc : best_boundary_valid_acc = avg_boundary_valid_acc
-            if avg_ensemble_valid_acc > best_ensemble_valid_acc : best_ensemble_valid_acc = avg_ensemble_valid_acc
-            
+            if avg_ensemble_valid_acc > best_ensemble_valid_acc : 
+                best_ensemble_valid_acc = avg_ensemble_valid_acc
+                best_model_params = {
+                'epoch' : i,
+                'state_dict' : self.model.state_dict(),
+                'optimizer' : self.model.optimizer.state_dict() 
+                }
+                torch.save(best_model_params, os.path.join(self.default_path, self.save_path, self.save_file+'.pt'))
+
             training_result = 'epoch.{0:3d} \t train_ac : {1:.4f}% \t  valid_ac : {2:.4f}% \t bdr_train : {3:.4f}% \t bdr_valid : {4:.4f}% \t ens_train : {5:.4f}% \t ens_valid : {6:.4f}% \t lr : {7:.6f}\n'.format(i+1, avg_train_acc, avg_valid_acc, avg_boundary_train_acc, avg_boundary_valid_acc, avg_ensemble_train_acc, avg_ensemble_valid_acc, curr_lr)
             f.write(training_result)
             print(training_result)
@@ -233,8 +241,14 @@ class TrainingBaseline :
             self.model.scheduler.step()
 
             if avg_valid_acc > best_valid_acc : 
+                best_model_params = {
+                'epoch' : i,
+                'state_dict' : self.model.state_dict(),
+                'optimizer' : self.model.optimizer.state_dict() 
+                }
                 best_valid_acc = avg_valid_acc
                 best_valid_loss = avg_valid_loss
+                torch.save(best_model_params, os.path.join(self.default_path, self.save_path, self.save_file+'.pt'))
             
             training_result = 'epoch.{0:3d} \t train_ac : {1:.4f}% \t  valid_ac : {2:.4f}% \t lr : {3:.6f}\n'.format(i+1, avg_train_acc, avg_valid_acc, curr_lr)
             f.write(training_result)

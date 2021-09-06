@@ -42,6 +42,10 @@ def Parsing_Args(args) :
         '--baseline', type = str_to_bool, default = False,
         help = 'select whether baseline or target model'
     )
+    parser.add_argument(
+        '--file', type = str, default = 'model_parameter',
+        help = 'name your saved model parameters'
+    )
     now = time.localtime()
     parser.add_argument(
         '--dst', type = str, default = '{:02d}/{:02d}/{:02d}-{:02d}:{:02d}:{:02d}'.format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec),
