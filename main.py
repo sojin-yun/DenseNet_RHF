@@ -4,7 +4,7 @@ from utils.random_seed import Fix_Randomness
 from utils.parse_args import Parsing_Args
 from utils.load_data import CustomDataLoader
 from run.train import TrainingEnsemble
-from model.resnet import ResNet_ensemble, BasicBlock_ensemble
+from model.ensemble.resnet import ResNet_ensemble, BasicBlock_ensemble
 from torchsummary import summary
 import torch
 

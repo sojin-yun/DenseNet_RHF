@@ -37,5 +37,9 @@ def Parsing_Args(args) :
         '--device', type = int, default = 0,
         help = 'select which GPU to use'
     )
+    parser.add_argument(
+        '--baseline', type = str_to_bool, default = False,
+        help = 'select whether baseline or target model'
+    )
 
     return vars(parser.parse_known_args(args)[0])
