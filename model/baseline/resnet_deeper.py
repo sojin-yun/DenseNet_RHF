@@ -89,7 +89,7 @@ class ResNet_deeper(nn.Module):
         self.loss = nn.CrossEntropyLoss()
         self.boundary_loss = nn.CrossEntropyLoss()
         self.ensemble_loss = nn.CrossEntropyLoss()
-        self.scheduler = StepLR(self.optimizer, step_size=12, gamma=0.5)
+        self.scheduler = StepLR(self.optimizer, step_size=20, gamma=0.5)
         #self.scheduler = MultiStepLR(self.optimizer, milestones=[1, 2, 3], gamma=0.5)
 
         # weight initialization
