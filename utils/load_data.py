@@ -31,7 +31,7 @@ class CustomDataLoader() :
 
         train_transformer = transforms.Compose([
             transforms.Resize((self.image_size, self.image_size)),
-            transforms.RandomCrop(size = (self.image_size, self.image_size), padding = 4),
+            transforms.RandomCrop(size = (self.image_size, self.image_size), padding = 8),
             transforms.RandomHorizontalFlip(0.5),
             transforms.ToTensor(),
             transforms.Normalize(self.data_mean, self.data_std),
