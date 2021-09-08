@@ -45,15 +45,16 @@ class TrainingEnsemble :
         f.write("Argument Information : {}\n\n".format(self.args))
         print('Make log.txt and log training result')
 
-        train_loss, valid_loss = 0.0, 0.0
-        train_acc, valid_acc = 0.0, 0.0
-        boundary_loss, valid_boundary_loss = 0.0, 0.0
-        boundary_acc, valid_boundary_acc = 0.0, 0.0
-        ensemble_loss, valid_ensemble_loss = 0.0, 0.0
-        ensemble_acc, valid_ensemble_acc = 0.0, 0.0
         best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc = 0., 0., 0.
 
         for i in range(self.epoch) :
+
+            train_loss, valid_loss = 0.0, 0.0
+            train_acc, valid_acc = 0.0, 0.0
+            boundary_loss, valid_boundary_loss = 0.0, 0.0
+            boundary_acc, valid_boundary_acc = 0.0, 0.0
+            ensemble_loss, valid_ensemble_loss = 0.0, 0.0
+            ensemble_acc, valid_ensemble_acc = 0.0, 0.0
 
             print('------------[Epoch:{}]-------------'.format(i+1))
             self.model.train()
@@ -185,11 +186,12 @@ class TrainingBaseline :
         f.write("{:04d}/{:02d}/{:02d}---{:02d}:{:02d}:{:02d}\n\n".format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec))
         print('Make log.txt and log training result')
 
-        train_loss, valid_loss = 0.0, 0.0
-        train_acc, valid_acc = 0.0, 0.0
         best_valid_acc, best_valid_loss = 0., 100.
 
         for i in range(self.epoch) :
+
+            train_loss, valid_loss = 0.0, 0.0
+            train_acc, valid_acc = 0.0, 0.0
 
             print('------------[Epoch:{}]-------------'.format(i+1))
             self.model.train()
