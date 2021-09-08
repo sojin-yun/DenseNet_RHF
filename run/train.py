@@ -242,13 +242,13 @@ class TrainingBaseline :
             self.model.scheduler.step()
 
             if avg_valid_acc > best_valid_acc : 
-                print('Best model is updated.')
                 best_model_params = {
                 'epoch' : i,
                 'state_dict' : self.model.state_dict(),
                 'optimizer' : self.model.optimizer.state_dict() 
                 }
                 best_valid_acc = avg_valid_acc
+                print('Best model is updated. Best valid accuracy : {}'.format(best_valid_acc))
                 best_valid_loss = avg_valid_loss
                 torch.save(best_model_params, os.path.join(self.default_path, self.save_path, self.save_file+'.pt'))
             
