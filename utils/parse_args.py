@@ -31,7 +31,7 @@ def Parsing_Args(args) :
         help = 'set batch size'
     )
     parser.add_argument(
-        '--epoch', type = int, default = 48,
+        '--epoch', type = int, default = 60,
         help = 'set training epoch'
     )
     parser.add_argument(

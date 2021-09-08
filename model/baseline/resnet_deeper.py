@@ -15,9 +15,9 @@ def conv1x1(in_planes: int, out_planes: int, stride: int = 1) :
     return nn.Conv2d(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
 
 
-class BasicBlock_ensemble_50(nn.Module):
+class BasicBlock_deeper(nn.Module):
     def __init__(self, inplanes: int, midplanes: int, planes: int, stride: int = 1, downsample = None, groups: int = 1, dilation: int = 1, norm_layer = None) :
-        super(BasicBlock_ensemble_50, self).__init__()
+        super(BasicBlock_deeper, self).__init__()
         
         # Normalization Layer
         if norm_layer is None:
@@ -32,44 +32,14 @@ class BasicBlock_ensemble_50(nn.Module):
         self.bn3 = norm_layer(planes)
         self.downsample = downsample
         self.stride = stride
-        self.boundary = None
-
-        # for boundary recovering
-        if self.stride == 2:
-            self.conv1_strided = conv1x1(inplanes, midplanes)
-            self.bn1_strided = norm_layer(midplanes)
-            self.upsample = nn.Upsample(scale_factor=self.stride, mode = 'bilinear', align_corners=False)
-    
-
-    def _copy_weight(self) :
-        with torch.no_grad() :
-            self.conv1_strided.weight = self.conv1.weight
-            self.conv1_strided.bias = self.conv1.bias
 
 
     def forward(self, x) :
         identity = x
 
         out = self.conv1(x)
-
-        # save boundary
-        
         out = self.bn1(out)
         out = self.relu(out)
-
-        if self.stride == 2:
-            out_strided = out
-            self._copy_weight()
-            
-            with torch.no_grad() :
-                out_no_strided = self.conv1_strided(x)
-
-            out_no_strided = self.bn1_strided(out_no_strided)
-            out_no_strided = self.relu(out_no_strided)
-            
-            out_strided = self.upsample(out_strided)
-            out_strided = self.relu(out_strided)
-            self.boundary = torch.abs(out_no_strided - out_strided)
 
         out = self.conv2(out)
         out = self.bn2(out)
@@ -77,7 +47,6 @@ class BasicBlock_ensemble_50(nn.Module):
 
         out = self.conv3(out)
         out = self.bn3(out)
-
         
         # downsampling이 필요한 경우 downsample layer를 block에 인자로 넣어주어야함
         if self.downsample is not None:
@@ -88,11 +57,9 @@ class BasicBlock_ensemble_50(nn.Module):
 
         return out
 
-class ResNet_ensemble_50(nn.Module):
-    def __init__(self, block, layers, boundary_layers, num_classes = 100, norm_layer = None, resnet_50 = None, device = None) :
-        super(ResNet_ensemble_50, self).__init__()
-
-        self.device = device
+class ResNet_deeper(nn.Module):
+    def __init__(self, block, layers, num_classes = 100, norm_layer = None) :
+        super(ResNet_deeper, self).__init__()
 
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
@@ -113,17 +80,10 @@ class ResNet_ensemble_50(nn.Module):
         self.layer2 = self._make_layer(block, 256, 128, 512, layers[1], stride=2, dilate=False)
         self.layer3 = self._make_layer(block, 512, 256, 1024, layers[2], stride=2, dilate=False)
         self.layer4 = self._make_layer(block, 1024, 512, 2048, layers[3], stride=2, dilate=False)
-
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.last_pool = nn.MaxPool2d(kernel_size=3, stride=2, padding=0)
         self.fc = nn.Linear(2048, num_classes)
 
-        self.boundary_features, self.compression_conv = self._make_boundary_conv(boundary_layers = boundary_layers)
-        self.boundary_features, self.compression_conv = nn.ModuleList(self.boundary_features), nn.ModuleList(self.compression_conv)
-        self.boundary_fc = nn.Linear(512, num_classes)
-        self.ensemble_fc = nn.Linear(2560, num_classes)
-
-        self.ensemble_relu = nn.ReLU(inplace=True)
+        self.cam_relu = nn.ReLU()
 
         self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0015)
         self.loss = nn.CrossEntropyLoss()
@@ -160,50 +120,6 @@ class ResNet_ensemble_50(nn.Module):
 
         return nn.Sequential(*layers)
 
-    def _make_boundary_conv(self, boundary_layers):
-        
-        model = []
-        comp = []
-
-        for conv in boundary_layers:
-            model += [nn.Sequential(
-                          nn.Conv2d(conv, conv, kernel_size=5, stride=2, padding = 2), 
-                          nn.BatchNorm2d(conv),
-                          nn.ReLU(inplace = True),)
-                          #nn.MaxPool2d((2, 2)))
-                          ]
-        
-        for i in range(len(boundary_layers)-1):
-            comp += [nn.Conv2d(boundary_layers[i]+boundary_layers[i+1], boundary_layers[i+1], kernel_size=1, stride=1, padding=0)]
-
-        return model, comp
-
-    def boundary_forward(self):
-
-        x = None
-        for idx in range(len(self.boundary_features)):
-            if x is None : 
-                if self.device == None :
-                    x = self.boundary_features[idx](self.boundary_maps[idx].to(torch.device(torch.cuda.current_device())))
-                else :
-                    x = self.boundary_features[idx](self.boundary_maps[idx].to(self.device))
-            else :
-                if self.device == None :
-                    x = torch.cat([x, self.boundary_maps[idx].to(torch.device(torch.cuda.current_device()))], dim = 1)
-                else :
-                    x = torch.cat([x, self.boundary_maps[idx].to(self.device)], dim = 1)
-                x = self.compression_conv[idx-1](x)
-                x = F.relu(x)
-                x = self.boundary_features[idx](x)
-        return x
-
-    def _get_boundary_location(self):
-        boundary_maps = []
-        for m in self.modules():
-            if isinstance(m, BasicBlock_ensemble_50):
-                if m.stride == 2:
-                    boundary_maps.append(m.boundary)
-        return boundary_maps
 
     def forward(self, x):
         x = self.conv1(x)
@@ -216,24 +132,12 @@ class ResNet_ensemble_50(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
 
-        x_f = x
+        x = self.cam_relu(x)
+
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
+
+        #x = x.view(x.size(0), -1)
         x = self.fc(x)
-        self.boundary_maps = self._get_boundary_location()
 
-        b = self.boundary_forward()
-
-        b_f = b
-        b = self.avgpool(b)
-        b = b.view(b.size(0), -1)
-        b = self.boundary_fc(b)
-
-        ensemble = torch.cat([x_f, b_f], dim = 1)
-        ensemble = self.ensemble_relu(ensemble)
-
-        ensemble = self.avgpool(ensemble)
-        ensemble = ensemble.view(ensemble.size(0), -1)
-        ensemble = self.ensemble_fc(ensemble)
-
-        return x, b, ensemble
+        return x

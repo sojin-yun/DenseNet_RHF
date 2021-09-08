@@ -57,8 +57,6 @@ class ResNet(nn.Module):
         self.inplanes = 64  # input shape
         self.dilation = 1  # dilation fixed
         self.groups = 1  # groups fixed
-
-        output_size, width = num_classes, 7
         
         # input block
         self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=7, stride=2, padding=3, bias=False)
@@ -100,13 +98,10 @@ class ResNet(nn.Module):
             )
 
         layers = []
-        layers.append(block(self.inplanes, planes, stride, downsample, self.groups,
-                            self.dilation, norm_layer))
+        layers.append(block(self.inplanes, planes, stride, downsample, self.groups, self.dilation, norm_layer))
         self.inplanes = planes
         for _ in range(1, blocks):
-            layers.append(block(self.inplanes, planes, groups=self.groups,
-                                 dilation=self.dilation,
-                                norm_layer=norm_layer))
+            layers.append(block(self.inplanes, planes, groups=self.groups, dilation=self.dilation, norm_layer=norm_layer))
 
         return nn.Sequential(*layers)
 
