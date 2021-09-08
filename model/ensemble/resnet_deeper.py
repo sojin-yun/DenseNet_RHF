@@ -216,8 +216,8 @@ class ResNet_ensemble_deeper(nn.Module):
         return boundary_maps
 
     def forward(self, x):
+        
         x = self.former_block(x)
-        print('x.shape : ', x.shape)
 
         x = self.layer1(x)
         x = self.layer2(x)
@@ -225,7 +225,6 @@ class ResNet_ensemble_deeper(nn.Module):
         x = self.layer4(x)
 
         x_f = x
-        print(x.shape)
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
         x = self.fc(x)

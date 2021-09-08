@@ -133,8 +133,8 @@ class ResNet_deeper(nn.Module):
 
 
     def forward(self, x):
+
         x = self.former_block(x)
-        print('x.shape : ', x.shape)
 
         x = self.layer1(x)
         x = self.layer2(x)
@@ -142,7 +142,6 @@ class ResNet_deeper(nn.Module):
         x = self.layer4(x)
 
         x = self.cam_relu(x)
-        print(x.shape)
 
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
