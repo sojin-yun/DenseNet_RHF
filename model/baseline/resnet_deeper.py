@@ -142,6 +142,7 @@ class ResNet_deeper(nn.Module):
         x = self.layer4(x)
 
         x = self.cam_relu(x)
+        print(x.shape)
 
         x = self.avgpool(x)
         x = torch.flatten(x, 1)

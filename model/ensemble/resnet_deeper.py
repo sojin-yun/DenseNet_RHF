@@ -225,6 +225,7 @@ class ResNet_ensemble_deeper(nn.Module):
         x = self.layer4(x)
 
         x_f = x
+        print(x.shape)
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
         x = self.fc(x)
