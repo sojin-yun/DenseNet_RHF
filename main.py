@@ -19,9 +19,9 @@ def drive(args) :
     data_loader = CustomDataLoader(flags)()
 
     if not flags['baseline'] :
-        model = ResNet_ensemble_deeper(block = BasicBlock_ensemble_deeper, layers = [3, 4, 6, 3], boundary_layers = [128, 256, 512], num_classes = 100, device = device, low_resolution = True)
+        model = ResNet_ensemble_deeper(block = BasicBlock_ensemble_deeper, layers = [3, 4, 6, 3], boundary_layers = [128, 256, 512], num_classes = 100, device = device, low_resolution = False)
     else :
-        model = ResNet_deeper(block = BasicBlock_deeper, layers = [3, 4, 6, 3], num_classes = 100, low_resolution = True)
+        model = ResNet_deeper(block = BasicBlock_deeper, layers = [3, 4, 6, 3], num_classes = 100, low_resolution = False)
 
     if not flags['baseline'] :
         TrainingEnsemble(flags, model ,data_loader, device)()
