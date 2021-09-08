@@ -58,7 +58,7 @@ class BasicBlock_deeper(nn.Module):
         return out
 
 class ResNet_deeper(nn.Module):
-    def __init__(self, block, layers, num_classes = 100, norm_layer = None) :
+    def __init__(self, block, layers, num_classes = 100, norm_layer = None, low_resolution = False) :
         super(ResNet_deeper, self).__init__()
 
         if norm_layer is None:
@@ -70,10 +70,19 @@ class ResNet_deeper(nn.Module):
         self.groups = 1  # groups fixed
         
         # input block
-        self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=7, stride=2, padding=3, bias=False)
-        self.bn1 = norm_layer(self.inplanes)
-        self.relu = nn.ReLU(inplace=True)
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        if not low_resolution :
+            self.former_block = nn.Sequential(
+                nn.Conv2d(3, self.inplanes, kernel_size=7, stride=2, padding=3, bias=False),
+                norm_layer(self.inplanes),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+            )
+        else :
+            self.former_block = nn.Sequential(
+                nn.Conv2d(3, self.inplanes, kernel_size=3, stride=1, padding=1, bias=False),
+                norm_layer(self.inplanes),
+                nn.ReLU(inplace=True)
+            )
         
         # residual blocks
         self.layer1 = self._make_layer(block, 64, 64, 256, layers[0])
@@ -93,12 +102,14 @@ class ResNet_deeper(nn.Module):
         #self.scheduler = MultiStepLR(self.optimizer, milestones=[1, 2, 3], gamma=0.5)
 
         # weight initialization
-        for idx, m in enumerate(self.modules()):
+        for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.Linear):
+                nn.init.xavier_normal_(m.weight)
 
     def _make_layer(self, block, inplanes: int, midplanes:int, planes: int, blocks: int, stride: int = 1, dilate: bool = False):
         norm_layer = self._norm_layer
@@ -122,10 +133,8 @@ class ResNet_deeper(nn.Module):
 
 
     def forward(self, x):
-        x = self.conv1(x)
-        x = self.bn1(x)
-        x = self.relu(x)
-        x = self.maxpool(x)
+        x = self.former_block(x)
+        print('x.shape : ', x.shape)
 
         x = self.layer1(x)
         x = self.layer2(x)

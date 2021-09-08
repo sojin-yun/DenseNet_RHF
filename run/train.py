@@ -242,6 +242,7 @@ class TrainingBaseline :
             self.model.scheduler.step()
 
             if avg_valid_acc > best_valid_acc : 
+                print('Best model is updated.')
                 best_model_params = {
                 'epoch' : i,
                 'state_dict' : self.model.state_dict(),

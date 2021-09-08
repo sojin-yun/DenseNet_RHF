@@ -89,7 +89,7 @@ class BasicBlock_ensemble_deeper(nn.Module):
         return out
 
 class ResNet_ensemble_deeper(nn.Module):
-    def __init__(self, block, layers, boundary_layers, num_classes = 100, norm_layer = None, device = None) :
+    def __init__(self, block, layers, boundary_layers, num_classes = 100, norm_layer = None, device = None, low_resolution = False) :
         super(ResNet_ensemble_deeper, self).__init__()
 
         self.device = device
@@ -103,10 +103,19 @@ class ResNet_ensemble_deeper(nn.Module):
         self.groups = 1  # groups fixed
         
         # input block
-        self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=7, stride=2, padding=3, bias=False)
-        self.bn1 = norm_layer(self.inplanes)
-        self.relu = nn.ReLU(inplace=True)
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        if not low_resolution :
+            self.former_block = nn.Sequential(
+                nn.Conv2d(3, self.inplanes, kernel_size=7, stride=2, padding=3, bias=False),
+                norm_layer(self.inplanes),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+            )
+        else :
+            self.former_block = nn.Sequential(
+                nn.Conv2d(3, self.inplanes, kernel_size=3, stride=1, padding=1, bias=False),
+                norm_layer(self.inplanes),
+                nn.ReLU(inplace=True)
+            )
         
         # residual blocks
         self.layer1 = self._make_layer(block, 64, 64, 256, layers[0])
@@ -207,10 +216,8 @@ class ResNet_ensemble_deeper(nn.Module):
         return boundary_maps
 
     def forward(self, x):
-        x = self.conv1(x)
-        x = self.bn1(x)
-        x = self.relu(x)
-        x = self.maxpool(x)
+        x = self.former_block(x)
+        print('x.shape : ', x.shape)
 
         x = self.layer1(x)
         x = self.layer2(x)
