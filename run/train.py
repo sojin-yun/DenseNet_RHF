@@ -17,10 +17,10 @@ class TrainingEnsemble :
         self.device = device
         self.train_loader, self.valid_loader = data_loader
         if self.args['data'] == 'cifar100' : 
-            self.default_path = '/home/NAS_mount/sjlee/Save_parameters/cifar100/' if self.args['server'] else self.default_path = './Save_parameters/cifar100/'
+            self.default_path = '/home/NAS_mount/sjlee/Save_parameters/cifar100/' if self.args['server'] else './Save_parameters/cifar100/'
             self.model_size = (3, 64, 64)
         elif self.args['data'] == 'mini_imagenet' : 
-            self.default_path = '/home/NAS_mount/sjlee/Save_parameters/mini_imagenet/' if self.args['server'] else self.default_path = './Save_parameters/mini_imagenet/'
+            self.default_path = '/home/NAS_mount/sjlee/Save_parameters/mini_imagenet/' if self.args['server'] else './Save_parameters/mini_imagenet/'
             self.model_size = (3, 224, 224)
 
         if self.device != None : 
@@ -34,10 +34,14 @@ class TrainingEnsemble :
         
         if not os.path.isdir(os.path.join(self.default_path, self.save_path)) :
             os.mkdir(os.path.join(self.default_path, self.save_path))
-        # s = open(os.path.join(self.default_path, self.save_path, 'model_summary.txt'), 'w')
-        # s.write(summary(self.model, self.model_size, batch_size = 1, device = torch.device(1)))
-        # s.close()
-        # print('Make model_summary.txt and log model summary')
+        if not self.args['server'] :
+            s = open(os.path.join(self.default_path, self.save_path, 'model_summary.txt'), 'w')
+            s.write('Model : {}-ensemble model. \n\n'.format(self.args['model']))
+            model_summary = summary(self.model, self.model_size, batch_size = 1)
+            for l in model_summary :
+                s.write(l+'\n')
+            s.close()
+        print('Make model_summary.txt and log.txt')
         f = open(os.path.join(self.default_path, self.save_path, 'log.txt'), 'w')
         print(os.path.join(self.default_path, self.save_path, 'log.txt'))
         now = time.localtime()
@@ -160,10 +164,10 @@ class TrainingBaseline :
         self.device = device
         self.train_loader, self.valid_loader = data_loader
         if self.args['data'] == 'cifar100' : 
-            self.default_path = '/home/NAS_mount/sjlee/Save_parameters/cifar100/' if self.args['server'] else self.default_path = './Save_parameters/cifar100/'
+            self.default_path = '/home/NAS_mount/sjlee/Save_parameters/cifar100/' if self.args['server'] else './Save_parameters/cifar100/'
             self.model_size = (3, 64, 64)
         elif self.args['data'] == 'mini_imagenet' : 
-            self.default_path = '/home/NAS_mount/sjlee/Save_parameters/mini_imagenet/' if self.args['server'] else self.default_path = './Save_parameters/mini_imagenet/'
+            self.default_path = '/home/NAS_mount/sjlee/Save_parameters/mini_imagenet/' if self.args['server'] else './Save_parameters/mini_imagenet/'
             self.model_size = (3, 224, 224)
 
         if self.device != None : 
@@ -177,10 +181,14 @@ class TrainingBaseline :
         
         if not os.path.isdir(os.path.join(self.default_path, self.save_path)) :
             os.mkdir(os.path.join(self.default_path, self.save_path))
-        # s = open(os.path.join(self.default_path, self.save_path, 'model_summary.txt'), 'w')
-        # s.write(summary(self.model, self.model_size, batch_size = 1, device = torch.device(1)))
-        # s.close()
-        # print('Make model_summary.txt and log model summary')
+        if not self.args['server'] :
+            s = open(os.path.join(self.default_path, self.save_path, 'model_summary.txt'), 'w')
+            s.write('Model : {}-baseline model. \n\n'.format(self.args['model']))
+            model_summary = summary(self.model, self.model_size, batch_size = 1)
+            for l in model_summary :
+                s.write(l+'\n')
+            s.close()
+        print('Make model_summary.txt and log.txt')
         f = open(os.path.join(self.default_path, self.save_path, 'log.txt'), 'w')
         print(os.path.join(self.default_path, self.save_path, 'log.txt'))
         now = time.localtime()

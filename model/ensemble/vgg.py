@@ -24,7 +24,7 @@ class VGG_ensemble(nn.Module):
         for m in self.compression_conv : m = m.to(self.device)
 
         if data == 'mini_imagenet' : width = 7
-        elif data == 'cifar100' : width = 1
+        elif data == 'cifar100' : width = 2
 
         self.classifier = nn.Sequential(
             nn.Linear(width * width * 512, 1024),

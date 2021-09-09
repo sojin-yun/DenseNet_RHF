@@ -1,5 +1,7 @@
 import sys
 import os
+
+import torchsummary
 from utils.select_model import Select_Model
 from utils.random_seed import Fix_Randomness
 from utils.parse_args import Parsing_Args
@@ -19,22 +21,18 @@ def drive(args) :
     device = torch.device(flags['device'])
     data_loader = CustomDataLoader(flags)()
 
+    print(flags['dst'], flags['model'])
+
     if not flags['baseline'] :
-        model = ResNet_ensemble_deeper(block = BasicBlock_ensemble_deeper, layers = [3, 4, 6, 3], boundary_layers = [128, 256, 512], num_classes = 100, device = device, low_resolution = True)
+        model = Select_Model(args = flags, device = device).ensemble_model(model = flags['model'])
     else :
-        model = ResNet_deeper(block = BasicBlock_deeper, layers = [3, 4, 6, 3], num_classes = 100, low_resolution = True)
+        model = Select_Model(args = flags, device = device).baseline_model(model = flags['model'])
 
     if not flags['baseline'] :
         TrainingEnsemble(flags, model ,data_loader, device)()
     else :
         TrainingBaseline(flags, model, data_loader, device)()
 
-def model_summary(args) :
-
-    flags = Parsing_Args(args)
-
-    print(summary(Select_Model(args = flags, device = 'cpu').baseline_model(model = flags['model']), (3, 64, 64), device = 'cpu'))
 
 if __name__ == '__main__' :
-    #drive(sys.argv)
-    model_summary(sys.argv)
+    drive(sys.argv)
