@@ -71,7 +71,7 @@ class TrainingEnsemble :
                 b_loss = self.model.boundary_loss(boundary_output, train_target)
                 e_loss = self.model.ensemble_loss(ensemble_output, train_target)
 
-                sum_loss = (t_loss*(1.0) + b_loss*(0.3) + e_loss*(0.3))
+                sum_loss = (t_loss*(1.0) + b_loss*(0.6) + e_loss*(0.3))
                 sum_loss.backward()
 
                 self.model.optimizer.step()
