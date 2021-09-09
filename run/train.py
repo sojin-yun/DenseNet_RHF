@@ -54,8 +54,6 @@ class TrainingEnsemble :
         f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name(self.args['device'])))
         print('Make log.txt and log training result')
 
-        print('GPU Information - {}'.format(torch.cuda.get_device_name(self.args['device'])))
-
         best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc = 0., 0., 0.
 
         for i in range(self.epoch) :
@@ -82,7 +80,7 @@ class TrainingEnsemble :
                 b_loss = self.model.boundary_loss(boundary_output, train_target)
                 e_loss = self.model.ensemble_loss(ensemble_output, train_target)
 
-                sum_loss = (t_loss*(1.0) + b_loss*(0.5) + e_loss*(0.25))
+                sum_loss = (t_loss*(1.0) + b_loss*(0.6) + e_loss*(0.3))
                 sum_loss.backward()
 
                 self.model.optimizer.step()
@@ -206,8 +204,6 @@ class TrainingBaseline :
         f.write("Argument Information : {}\n\n".format(self.args))
         f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name(self.args['device'])))
         print('Make log.txt and log training result')
-
-        print('GPU Information - {}'.format(torch.cuda.get_device_name(self.args['device'])))
 
         best_valid_acc, best_valid_loss = 0., 100.
 
