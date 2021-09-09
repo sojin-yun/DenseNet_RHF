@@ -48,7 +48,7 @@ def Parsing_Args(args) :
     )
     now = time.localtime()
     parser.add_argument(
-        '--dst', type = str, default = '{:02d}/{:02d}/{:02d}-{:02d}:{:02d}:{:02d}'.format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec),
+        '--dst', type = str, default = '{:02d}_{:02d}_{:02d}-{:02d}_{:02d}_{:02d}'.format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec),
         help = 'folder that save model parameter and log.txt'
     )
     parser.add_argument(

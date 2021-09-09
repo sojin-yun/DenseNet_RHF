@@ -19,7 +19,7 @@ class CustomDataLoader() :
         }
 
         self.dataset_components = {
-            'cifar100' : {'data' : torchvision.datasets.CIFAR100, 'path' : '/home/NAS_mount/sjlee/CIFAR100/'},
+            'cifar100' : {'data' : torchvision.datasets.CIFAR100, 'path' : '/home/NAS_mount/sjlee/CIFAR100/'} if self.server else {'data' : torchvision.datasets.CIFAR100, 'path' : './data/CIFAR100/'},
             'mini_imagenet' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/Mini_ImageNet/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Mini_ImageNet/'},
             'crc' : None
         }

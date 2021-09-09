@@ -43,6 +43,7 @@ class TrainingEnsemble :
         now = time.localtime()
         f.write("Start training at {:04d}/{:02d}/{:02d}--{:02d}:{:02d}:{:02d}\n\n".format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec))
         f.write("Argument Information : {}\n\n".format(self.args))
+        f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name(self.args['device'])))
         print('Make log.txt and log training result')
 
         best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc = 0., 0., 0.
@@ -183,7 +184,9 @@ class TrainingBaseline :
         f = open(os.path.join(self.default_path, self.save_path, 'log.txt'), 'w')
         print(os.path.join(self.default_path, self.save_path, 'log.txt'))
         now = time.localtime()
-        f.write("{:04d}/{:02d}/{:02d}---{:02d}:{:02d}:{:02d}\n\n".format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec))
+        f.write("Start training at {:04d}/{:02d}/{:02d}--{:02d}:{:02d}:{:02d}\n\n".format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec))
+        f.write("Argument Information : {}\n\n".format(self.args))
+        f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name(self.args['device'])))
         print('Make log.txt and log training result')
 
         best_valid_acc, best_valid_loss = 0., 100.
@@ -261,4 +264,4 @@ class TrainingBaseline :
         # Training is finished.
         f.write('\nBest valid acc : {0:.4f}% \t Best valid loss : {1:.6f} \n'.format(best_valid_acc, best_valid_loss))
         f.close()
-        print('Best valid acc : {0:.4f}% \t Best valid loss : {1:.4f}% \n'.format(best_valid_acc, best_valid_loss))
+        print('Best valid acc : {0:.4f}% \t Best valid loss : {1:.6f} \n'.format(best_valid_acc, best_valid_loss))
