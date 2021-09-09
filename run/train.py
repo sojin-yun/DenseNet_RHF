@@ -4,6 +4,7 @@ from tqdm import tqdm
 import os
 import time
 from torchsummary import summary
+import copy
 
 class TrainingEnsemble :
 
@@ -37,18 +38,22 @@ class TrainingEnsemble :
         if not self.args['server'] :
             s = open(os.path.join(self.default_path, self.save_path, 'model_summary.txt'), 'w')
             s.write('Model : {}-ensemble model. \n\n'.format(self.args['model']))
-            model_summary = summary(self.model, self.model_size, batch_size = 1)
+            copy_model = copy.deepcopy(self.model)
+            copy_model.to('cpu')
+            model_summary = summary(copy_model, self.model_size, batch_size = 1, device = 'cpu')
+            del copy_model
+            torch.cuda.empty_cache()
             for l in model_summary :
                 s.write(l+'\n')
             s.close()
-        print('Make model_summary.txt and log.txt')
+        print('\n\nMake model_summary.txt and log.txt')
         f = open(os.path.join(self.default_path, self.save_path, 'log.txt'), 'w')
         print(os.path.join(self.default_path, self.save_path, 'log.txt'))
         now = time.localtime()
         f.write("Start training at {:04d}/{:02d}/{:02d}--{:02d}:{:02d}:{:02d}\n\n".format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec))
         f.write("Argument Information : {}\n\n".format(self.args))
         f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name(self.args['device'])))
-        print('Make log.txt and log training result')
+        print('Make log.txt and log training result\n\n')
 
         best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc = 0., 0., 0.
 
@@ -184,18 +189,22 @@ class TrainingBaseline :
         if not self.args['server'] :
             s = open(os.path.join(self.default_path, self.save_path, 'model_summary.txt'), 'w')
             s.write('Model : {}-baseline model. \n\n'.format(self.args['model']))
-            model_summary = summary(self.model, self.model_size, batch_size = 1)
+            copy_model = copy.deepcopy(self.model)
+            copy_model.to('cpu')
+            model_summary = summary(copy_model, self.model_size, batch_size = 1, device = 'cpu')
+            del copy_model
+            torch.cuda.empty_cache()
             for l in model_summary :
                 s.write(l+'\n')
             s.close()
-        print('Make model_summary.txt and log.txt')
+        print('\n\nMake model_summary.txt and log.txt')
         f = open(os.path.join(self.default_path, self.save_path, 'log.txt'), 'w')
         print(os.path.join(self.default_path, self.save_path, 'log.txt'))
         now = time.localtime()
         f.write("Start training at {:04d}/{:02d}/{:02d}--{:02d}:{:02d}:{:02d}\n\n".format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec))
         f.write("Argument Information : {}\n\n".format(self.args))
         f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name(self.args['device'])))
-        print('Make log.txt and log training result')
+        print('Make log.txt and log training result\n\n')
 
         best_valid_acc, best_valid_loss = 0., 100.
 
