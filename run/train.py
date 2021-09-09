@@ -16,12 +16,20 @@ class TrainingEnsemble :
         self.model = model
         self.device = device
         self.train_loader, self.valid_loader = data_loader
-        if self.args['data'] == 'cifar100' : 
-            self.default_path = '/home/NAS_mount/sjlee/Save_parameters/cifar100/'
-            self.model_size = (3, 32, 32)
-        elif self.args['data'] == 'mini_imagenet' : 
-            self.default_path = '/home/NAS_mount/sjlee/Save_parameters/mini_imagenet/'
-            self.model_size = (3, 224, 224)
+        if self.args['server'] :
+            if self.args['data'] == 'cifar100' : 
+                self.default_path = '/home/NAS_mount/sjlee/Save_parameters/cifar100/'
+                self.model_size = (3, 32, 32)
+            elif self.args['data'] == 'mini_imagenet' : 
+                self.default_path = '/home/NAS_mount/sjlee/Save_parameters/mini_imagenet/'
+                self.model_size = (3, 224, 224)
+        else :
+            if self.args['data'] == 'cifar100' : 
+                self.default_path = './Save_parameters/cifar100/'
+                self.model_size = (3, 32, 32)
+            elif self.args['data'] == 'mini_imagenet' : 
+                self.default_path = './Save_parameters/mini_imagenet/'
+                self.model_size = (3, 224, 224)
 
         if self.device != None : 
             self.device = device
@@ -43,17 +51,21 @@ class TrainingEnsemble :
         now = time.localtime()
         f.write("Start training at {:04d}/{:02d}/{:02d}--{:02d}:{:02d}:{:02d}\n\n".format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec))
         f.write("Argument Information : {}\n\n".format(self.args))
+        f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name(self.args['device'])))
         print('Make log.txt and log training result')
 
-        train_loss, valid_loss = 0.0, 0.0
-        train_acc, valid_acc = 0.0, 0.0
-        boundary_loss, valid_boundary_loss = 0.0, 0.0
-        boundary_acc, valid_boundary_acc = 0.0, 0.0
-        ensemble_loss, valid_ensemble_loss = 0.0, 0.0
-        ensemble_acc, valid_ensemble_acc = 0.0, 0.0
+        print('GPU Information - {}'.format(torch.cuda.get_device_name(self.args['device'])))
+
         best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc = 0., 0., 0.
 
         for i in range(self.epoch) :
+
+            train_loss, valid_loss = 0.0, 0.0
+            train_acc, valid_acc = 0.0, 0.0
+            boundary_loss, valid_boundary_loss = 0.0, 0.0
+            boundary_acc, valid_boundary_acc = 0.0, 0.0
+            ensemble_loss, valid_ensemble_loss = 0.0, 0.0
+            ensemble_acc, valid_ensemble_acc = 0.0, 0.0
 
             print('------------[Epoch:{}]-------------'.format(i+1))
             self.model.train()
@@ -70,7 +82,7 @@ class TrainingEnsemble :
                 b_loss = self.model.boundary_loss(boundary_output, train_target)
                 e_loss = self.model.ensemble_loss(ensemble_output, train_target)
 
-                sum_loss = (t_loss*(1.0) + b_loss*(0.3) + e_loss*(0.3))
+                sum_loss = (t_loss*(1.0) + b_loss*(0.5) + e_loss*(0.25))
                 sum_loss.backward()
 
                 self.model.optimizer.step()
@@ -157,12 +169,20 @@ class TrainingBaseline :
         self.model = model
         self.device = device
         self.train_loader, self.valid_loader = data_loader
-        if self.args['data'] == 'cifar100' : 
-            self.default_path = '/home/NAS_mount/sjlee/Save_parameters/cifar100/'
-            self.model_size = (3, 32, 32)
-        elif self.args['data'] == 'mini_imagenet' : 
-            self.default_path = '/home/NAS_mount/sjlee/Save_parameters/mini_imagenet/'
-            self.model_size = (3, 224, 224)
+        if self.args['server'] :
+            if self.args['data'] == 'cifar100' : 
+                self.default_path = '/home/NAS_mount/sjlee/Save_parameters/cifar100/'
+                self.model_size = (3, 32, 32)
+            elif self.args['data'] == 'mini_imagenet' : 
+                self.default_path = '/home/NAS_mount/sjlee/Save_parameters/mini_imagenet/'
+                self.model_size = (3, 224, 224)
+        else :
+            if self.args['data'] == 'cifar100' : 
+                self.default_path = './Save_parameters/cifar100/'
+                self.model_size = (3, 32, 32)
+            elif self.args['data'] == 'mini_imagenet' : 
+                self.default_path = './Save_parameters/mini_imagenet/'
+                self.model_size = (3, 224, 224)
 
         if self.device != None : 
             self.device = device
@@ -182,14 +202,19 @@ class TrainingBaseline :
         f = open(os.path.join(self.default_path, self.save_path, 'log.txt'), 'w')
         print(os.path.join(self.default_path, self.save_path, 'log.txt'))
         now = time.localtime()
-        f.write("{:04d}/{:02d}/{:02d}---{:02d}:{:02d}:{:02d}\n\n".format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec))
+        f.write("Start training at {:04d}/{:02d}/{:02d}--{:02d}:{:02d}:{:02d}\n\n".format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec))
+        f.write("Argument Information : {}\n\n".format(self.args))
+        f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name(self.args['device'])))
         print('Make log.txt and log training result')
 
-        train_loss, valid_loss = 0.0, 0.0
-        train_acc, valid_acc = 0.0, 0.0
+        print('GPU Information - {}'.format(torch.cuda.get_device_name(self.args['device'])))
+
         best_valid_acc, best_valid_loss = 0., 100.
 
         for i in range(self.epoch) :
+
+            train_loss, valid_loss = 0.0, 0.0
+            train_acc, valid_acc = 0.0, 0.0
 
             print('------------[Epoch:{}]-------------'.format(i+1))
             self.model.train()
@@ -259,4 +284,4 @@ class TrainingBaseline :
         # Training is finished.
         f.write('\nBest valid acc : {0:.4f}% \t Best valid loss : {1:.6f} \n'.format(best_valid_acc, best_valid_loss))
         f.close()
-        print('Best valid acc : {0:.4f}% \t Best valid loss : {1:.4f}% \n'.format(best_valid_acc, best_valid_loss))
+        print('Best valid acc : {0:.4f}% \t Best valid loss : {1:.6f} \n'.format(best_valid_acc, best_valid_loss))
