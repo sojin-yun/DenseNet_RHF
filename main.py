@@ -21,8 +21,6 @@ def drive(args) :
     device = torch.device(flags['device'])
     data_loader = CustomDataLoader(flags)()
 
-    print(flags['dst'], flags['model'])
-
     if not flags['baseline'] :
         model = Select_Model(args = flags, device = device).ensemble_model(model = flags['model'])
     else :
