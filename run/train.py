@@ -18,7 +18,7 @@ class TrainingEnsemble :
         self.train_loader, self.valid_loader = data_loader
         if self.args['data'] == 'cifar100' : 
             self.default_path = '/home/NAS_mount/sjlee/Save_parameters/cifar100/'
-            self.model_size = (3, 32, 32)
+            self.model_size = (3, 64, 64)
         elif self.args['data'] == 'mini_imagenet' : 
             self.default_path = '/home/NAS_mount/sjlee/Save_parameters/mini_imagenet/'
             self.model_size = (3, 224, 224)
@@ -160,7 +160,7 @@ class TrainingBaseline :
         self.train_loader, self.valid_loader = data_loader
         if self.args['data'] == 'cifar100' : 
             self.default_path = '/home/NAS_mount/sjlee/Save_parameters/cifar100/'
-            self.model_size = (3, 32, 32)
+            self.model_size = (3, 64, 64)
         elif self.args['data'] == 'mini_imagenet' : 
             self.default_path = '/home/NAS_mount/sjlee/Save_parameters/mini_imagenet/'
             self.model_size = (3, 224, 224)

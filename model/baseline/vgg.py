@@ -16,15 +16,13 @@ class VGG(nn.Module):
         self.features = self._make_layers(self.select_model[model_key])
 
         if data == 'mini_imagenet' : width = 7
-        elif data == 'cifar100' : width = 1
+        elif data == 'cifar100' : width = 2
 
         self.classifier = nn.Sequential(
             nn.Linear(width * width* 512, 4096),
             nn.ReLU(inplace=True),
-            nn.Dropout(),
             nn.Linear(4096, 4096),
             nn.ReLU(inplace=True),
-            nn.Dropout(),
             nn.Linear(4096, num_classes)
         )
 
@@ -67,7 +65,9 @@ class VGG(nn.Module):
     
     def forward(self, x):
         output = self.features(x)
+        print(output.shape)
         output = output.view(output.size(0), -1)
+        print(output.shape)
         output = self.classifier(output)
 
         return output

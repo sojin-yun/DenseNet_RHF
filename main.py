@@ -1,5 +1,6 @@
 import sys
 import os
+from utils.select_model import Select_Model
 from utils.random_seed import Fix_Randomness
 from utils.parse_args import Parsing_Args
 from utils.load_data import CustomDataLoader
@@ -28,5 +29,12 @@ def drive(args) :
     else :
         TrainingBaseline(flags, model, data_loader, device)()
 
+def model_summary(args) :
+
+    flags = Parsing_Args(args)
+
+    print(summary(Select_Model(args = flags, device = 'cpu').baseline_model(model = flags['model']), (3, 64, 64), device = 'cpu'))
+
 if __name__ == '__main__' :
-    drive(sys.argv)
+    #drive(sys.argv)
+    model_summary(sys.argv)

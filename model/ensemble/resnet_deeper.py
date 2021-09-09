@@ -148,6 +148,8 @@ class ResNet_ensemble_deeper(nn.Module):
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.Linear):
+                nn.init.xavier_normal_(m.weight)
 
     def _make_layer(self, block, inplanes: int, midplanes:int, planes: int, blocks: int, stride: int = 1, dilate: bool = False):
         norm_layer = self._norm_layer
@@ -216,7 +218,7 @@ class ResNet_ensemble_deeper(nn.Module):
         return boundary_maps
 
     def forward(self, x):
-        
+
         x = self.former_block(x)
 
         x = self.layer1(x)
