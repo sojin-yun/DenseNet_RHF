@@ -102,6 +102,10 @@ class ResNet_deeper(nn.Module):
         #self.scheduler = MultiStepLR(self.optimizer, milestones=[1, 2, 3], gamma=0.5)
 
         # weight initialization
+        self._initializing_weights()
+
+
+    def _initializing_weights(self) :
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
@@ -110,6 +114,7 @@ class ResNet_deeper(nn.Module):
                 nn.init.constant_(m.bias, 0)
             elif isinstance(m, nn.Linear):
                 nn.init.xavier_normal_(m.weight)
+                
 
     def _make_layer(self, block, inplanes: int, midplanes:int, planes: int, blocks: int, stride: int = 1, dilate: bool = False):
         norm_layer = self._norm_layer

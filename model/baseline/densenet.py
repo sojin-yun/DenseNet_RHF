@@ -11,10 +11,6 @@ class Bottleneck(nn.Module):
         
         inner_channel = 4 * growth_rate
 
-        #"""We find this design especially effective for DenseNet and
-        #we refer to our network with such a bottleneck layer, i.e.,
-        #to the BN-ReLU-Conv(1×1)-BN-ReLU-Conv(3×3) version of H ` ,
-        #as DenseNet-B."""
         self.bottle_neck = nn.Sequential(
             nn.BatchNorm2d(in_channels),
             nn.ReLU(inplace=True),
@@ -32,10 +28,7 @@ class Bottleneck(nn.Module):
 class Transition(nn.Module):
     def __init__(self, in_channels, out_channels):
         super().__init__()
-        #"""The transition layers used in our experiments
-        #consist of a batch normalization layer and an 1×1
-        #convolutional layer followed by a 2×2 average pooling
-        #layer""".
+
         self.down_sample = nn.Sequential(
             nn.BatchNorm2d(in_channels),
             nn.Conv2d(in_channels, out_channels, 1, bias=False),
@@ -51,38 +44,35 @@ class DenseNet(nn.Module):
         super().__init__()
         self.growth_rate = growth_rate
 
-        #"""Before entering the first dense block, a convolution
-        #with 16 (or twice the growth rate for DenseNet-BC)
-        #output channels is performed on the input images."""
         inner_channels = 2 * growth_rate
 
-        #For convolutional layers with kernel size 3×3, each
-        #side of the inputs is zero-padded by one pixel to keep
-        #the feature-map size fixed.
         self.conv1 = nn.Conv2d(3, inner_channels, kernel_size=3, padding=1, bias=False)
 
-        self.features = nn.Sequential()
+        self.features = []
 
         for index in range(len(nblocks) - 1):
-            self.features.add_module("dense_block_layer_{}".format(index), self._make_dense_layers(block, inner_channels, nblocks[index]))
+            self.features.append(self._make_dense_layers(block, inner_channels, nblocks[index]))
             inner_channels += growth_rate * nblocks[index]
 
-            #"""If a dense block contains m feature-maps, we let the
-            #following transition layer generate θm output feature-
-            #maps, where 0 < θ ≤ 1 is referred to as the compression
-            #fac-tor.
             out_channels = int(reduction * inner_channels) 
-            self.features.add_module("transition_layer_{}".format(index), Transition(inner_channels, out_channels))
+            self.features.append(Transition(inner_channels, out_channels))
             inner_channels = out_channels
 
-        self.features.add_module("dense_block{}".format(len(nblocks) - 1), self._make_dense_layers(block, inner_channels, nblocks[len(nblocks)-1]))
+        self.features.append(self._make_dense_layers(block, inner_channels, nblocks[len(nblocks)-1]))
         inner_channels += growth_rate * nblocks[len(nblocks) - 1]
-        self.features.add_module('bn', nn.BatchNorm2d(inner_channels))
-        self.features.add_module('relu', nn.ReLU(inplace=True))
+
+        self.features.append(nn.BatchNorm2d(inner_channels))
+        self.features.append(nn.ReLU(inplace=True))
 
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
 
         self.linear = nn.Linear(inner_channels, num_class)
+
+        self.features = nn.Sequential(*self.features)
+
+        # Initializing_weights
+        self._initializing_weights()
+
 
     def forward(self, x):
         output = self.conv1(x)
@@ -92,9 +82,24 @@ class DenseNet(nn.Module):
         output = self.linear(output)
         return output
 
+
     def _make_dense_layers(self, block, in_channels, nblocks):
-        dense_block = nn.Sequential()
-        for index in range(nblocks):
-            dense_block.add_module('bottle_neck_layer_{}'.format(index), block(in_channels, self.growth_rate))
+
+        dense_block = []
+
+        for _ in range(nblocks):
+            dense_block.append(block(in_channels, self.growth_rate))
             in_channels += self.growth_rate
-        return dense_block
+
+        return nn.Sequential(*dense_block)
+
+    
+    def _initializing_weights(self) :
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.Linear):
+                nn.init.xavier_normal_(m.weight)

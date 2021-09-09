@@ -51,7 +51,7 @@ class VGG_ensemble(nn.Module):
 
         self.ensemble_relu = nn.ReLU(inplace=True)
 
-        self._initialize_weights()
+        self._initializing_weights()
         
         self.optimizer = optim.SGD(self.parameters(), lr = 0.01, momentum = 0.9, weight_decay=0.0015)
         self.loss = nn.CrossEntropyLoss()
@@ -112,7 +112,7 @@ class VGG_ensemble(nn.Module):
         return x
 
 
-    def _initialize_weights(self):
+    def _initializing_weights(self):
         
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
