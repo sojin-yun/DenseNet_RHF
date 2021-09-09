@@ -57,6 +57,9 @@ class TrainingEnsemble :
 
         best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc = 0., 0., 0.
 
+        backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight = 1.0, 0.6, 0.3
+        f.write('Loss Information - Backbone_loss : {0} | Boundary_loss : {1} | Ensemble_loss : {2}'.format(backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight))
+
         for i in range(self.epoch) :
 
             train_loss, valid_loss = 0.0, 0.0
@@ -81,7 +84,7 @@ class TrainingEnsemble :
                 b_loss = self.model.boundary_loss(boundary_output, train_target)
                 e_loss = self.model.ensemble_loss(ensemble_output, train_target)
 
-                sum_loss = (t_loss*(1.0) + b_loss*(0.6) + e_loss*(0.3))
+                sum_loss = (t_loss*(backbone_loss_weight) + b_loss*(boundary_loss_weight) + e_loss*(ensemble_loss_weight))
                 sum_loss.backward()
 
                 self.model.optimizer.step()
