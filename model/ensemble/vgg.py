@@ -11,8 +11,8 @@ class VGG_ensemble(nn.Module):
         if device != None : self.device = device
 
         self.select_model = {
-                '16' : {'conv_layers' : [64, 'R', 128, 'R', 256, 256, 'R', 512, 512,'R', 512, 512, 'R'], 'boundary_layers' : [64, 128, 256, 512, 512]},
-                '19' : {'conv_layers' : [64, 'R', 128, 'R', 256, 256, 256, 'R', 512, 512, 512, 'R', 512, 512, 512, 'R'], 'boundary_layers' : [64, 128, 256, 512, 512]}
+                '16' : {'conv_layers' : [64, 64, 128, 'R', 256, 256, 'R', 512, 512,'R', 512, 512, 512], 'boundary_layers' : [128, 256, 512]},
+                '19' : {'conv_layers' : [64, 64, 128, 'R', 256, 256, 256, 'R', 512, 512, 512, 'R', 512, 512, 512, 512], 'boundary_layers' : [128, 256, 512]}
               }
 
         self.features = self._make_layer_conv(conv_layers = self.select_model[model_key]['conv_layers'])
@@ -24,28 +24,28 @@ class VGG_ensemble(nn.Module):
         for m in self.compression_conv : m = m.to(self.device)
 
         if data == 'mini_imagenet' : width = 7
-        elif data == 'cifar100' : width = 2
+        elif data == 'cifar100' : width = 8
 
         self.classifier = nn.Sequential(
-            nn.Linear(width * width * 512, 1024),
+            nn.Linear(width * width * 512, 2048),
             nn.ReLU(inplace=True),
-            nn.Linear(1024, 512),
+            nn.Linear(2048, 1024),
             nn.ReLU(inplace=True),
-            nn.Linear(512, 100)
+            nn.Linear(1024, num_classes)
         )
         self.boundary_classifier = nn.Sequential(
-            nn.Linear(width * width * 512, 1024),
+            nn.Linear(width * width * 512, 2048),
             nn.ReLU(inplace=True),
-            nn.Linear(1024, 512),
+            nn.Linear(2048, 1024),
             nn.ReLU(inplace=True),
-            nn.Linear(512, 100)
+            nn.Linear(1024, num_classes)
         )
         self.ensemble_classifier = nn.Sequential(
-            nn.Linear(width * width * 1024, 2048),
+            nn.Linear(width * width * 1024, 4096),
             nn.ReLU(inplace=True),
-            nn.Linear(2048, 512),
+            nn.Linear(4096, 2048),
             nn.ReLU(inplace=True),
-            nn.Linear(512, 100)
+            nn.Linear(2048, num_classes)
         )
 
 
@@ -57,7 +57,7 @@ class VGG_ensemble(nn.Module):
         self.loss = nn.CrossEntropyLoss()
         self.boundary_loss = nn.CrossEntropyLoss()
         self.ensemble_loss = nn.CrossEntropyLoss()
-        self.scheduler = StepLR(self.optimizer, step_size=10, gamma=0.5)
+        self.scheduler = StepLR(self.optimizer, step_size=20, gamma=0.5)
 
 
     def _make_layer_conv(self, conv_layers):

@@ -9,21 +9,21 @@ class VGG(nn.Module):
         super().__init__()
 
         self.select_model = {
-                '16' : [64, 64, 'M', 128, 128, 'M', 256, 256, 256,      'M', 512, 512, 512,      'M', 512, 512, 512,      'M'],
-                '19' : [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'M']
+                '16' : [64, 64, 128, 128, 'M', 256, 256, 256,      'M', 512, 512, 512,      'M', 512, 512, 512],
+                '19' : [64, 64, 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512]
               }
 
         self.features = self._make_layers(self.select_model[model_key])
 
         if data == 'mini_imagenet' : width = 7
-        elif data == 'cifar100' : width = 2
+        elif data == 'cifar100' : width = 8
 
         self.classifier = nn.Sequential(
-            nn.Linear(width * width* 512, 4096),
+            nn.Linear(width * width* 512, 2048),
             nn.ReLU(inplace=True),
-            nn.Linear(4096, 4096),
+            nn.Linear(2048, 1024),
             nn.ReLU(inplace=True),
-            nn.Linear(4096, num_classes)
+            nn.Linear(1024, num_classes)
         )
 
         self.ensemble_relu = nn.ReLU(inplace=True)
@@ -32,7 +32,7 @@ class VGG(nn.Module):
         
         self.optimizer = optim.SGD(self.parameters(), lr = 0.01, momentum = 0.9, weight_decay=0.0015)
         self.loss = nn.CrossEntropyLoss()
-        self.scheduler = StepLR(self.optimizer, step_size=12, gamma=0.5)
+        self.scheduler = StepLR(self.optimizer, step_size=20, gamma=0.5)
 
 
     def _make_layers(self, select_model):
