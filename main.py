@@ -16,6 +16,8 @@ import torch
 
 def drive(args) :
 
+    Fix_Randomness(42)
+
     flags = Parsing_Args(args)
 
     device = torch.device(flags['device'])
