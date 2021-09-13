@@ -174,7 +174,7 @@ class ResNet_ensemble_deeper(nn.Module):
                 nn.init.constant_(m.bias, 0)
             elif isinstance(m, nn.Linear):
                 nn.init.xavier_normal_(m.weight)
-                
+
 
     def _make_layer(self, block, inplanes: int, midplanes:int, planes: int, blocks: int, stride: int = 1, dilate: bool = False):
         norm_layer = self._norm_layer
@@ -219,21 +219,13 @@ class ResNet_ensemble_deeper(nn.Module):
         return model, comp
 
     def boundary_forward(self):
-
         x = None
         for idx in range(len(self.boundary_features)):
             if x is None : 
-                if self.device == None :
-                    x = self.boundary_features[idx](self.boundary_maps[idx].to(torch.device(torch.cuda.current_device())))
-                else :
-                    x = self.boundary_features[idx](self.boundary_maps[idx].to(self.device))
+                x = self.boundary_features[idx](self.boundary_maps[idx].to(self.device))
             else :
-                if self.device == None :
-                    x = torch.cat([x, self.boundary_maps[idx].to(torch.device(torch.cuda.current_device()))], dim = 1)
-                else :
-                    x = torch.cat([x, self.boundary_maps[idx].to(self.device)], dim = 1)
+                x = torch.cat([x, self.boundary_maps[idx].to(self.device)], dim = 1)
                 x = self.compression_conv[idx-1](x)
-                x = F.relu(x)
                 x = self.boundary_features[idx](x)
         return x
 
