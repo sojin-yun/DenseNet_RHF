@@ -4,6 +4,7 @@ from tqdm import tqdm
 import os
 import time
 from torchsummary import summary
+from torch.utils.tensorboard import SummaryWriter
 import copy
 
 class TrainingEnsemble :
@@ -33,19 +34,27 @@ class TrainingEnsemble :
 
     def run(self) :
         
+        # Log hyper-parameters, model summary and tensorboard
         if not os.path.isdir(os.path.join(self.default_path, self.save_path)) :
             os.mkdir(os.path.join(self.default_path, self.save_path))
+        
+        if self.args['tensorboard'] : 
+            folder = 'tensor_board'
+            os.mkdir(os.path.join(self.default_path, self.save_path, folder))
+            self.ts_board = SummaryWriter(log_dir = os.path.join(self.default_path, self.save_path, folder))
+
         if not self.args['server'] :
             s = open(os.path.join(self.default_path, self.save_path, 'model_summary.txt'), 'w')
             s.write('Model : {}-ensemble model. \n\n'.format(self.args['model']))
-            copy_model = copy.deepcopy(self.model)
-            copy_model.to('cpu')
-            model_summary = summary(copy_model, self.model_size, batch_size = 1, device = 'cpu')
-            del copy_model
-            torch.cuda.empty_cache()
-            for l in model_summary :
-                s.write(l+'\n')
+            # copy_model = copy.deepcopy(self.model)
+            # copy_model.to('cpu')
+            # model_summary = summary(copy_model, self.model_size, batch_size = 1, device = 'cpu')
+            # del copy_model
+            # torch.cuda.empty_cache()
+            # for l in model_summary :
+            #     s.write(l+'\n')
             s.close()
+
         print('\n\nMake model_summary.txt and log.txt')
         f = open(os.path.join(self.default_path, self.save_path, 'log.txt'), 'w')
         print(os.path.join(self.default_path, self.save_path, 'log.txt'))
@@ -57,9 +66,10 @@ class TrainingEnsemble :
 
         best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc = 0., 0., 0.
 
-        backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight = 1.0, 0.6, 0.3
-        f.write('Loss Information - Backbone_loss : {0} | Boundary_loss : {1} | Ensemble_loss : {2}'.format(backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight))
-
+        backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight = 1.0, 0.2, 0.2
+        f.write('Loss Information - Backbone_loss : {0} | Boundary_loss : {1} | Ensemble_loss : {2}\n\n'.format(backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight))
+        f.write('Optimizer : {}\n'.format(self.model.optimizer))
+        f.write('Learning_scheduler : step_size : {0} | gamma : {1}\n\n'.format(self.model.scheduler.step_size, self.model.scheduler.gamma))
         for i in range(self.epoch) :
 
             train_loss, valid_loss = 0.0, 0.0
@@ -72,7 +82,11 @@ class TrainingEnsemble :
             print('------------[Epoch:{}]-------------'.format(i+1))
             self.model.train()
 
-            for train_data, train_target in tqdm(self.train_loader, desc="{:17s}".format('Training State'), mininterval=0.01) :
+            n_train_batchs = len(self.train_loader)
+            n_valid_batchs = len(self.valid_loader)
+            batch_size = self.args['batch_size']
+
+            for train_iter, (train_data, train_target) in enumerate(tqdm(self.train_loader, desc="{:17s}".format('Training State'), mininterval=0.01)) :
                 
                 if self.device != None : train_data, train_target = train_data.to(self.device), train_target.to(self.device)
                 
@@ -93,7 +107,6 @@ class TrainingEnsemble :
                 _, boundary_pred = torch.max(boundary_output, dim = 1)
                 _, ensemble_pred = torch.max(ensemble_output, dim = 1)
 
-                batch_size = self.args['batch_size']
             
                 train_loss += t_loss.item()
                 boundary_loss += b_loss.item()
@@ -102,11 +115,16 @@ class TrainingEnsemble :
                 boundary_acc += (torch.sum(boundary_pred == train_target.data).item()*(100.0 / batch_size))
                 ensemble_acc += (torch.sum(ensemble_pred == train_target.data).item()*(100.0 / batch_size))
 
+                if self.args['tensorboard'] :
+                    self.ts_board.add_scalars('Loss/train', {'t_loss' : t_loss.item(), 
+                                                             't_boundary_loss' : b_loss.item(), 
+                                                             't_ensemble_loss' : e_loss.item()}, i * n_train_batchs + train_iter)
+
             with torch.no_grad() :
 
                 self.model.eval()
 
-                for valid_data, valid_target in tqdm(self.valid_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01) :
+                for valid_iter, (valid_data, valid_target) in enumerate(tqdm(self.valid_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01)) :
 
                     if self.device != None : valid_data, valid_target = valid_data.to(self.device), valid_target.to(self.device)
 
@@ -129,12 +147,26 @@ class TrainingEnsemble :
                     valid_boundary_acc += (torch.sum(v_boundary_pred == valid_target.data)).item()*(100.0 / batch_size)
                     valid_ensemble_acc += (torch.sum(v_ensemble_pred == valid_target.data)).item()*(100.0 / batch_size)
 
-            avg_train_acc = train_acc/len(self.train_loader)
-            avg_boundary_train_acc = boundary_acc/len(self.train_loader)
-            avg_ensemble_train_acc = ensemble_acc/len(self.train_loader)
-            avg_valid_acc = valid_acc/len(self.valid_loader)
-            avg_boundary_valid_acc = valid_boundary_acc/len(self.valid_loader)
-            avg_ensemble_valid_acc = valid_ensemble_acc/len(self.valid_loader)
+                    if self.args['tensorboard'] :
+                        self.ts_board.add_scalars('Loss/valid', {'v_loss' : v_loss.item(), 
+                                                                 'v_boundary_loss' : valid_b_loss.item(), 
+                                                                 'v_ensemble_loss' : valid_e_loss.item()}, i * n_valid_batchs + valid_iter)
+
+
+            avg_train_acc = train_acc/n_train_batchs
+            avg_boundary_train_acc = boundary_acc/n_train_batchs
+            avg_ensemble_train_acc = ensemble_acc/n_train_batchs
+            avg_valid_acc = valid_acc/n_valid_batchs
+            avg_boundary_valid_acc = valid_boundary_acc/n_valid_batchs
+            avg_ensemble_valid_acc = valid_ensemble_acc/n_valid_batchs
+            avg_tarin_loss = ensemble_loss/n_train_batchs
+            avg_valid_loss = valid_ensemble_loss/n_train_batchs
+
+            if self.args['tensorboard'] :
+                    self.ts_board.add_scalars('Accuracy', {'train_acc' : avg_ensemble_train_acc, 
+                                                           'valid_acc' : avg_ensemble_valid_acc}, i)
+                    self.ts_board.add_scalars('Loss_per_epoch', {'train_loss' : avg_tarin_loss, 
+                                                                 'valid_loss' : avg_valid_loss}, i)
 
             curr_lr = self.model.optimizer.param_groups[0]['lr']
 
@@ -187,8 +219,15 @@ class TrainingBaseline :
 
     def run(self) :
         
+        # Log hyper-parameters, model summary and tensorboard
         if not os.path.isdir(os.path.join(self.default_path, self.save_path)) :
             os.mkdir(os.path.join(self.default_path, self.save_path))
+
+        if self.args['tensorboard'] : 
+            folder = 'tensor_board'
+            os.mkdir(os.path.join(self.default_path, self.save_path, folder))
+            self.ts_board = SummaryWriter(log_dir = os.path.join(self.default_path, self.save_path, folder))
+
         if not self.args['server'] :
             s = open(os.path.join(self.default_path, self.save_path, 'model_summary.txt'), 'w')
             s.write('Model : {}-baseline model. \n\n'.format(self.args['model']))
@@ -200,6 +239,7 @@ class TrainingBaseline :
             for l in model_summary :
                 s.write(l+'\n')
             s.close()
+
         print('\n\nMake model_summary.txt and log.txt')
         f = open(os.path.join(self.default_path, self.save_path, 'log.txt'), 'w')
         print(os.path.join(self.default_path, self.save_path, 'log.txt'))
@@ -208,8 +248,12 @@ class TrainingBaseline :
         f.write("Argument Information : {}\n\n".format(self.args))
         f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name(self.args['device'])))
         print('Make log.txt and log training result\n\n')
+        f.write('Optimizer : {}\n'.format(self.model.optimizer))
+        f.write('Learning_scheduler : step_size : {0} | gamma : {1}\n\n'.format(self.model.scheduler.step_size, self.model.scheduler.gamma))
 
         best_valid_acc, best_valid_loss = 0., 100.
+
+
 
         for i in range(self.epoch) :
 
@@ -219,7 +263,11 @@ class TrainingBaseline :
             print('------------[Epoch:{}]-------------'.format(i+1))
             self.model.train()
 
-            for train_data, train_target in tqdm(self.train_loader, desc="{:17s}".format('Training State'), mininterval=0.01) :
+            n_train_batchs = len(self.train_loader)
+            n_valid_batchs = len(self.valid_loader)
+            batch_size = self.args['batch_size']
+
+            for train_iter, (train_data, train_target) in enumerate(tqdm(self.train_loader, desc="{:17s}".format('Training State'), mininterval=0.01)) :
                 
                 if self.device != None : train_data, train_target = train_data.to(self.device), train_target.to(self.device)
                 
@@ -234,17 +282,18 @@ class TrainingBaseline :
                 self.model.optimizer.step()
                 
                 _, pred = torch.max(train_output, dim = 1)
-
-                batch_size = self.args['batch_size']
             
                 train_loss += t_loss.item()
                 train_acc += (torch.sum(pred == train_target.data).item()*(100.0 / batch_size))
+
+                if self.args['tensorboard'] :
+                    self.ts_board.add_scalar('Loss/train', t_loss.item(), i * n_train_batchs + train_iter)
 
             with torch.no_grad() :
 
                 self.model.eval()
 
-                for valid_data, valid_target in tqdm(self.valid_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01) :
+                for valid_iter, (valid_data, valid_target) in enumerate(tqdm(self.valid_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01)) :
 
                     if self.device != None : valid_data, valid_target = valid_data.to(self.device), valid_target.to(self.device)
 
@@ -259,9 +308,19 @@ class TrainingBaseline :
                     valid_loss += v_loss.item()
                     valid_acc += (torch.sum(v_pred == valid_target.data)).item()*(100.0 / batch_size)
 
-            avg_train_acc = train_acc/len(self.train_loader)
-            avg_valid_acc = valid_acc/len(self.valid_loader)
-            avg_valid_loss = valid_loss/len(self.valid_loader)
+                    if self.args['tensorboard'] :
+                        self.ts_board.add_scalar('Loss/valid', v_loss.item(), i * n_valid_batchs + valid_iter)
+
+            avg_train_acc = train_acc/n_train_batchs
+            avg_valid_acc = valid_acc/n_valid_batchs
+            avg_tarin_loss = train_loss/n_train_batchs
+            avg_valid_loss = valid_loss/n_valid_batchs
+
+            if self.args['tensorboard'] :
+                self.ts_board.add_scalars('Accuracy', {'train_acc' : avg_train_acc, 
+                                                       'valid_acc' : avg_valid_acc}, i)
+                self.ts_board.add_scalars('Loss_per_epoch', {'train_loss' : avg_tarin_loss, 
+                                                             'valid_loss' : avg_valid_loss}, i)
 
             curr_lr = self.model.optimizer.param_groups[0]['lr']
 

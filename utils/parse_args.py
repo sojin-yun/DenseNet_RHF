@@ -55,5 +55,9 @@ def Parsing_Args(args) :
         '--model', type = str, default = 'resnet50',
         help = 'select a model you want to train'
     )
+    parser.add_argument(
+        '--tensorboard', type = str_to_bool, default = False,
+        help = 'set mode to visualize training iteration on tensorboard'
+    )
 
     return vars(parser.parse_known_args(args)[0])
