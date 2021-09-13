@@ -211,7 +211,10 @@ class ResNet_ensemble_deeper(nn.Module):
                           ]
         
         for i in range(len(boundary_layers)-1):
-            comp += [nn.Conv2d(boundary_layers[i]+boundary_layers[i+1], boundary_layers[i+1], kernel_size=1, stride=1, padding=0)]
+            comp += [nn.Sequential(
+                          nn.Conv2d(boundary_layers[i]+boundary_layers[i+1], boundary_layers[i+1], kernel_size=1, stride=1, padding=0),
+                          nn.BatchNorm2d(boundary_layers[i+1]),
+                          nn.ReLU(inplace = True))]
 
         return model, comp
 
