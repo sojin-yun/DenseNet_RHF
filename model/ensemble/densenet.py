@@ -65,40 +65,49 @@ class Transition_ensemble(nn.Module):
 
 
 class DenseNet_ensemble(nn.Module):
-    def __init__(self, block, nblocks, boundary_layers, growth_rate=12, reduction=0.5, num_class=100, device = None):
+    def __init__(self, block, nblocks, boundary_layers, growth_rate=12, reduction=0.5, num_class=100, device = None, low_resolution = False):
         super().__init__()
         self.growth_rate = growth_rate
+        self.low_resolution = low_resolution
 
         inner_channels = 2 * growth_rate
 
         if device != None : self.device = device
 
-        self.conv1 = nn.Conv2d(3, inner_channels, kernel_size=3, padding=1, bias=False)
+        self.features = nn.Sequential()
 
-        self.features = []
+        if not self.low_resolution :
+            self.features.add_module('conv0', nn.Conv2d(3, inner_channels, kernel_size = 7, stride = 2, padding = 3, bias = False))
+            self.features.add_module('norm0', nn.BatchNorm2d(inner_channels))
+            self.features.add_module('avgpool0', nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+            
+        else :
+            self.features.add_module('conv0', nn.Conv2d(3, inner_channels, kernel_size=3, padding=1, bias=False))
+            self.features.add_module('norm0', nn.BatchNorm2d(inner_channels))
+
 
         for index in range(len(nblocks) - 1):
-            self.features.append(self._make_dense_layers(block, inner_channels, nblocks[index]))
+            self.features.add_module("dense_block_layer_{}".format(index), self._make_dense_layers(block, inner_channels, nblocks[index]))
             inner_channels += growth_rate * nblocks[index]
 
             out_channels = int(reduction * inner_channels) 
-            self.features.append(Transition_ensemble(inner_channels, out_channels))
+            self.features.add_module("transition_layer_{}".format(index), Transition_ensemble(inner_channels, out_channels))
             inner_channels = out_channels
 
-        self.features.append(self._make_dense_layers(block, inner_channels, nblocks[len(nblocks)-1]))
+        self.features.add_module("dense_block{}".format(len(nblocks) - 1), self._make_dense_layers(block, inner_channels, nblocks[len(nblocks)-1]))
         inner_channels += growth_rate * nblocks[len(nblocks) - 1]
 
-        self.features.append(nn.BatchNorm2d(inner_channels))
-        self.features.append(nn.ReLU(inplace=True))
+        self.features.add_module('bn', nn.BatchNorm2d(inner_channels))
+        self.features.add_module('relu', nn.ReLU(inplace=True))
 
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(inner_channels, num_class)
 
         self.features = nn.Sequential(*self.features)
 
         self.boundary_features, self.compression_conv = self._make_boundary_conv(boundary_layers = boundary_layers)
         self.boundary_features, self.compression_conv = nn.ModuleList(self.boundary_features), nn.ModuleList(self.compression_conv)
 
+        self.fc = nn.Linear(inner_channels, num_class)
         self.boundary_fc = nn.Linear(512, num_class)
         self.ensemble_fc = nn.Linear(inner_channels + 512, num_class)
 
@@ -146,10 +155,9 @@ class DenseNet_ensemble(nn.Module):
 
 
     def _make_dense_layers(self, block, in_channels, nblocks):
-        #dense_block = nn.Sequential()
-        dense_block = []
+        dense_block = nn.Sequential()
         for index in range(nblocks):
-            dense_block.append(block(in_channels, self.growth_rate))
+            dense_block.add_module('bottle_neck_layer_{}'.format(index), block(in_channels, self.growth_rate))
             in_channels += self.growth_rate
         return nn.Sequential(*dense_block)
 
@@ -220,7 +228,3 @@ class DenseNet_ensemble(nn.Module):
         ensemble = self.ensemble_fc(ensemble)
 
         return x, b, ensemble
-
-if __name__ == '__main__' :
-    print(summary(DenseNet_ensemble(Bottleneck_ensemble, [6,12,24,16], [128, 256, 512], 32, device = 'cpu'), (3, 64, 64)))
-    #print(DenseNet_ensemble(Bottleneck_ensemble, [6, 12, 24, 16], [128, 256, 512], 32))

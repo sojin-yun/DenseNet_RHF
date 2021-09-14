@@ -8,12 +8,19 @@ class VGG(nn.Module):
     def __init__(self, model_key, num_classes = 100, data = 'mini_imagenet'):
         super().__init__()
 
-        self.select_model = {
-                '16' : [64, 64, 128, 128, 'M', 256, 256, 256,      'M', 512, 512, 512,      'M', 512, 512, 512],
-                '19' : [64, 64, 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512]
-              }
 
-        self.features = self._make_layers(self.select_model[model_key])
+        if data == 'mini_imagenet' :
+            self.select_model = {
+                    '16' : {'conv_layers' : [64, 64, 'M', 128, 128, 'M', 256, 256, 256,      'M', 512, 512, 512,      'M', 512, 512, 512, 'M']},
+                    '19' : {'conv_layers' : [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'M']}
+                }
+        elif data == 'cifar100' :
+            self.select_model = {
+                    '16' : {'conv_layers' : [64, 64, 128, 128, 'M', 256, 256, 256,      'M', 512, 512, 512,      'M', 512, 512, 512]},
+                    '19' : {'conv_layers' : [64, 64, 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512]}
+                }
+
+        self.features = self._make_layers(self.select_model[model_key]['conv_layers'])
 
         if data == 'mini_imagenet' : width = 7
         elif data == 'cifar100' : width = 8

@@ -40,29 +40,37 @@ class Transition(nn.Module):
 
 
 class DenseNet(nn.Module):
-    def __init__(self, block, nblocks, growth_rate=12, reduction=0.5, num_class=100):
+    def __init__(self, block, nblocks, growth_rate=12, reduction=0.5, num_class=100, low_resolution = None):
         super().__init__()
         self.growth_rate = growth_rate
+        self.low_resolution = low_resolution
 
         inner_channels = 2 * growth_rate
 
-        self.conv1 = nn.Conv2d(3, inner_channels, kernel_size=3, padding=1, bias=False)
+        self.features = nn.Sequential()
 
-        self.features = []
+        if not self.low_resolution :
+            self.features.add_module('conv0', nn.Conv2d(3, inner_channels, kernel_size = 7, stride = 2, padding = 3, bias = False))
+            self.features.add_module('norm0', nn.BatchNorm2d(inner_channels))
+            self.features.add_module('avgpool0', nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+            
+        else :
+            self.features.add_module('conv0', nn.Conv2d(3, inner_channels, kernel_size=3, padding=1, bias=False))
+            self.features.add_module('norm0', nn.BatchNorm2d(inner_channels))
 
         for index in range(len(nblocks) - 1):
-            self.features.append(self._make_dense_layers(block, inner_channels, nblocks[index]))
+            self.features.add_module("dense_block_layer_{}".format(index), self._make_dense_layers(block, inner_channels, nblocks[index]))
             inner_channels += growth_rate * nblocks[index]
 
             out_channels = int(reduction * inner_channels) 
-            self.features.append(Transition(inner_channels, out_channels))
+            self.features.add_module("transition_layer_{}".format(index), Transition(inner_channels, out_channels))
             inner_channels = out_channels
 
-        self.features.append(self._make_dense_layers(block, inner_channels, nblocks[len(nblocks)-1]))
+        self.features.add_module("dense_block{}".format(len(nblocks) - 1), self._make_dense_layers(block, inner_channels, nblocks[len(nblocks)-1]))
         inner_channels += growth_rate * nblocks[len(nblocks) - 1]
 
-        self.features.append(nn.BatchNorm2d(inner_channels))
-        self.features.append(nn.ReLU(inplace=True))
+        self.features.add_module('bn', nn.BatchNorm2d(inner_channels))
+        self.features.add_module('relu', nn.ReLU(inplace=True))
 
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
 
@@ -85,10 +93,10 @@ class DenseNet(nn.Module):
 
     def _make_dense_layers(self, block, in_channels, nblocks):
 
-        dense_block = []
+        dense_block = nn.Sequential()
 
-        for _ in range(nblocks):
-            dense_block.append(block(in_channels, self.growth_rate))
+        for index in range(nblocks):
+            dense_block.add_module('bottle_neck_layer_{}'.format(index), block(in_channels, self.growth_rate))
             in_channels += self.growth_rate
 
         return nn.Sequential(*dense_block)

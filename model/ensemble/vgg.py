@@ -10,10 +10,16 @@ class VGG_ensemble(nn.Module):
         super(VGG_ensemble, self).__init__()
         if device != None : self.device = device
 
-        self.select_model = {
-                '16' : {'conv_layers' : [64, 64, 128, 'R', 256, 256, 'R', 512, 512,'R', 512, 512, 512], 'boundary_layers' : [128, 256, 512]},
-                '19' : {'conv_layers' : [64, 64, 128, 'R', 256, 256, 256, 'R', 512, 512, 512, 'R', 512, 512, 512, 512], 'boundary_layers' : [128, 256, 512]}
-              }
+        if data == 'mini_imagenet' :
+            self.select_model = {
+                    '16' : {'conv_layers' : [64, 'R', 128, 'R', 256, 256,      'R', 512, 512,      'R', 512, 512, 'R'],      'boundary_layers' : [64, 128, 256, 512, 512]},
+                    '19' : {'conv_layers' : [64, 'R', 128, 'R', 256, 256, 256, 'R', 512, 512, 512, 'R', 512, 512, 512, 'R'], 'boundary_layers' : [64, 128, 256, 512, 512]}
+                }
+        elif data == 'cifar100' :
+            self.select_model = {
+                    '16' : {'conv_layers' : [64, 64, 128, 'R', 256, 256,      'R', 512, 512,      'R', 512, 512, 512     ], 'boundary_layers' : [128, 256, 512]},
+                    '19' : {'conv_layers' : [64, 64, 128, 'R', 256, 256, 256, 'R', 512, 512, 512, 'R', 512, 512, 512, 512], 'boundary_layers' : [128, 256, 512]}
+                }
 
         self.features = self._make_layer_conv(conv_layers = self.select_model[model_key]['conv_layers'])
         self.boundary_features, self.compression_conv = self._make_boundary_conv(boundary_layers = self.select_model[model_key]['boundary_layers'])
