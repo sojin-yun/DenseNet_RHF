@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+import torch.optim as optim
+from torch.optim.lr_scheduler import StepLR
 from torchsummary import summary
 import torchsummary
 
@@ -78,13 +80,16 @@ class DenseNet(nn.Module):
 
         self.features = nn.Sequential(*self.features)
 
+        self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0015)
+        self.loss = nn.CrossEntropyLoss()
+        self.scheduler = StepLR(self.optimizer, step_size=15, gamma=0.5)
+
         # Initializing_weights
         self._initializing_weights()
 
 
     def forward(self, x):
-        output = self.conv1(x)
-        output = self.features(output)
+        output = self.features(x)
         output = self.avgpool(output)
         output = output.view(output.size()[0], -1)
         output = self.linear(output)

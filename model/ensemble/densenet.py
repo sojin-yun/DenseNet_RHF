@@ -59,7 +59,6 @@ class Transition_ensemble(nn.Module):
         ret_pool = x
         ret_upsample = self.up_sampling(ret_pool)
         self.boundary = torch.abs(ret_forward - ret_upsample)
-        print(self.boundary.shape)
 
         return x
 
@@ -117,7 +116,7 @@ class DenseNet_ensemble(nn.Module):
         self.loss = nn.CrossEntropyLoss()
         self.boundary_loss = nn.CrossEntropyLoss()
         self.ensemble_loss = nn.CrossEntropyLoss()
-        self.scheduler = StepLR(self.optimizer, step_size=20, gamma=0.5)
+        self.scheduler = StepLR(self.optimizer, step_size=15, gamma=0.5)
 
         # Initialization weights
         self._initializing_weights()
@@ -204,7 +203,6 @@ class DenseNet_ensemble(nn.Module):
 
 
     def forward(self, x):
-        x = self.conv1(x)
         x = self.features(x)
         x_f = x
         x = self.avgpool(x)

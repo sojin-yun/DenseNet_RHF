@@ -15,6 +15,9 @@ def Parsing_Args(args) :
         epilog="python run.py mode")
 
     parser.add_argument(
+        'mode', choices = ['train', 'eval']
+    )
+    parser.add_argument(
         '--seed', type = int, default = 42,
         help = 'seed number that fixes randomness'
     )
@@ -58,6 +61,10 @@ def Parsing_Args(args) :
     parser.add_argument(
         '--tensorboard', type = str_to_bool, default = False,
         help = 'set mode to visualize training iteration on tensorboard'
+    )
+    parser.add_argument(
+        '--pretrained', type = str_to_bool, default = False,
+        help = 'select whether using pretrained weight or not'
     )
 
     return vars(parser.parse_known_args(args)[0])
