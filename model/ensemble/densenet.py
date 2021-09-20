@@ -106,9 +106,10 @@ class DenseNet_ensemble(nn.Module):
         self.boundary_features, self.compression_conv = self._make_boundary_conv(boundary_layers = boundary_layers)
         self.boundary_features, self.compression_conv = nn.ModuleList(self.boundary_features), nn.ModuleList(self.compression_conv)
 
+        boundary_inner_channels = boundary_layers[2]
         self.fc = nn.Linear(inner_channels, num_class)
-        self.boundary_fc = nn.Linear(512, num_class)
-        self.ensemble_fc = nn.Linear(inner_channels + 512, num_class)
+        self.boundary_fc = nn.Linear(boundary_inner_channels, num_class)
+        self.ensemble_fc = nn.Linear(inner_channels + boundary_inner_channels, num_class)
 
         self.ensemble_relu = nn.ReLU(inplace=True)
 

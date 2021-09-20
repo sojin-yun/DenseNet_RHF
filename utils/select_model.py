@@ -47,10 +47,10 @@ class Select_Model :
             return DenseNet_ensemble(Bottleneck_ensemble, [6, 12, 24, 16], [128, 256, 512], 32, device = self.device, low_resolution = self.low_resolution)
 
         elif model == 'densenet169' :
-            return DenseNet_ensemble(Bottleneck_ensemble, [6, 12, 32, 32], [128, 256, 512], 32, device = self.device, low_resolution = self.low_resolution)
+            return DenseNet_ensemble(Bottleneck_ensemble, [6, 12, 32, 32], [128, 256, 640], 32, device = self.device, low_resolution = self.low_resolution)
 
         elif model == 'densenet201' :
-            return DenseNet_ensemble(Bottleneck_ensemble, [6, 12, 48, 32], [128, 256, 512], 32, device = self.device, low_resolution = self.low_resolution)
+            return DenseNet_ensemble(Bottleneck_ensemble, [6, 12, 48, 32], [128, 256, 896], 32, device = self.device, low_resolution = self.low_resolution)
 
 
     def baseline_model(self, model) :

@@ -64,9 +64,14 @@ class TrainingEnsemble :
         f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name(self.args['device'])))
         print('Make log.txt and log training result\n\n')
 
+        print('GPU Information - {}\n\n'.format(torch.cuda.get_device_name(self.args['device'])))
+
         best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc = 0., 0., 0.
 
-        backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight = 1.0, 0.2, 0.2
+        # for non-pretrained
+        #backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight = 1.0, 0.2, 0.2
+        # for pre-trained
+        backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight = 1.0, 0.5, 0.5
         f.write('Loss Information - Backbone_loss : {0} | Boundary_loss : {1} | Ensemble_loss : {2}\n\n'.format(backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight))
         f.write('Optimizer : {}\n'.format(self.model.optimizer))
         f.write('Learning_scheduler : step_size : {0} | gamma : {1}\n\n'.format(self.model.scheduler.step_size, self.model.scheduler.gamma))
@@ -191,6 +196,7 @@ class TrainingEnsemble :
         f.write('\nBest valid acc : {0:.4f}% \t Best boundary acc : {1:.4f}% \t Best ensemble acc : {2:.4f}%\n'.format(best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc))
         f.close()
         print('Best valid acc : {0:.4f}% \t Best boundary acc : {1:.4f}% \t Best ensemble acc : {2:.4f}%'.format(best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc))
+        print("Argument Information : {}\n\n".format(self.args))
 
 class TrainingBaseline :
 
@@ -248,11 +254,11 @@ class TrainingBaseline :
         f.write("Argument Information : {}\n\n".format(self.args))
         f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name(self.args['device'])))
         print('Make log.txt and log training result\n\n')
+        print('GPU Information - {}\n\n'.format(torch.cuda.get_device_name(self.args['device'])))
         f.write('Optimizer : {}\n'.format(self.model.optimizer))
         f.write('Learning_scheduler : step_size : {0} | gamma : {1}\n\n'.format(self.model.scheduler.step_size, self.model.scheduler.gamma))
 
         best_valid_acc, best_valid_loss = 0., 100.
-
 
 
         for i in range(self.epoch) :
@@ -343,4 +349,5 @@ class TrainingBaseline :
         # Training is finished.
         f.write('\nBest valid acc : {0:.4f}% \t Best valid loss : {1:.6f} \n'.format(best_valid_acc, best_valid_loss))
         f.close()
-        print('Best valid acc : {0:.4f}% \t Best valid loss : {1:.6f} \n'.format(best_valid_acc, best_valid_loss))
+        print('Best valid acc : {0:.4f}% \t Best valid loss : {1:.6f} \n\n'.format(best_valid_acc, best_valid_loss))
+        print("Argument Information : {}\n\n".format(self.args))

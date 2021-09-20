@@ -39,7 +39,7 @@ class VGG(nn.Module):
         
         self.optimizer = optim.SGD(self.parameters(), lr = 0.01, momentum = 0.9, weight_decay=0.0015)
         self.loss = nn.CrossEntropyLoss()
-        self.scheduler = StepLR(self.optimizer, step_size=12, gamma=0.5)
+        self.scheduler = StepLR(self.optimizer, step_size=15, gamma=0.5)
 
 
     def _make_layers(self, select_model):
