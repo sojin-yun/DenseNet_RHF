@@ -62,8 +62,12 @@ class CustomDataLoader() :
 
         print('Dataset Information -> {0} || img size : {1} || mean : {2} || std : {3}'.format(self.data, self.image_size, self.data_mean, self.data_std))
 
-        train_loader = DataLoader(dataset = datasets[0], batch_size = self.args['batch_size'], shuffle = True, num_workers=0)
-        valid_loader = DataLoader(dataset = datasets[1], batch_size = self.args['batch_size'], shuffle = False, num_workers=0)
+        if self.args['mode'] == 'cam' :
+            train_loader = None
+            valid_loader = DataLoader(dataset = datasets[1], batch_size = 1, shuffle = False, num_workers=0)
+        else :
+            train_loader = DataLoader(dataset = datasets[0], batch_size = self.args['batch_size'], shuffle = True, num_workers=0)
+            valid_loader = DataLoader(dataset = datasets[1], batch_size = self.args['batch_size'], shuffle = False, num_workers=0)
 
         return train_loader, valid_loader
 

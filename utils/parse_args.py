@@ -15,7 +15,7 @@ def Parsing_Args(args) :
         epilog="python run.py mode")
 
     parser.add_argument(
-        'mode', choices = ['train', 'eval']
+        'mode', choices = ['train', 'eval', 'cam']
     )
     parser.add_argument(
         '--seed', type = int, default = 42,
@@ -38,7 +38,7 @@ def Parsing_Args(args) :
         help = 'set training epoch'
     )
     parser.add_argument(
-        '--device', type = int, default = 0,
+        '--device', type = str, default = '0',
         help = 'select which GPU to use'
     )
     parser.add_argument(
@@ -69,6 +69,10 @@ def Parsing_Args(args) :
     parser.add_argument(
         '--weight', type = str, default = None,
         help = 'select whether loading checkpoint or not'
+    )
+    parser.add_argument(
+        '--cam', nargs='+', default=[],
+        help = 'pretrained weight''s path to get heatmap'
     )
 
     return vars(parser.parse_known_args(args)[0])
