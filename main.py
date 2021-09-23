@@ -44,7 +44,6 @@ def drive(args) :
         model.load_state_dict(model_params)
         print('Pretrained weights are loaded.')
 
-
     # Select what mode you want to run
     if flags['mode'] == 'train' :
         if not flags['baseline'] :

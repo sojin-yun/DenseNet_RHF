@@ -30,6 +30,7 @@ MANIFEST
 data/
 Save_parameters/
 weights/
+export/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
