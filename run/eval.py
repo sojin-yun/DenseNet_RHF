@@ -55,7 +55,7 @@ class Evaluation :
             avg_boundary_valid_acc = valid_boundary_acc/len(self.valid_loader)
             avg_ensemble_valid_acc = valid_ensemble_acc/len(self.valid_loader)
 
-        print('Evaluation Result --- Backbone Acc : {0:.4f} | Boundary Acc : {1:.4f} | Ensemble Acc : {2:.4f}'.format(avg_valid_acc, avg_boundary_valid_acc, avg_ensemble_valid_acc))
+        print('\n\nEvaluation Result --- Backbone Acc : {0:.4f}% | Boundary Acc : {1:.4f}% | Ensemble Acc : {2:.4f}%'.format(avg_valid_acc, avg_boundary_valid_acc, avg_ensemble_valid_acc))
 
 
     def run_baseline(self) :
@@ -86,4 +86,4 @@ class Evaluation :
             avg_valid_acc = valid_acc/len(self.valid_loader)
             avg_valid_loss = valid_loss/len(self.valid_loader)
 
-        print('Evaluation Result --- Valid Loss : {0:.4f} | Valid Acc : {1:.4f}'.format(avg_valid_loss, avg_valid_acc))
+        print('\n\nEvaluation Result --- Valid Loss : {0:.4f} | Valid Acc : {1:.4f}%'.format(avg_valid_loss, avg_valid_acc))

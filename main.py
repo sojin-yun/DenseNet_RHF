@@ -52,6 +52,14 @@ def drive(args) :
         else :
             TrainingBaseline(flags, model, data_loader, device)()
     elif flags['mode'] == 'eval' :
+        load_checkpoint = flags['weight']
+        if load_checkpoint != None :
+            checkpoint = torch.load('./weights/evaluation/{0}'.format(flags['weight']), map_location = device)
+            params = checkpoint['state_dict']
+            model_params = model.state_dict()
+            model_params.update(params)
+            model.load_state_dict(model_params)
+            print('Pretrained weights are loaded for evaluation.')
         Evaluation(flags, model ,data_loader, device)()
 
 

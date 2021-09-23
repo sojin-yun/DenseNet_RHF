@@ -66,5 +66,9 @@ def Parsing_Args(args) :
         '--pretrained', type = str_to_bool, default = False,
         help = 'select whether using pretrained weight or not'
     )
+    parser.add_argument(
+        '--weight', type = str, default = None,
+        help = 'select whether loading checkpoint or not'
+    )
 
     return vars(parser.parse_known_args(args)[0])
