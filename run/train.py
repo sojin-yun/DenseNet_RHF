@@ -19,10 +19,10 @@ class TrainingEnsemble :
         self.device = device
         self.train_loader, self.valid_loader = data_loader
         if self.args['data'] == 'cifar100' : 
-            self.default_path = '/home/NAS_mount/sjlee/Save_parameters/cifar100/' if self.args['server'] else './Save_parameters/cifar100/'
+            self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/cifar100/' if self.args['server'] else './Save_parameters/cifar100/'
             self.model_size = (3, 64, 64)
         elif self.args['data'] == 'mini_imagenet' : 
-            self.default_path = '/home/NAS_mount/sjlee/Save_parameters/mini_imagenet/' if self.args['server'] else './Save_parameters/mini_imagenet/'
+            self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/mini_imagenet/' if self.args['server'] else './Save_parameters/mini_imagenet/'
             self.model_size = (3, 224, 224)
 
         if self.device != None : 
@@ -210,10 +210,10 @@ class TrainingBaseline :
         self.device = device
         self.train_loader, self.valid_loader = data_loader
         if self.args['data'] == 'cifar100' : 
-            self.default_path = '/home/NAS_mount/sjlee/Save_parameters/cifar100/' if self.args['server'] else './Save_parameters/cifar100/'
+            self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/cifar100/' if self.args['server'] else './Save_parameters/cifar100/'
             self.model_size = (3, 64, 64)
         elif self.args['data'] == 'mini_imagenet' : 
-            self.default_path = '/home/NAS_mount/sjlee/Save_parameters/mini_imagenet/' if self.args['server'] else './Save_parameters/mini_imagenet/'
+            self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/mini_imagenet/' if self.args['server'] else './Save_parameters/mini_imagenet/'
             self.model_size = (3, 224, 224)
 
         if self.device != None : 

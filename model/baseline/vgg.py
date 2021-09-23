@@ -33,8 +33,6 @@ class VGG(nn.Module):
             nn.Linear(1024, num_classes)
         )
 
-        self.ensemble_relu = nn.ReLU(inplace=True)
-
         self._initialize_weights()
         
         self.optimizer = optim.SGD(self.parameters(), lr = 0.01, momentum = 0.9, weight_decay=0.0015)

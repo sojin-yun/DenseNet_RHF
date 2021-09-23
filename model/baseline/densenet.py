@@ -80,6 +80,8 @@ class DenseNet(nn.Module):
 
         self.features = nn.Sequential(*self.features)
 
+        self.cam_relu = nn.ReLU()
+
         self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0015)
         self.loss = nn.CrossEntropyLoss()
         self.scheduler = StepLR(self.optimizer, step_size=15, gamma=0.5)
@@ -90,6 +92,7 @@ class DenseNet(nn.Module):
 
     def forward(self, x):
         output = self.features(x)
+        output = self.cam_relu(output)
         output = self.avgpool(output)
         output = output.view(output.size()[0], -1)
         output = self.linear(output)

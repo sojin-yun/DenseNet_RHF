@@ -54,7 +54,6 @@ class VGG_ensemble(nn.Module):
             nn.Linear(2048, num_classes)
         )
 
-
         self.ensemble_relu = nn.ReLU(inplace=True)
 
         self._initializing_weights()
