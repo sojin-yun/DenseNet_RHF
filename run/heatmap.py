@@ -87,7 +87,7 @@ class RunGradCAM() :
             if (baseline_pred.item() != target.item()) and (ensemble_pred.item() == target.item()) : figsave_path = os.path.join(self.default_path, self.save_path, 'Ensemble_correct/', str(target.item()))
             elif (baseline_pred.item() == target.item()) and (ensemble_pred.item() == target.item()) : figsave_path = os.path.join(self.default_path, self.save_path, 'Both_correct/', str(target.item()))
             else : continue
-            
+
             print(figsave_path)
 
             fig = plt.figure(figsize=(12, 4))
@@ -109,7 +109,7 @@ class RunGradCAM() :
             ax2.set_title('Ensemble', fontsize = 15)
             ax2.axis('off')
 
-            plt.savefig(figsave_path+'\\{0}.png'.format(idx))
+            plt.savefig(figsave_path+'/{0}.png'.format(str(idx)))
             plt.close()
             #plt.show()
 
