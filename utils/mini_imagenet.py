@@ -33,7 +33,7 @@ for mode in ['train/', 'val/'] :
 class_txt = open(dst_data_path+'class_label.txt', 'w')
 for f in sampled_classes :
     class_txt.write(f+'\n')
-class_txt.write('random_seed : ' + str(random_seed))
+class_txt.write('random_seed : ' + str(42))
 class_txt.close()
 
 summary_class = plt.figure(figsize=(20, 20))
