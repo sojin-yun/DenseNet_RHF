@@ -105,7 +105,7 @@ class RunGradCAM() :
             ax2.set_title('Ensemble', fontsize = 15)
             ax2.axis('off')
 
-            #plt.savefig(figsave_path+'\\{0}.png'.format(idx))
-            #plt.close()
-            plt.show()
+            plt.savefig(figsave_path+'\\{0}.png'.format(idx))
+            plt.close()
+            #plt.show()
 
