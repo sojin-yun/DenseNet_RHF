@@ -161,10 +161,8 @@ class VGG_ensemble(nn.Module):
         x_f = x
         x = x.view(x.size(0), -1)
         x = self.classifier(x)
-        print(x.is_cuda)
         self.boundary_maps = self._get_boundary_location()
         b = self.boundary_forward()
-        print(b.is_cuda)
         b_f = b
         b = b.view(b.size(0), -1)
         b = self.boundary_classifier(b)
