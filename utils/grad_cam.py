@@ -3,11 +3,11 @@ from torch._C import BoolType
 import torch.nn as nn
 
 class GradCAM(nn.Module) :
-    def __init__(self, model, hooked_layer, ensemble : BoolType) :
+    def __init__(self, model, hooked_layer, device, ensemble : BoolType) :
         super(GradCAM, self).__init__()
         
         # hook on target layer.
-        self.model = model
+        self.model = model.to(device)
         self.ensemble = ensemble
         list(self.model.modules())[hooked_layer].register_forward_hook(self.forward_hook)
         print('Hook on {0}'.format(list(self.model.modules())[hooked_layer]))
