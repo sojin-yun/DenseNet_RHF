@@ -43,8 +43,8 @@ class RunGradCAM() :
                              'ensemble' : {'vgg16' : [132, 102], 'vgg19' : [141, 111], 'resnet50' : [186, 185], 'resnet101' : [322, 321], 'resnet152' : [458, 457], 'densenet121' : [525, 524], 'densenet169' : [717, 716], 'densenet201' : [845, 844]}}
         idx = 0 if self.args['data'] == 'mini_imagenet' else 1
 
-        self.baseline_cam = GradCAM(model = self.baseline_model, hooked_layer = self.hooked_layer['baseline'][self.args['model']][idx], ensemble = False)
-        self.ensemble_cam = GradCAM(model = self.ensemble_model, hooked_layer = self.hooked_layer['ensemble'][self.args['model']][idx], ensemble = True)
+        self.baseline_cam = GradCAM(model = self.baseline_model, hooked_layer = self.hooked_layer['baseline'][self.args['model']][idx], device = self.device, ensemble = False)
+        self.ensemble_cam = GradCAM(model = self.ensemble_model, hooked_layer = self.hooked_layer['ensemble'][self.args['model']][idx], device = self.device, ensemble = True)
 
     def _make_folder(self) :
 
