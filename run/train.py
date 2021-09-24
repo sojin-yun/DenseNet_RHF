@@ -61,10 +61,10 @@ class TrainingEnsemble :
         now = time.localtime()
         f.write("Start training at {:04d}/{:02d}/{:02d}--{:02d}:{:02d}:{:02d}\n\n".format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec))
         f.write("Argument Information : {}\n\n".format(self.args))
-        f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name(self.args['device'])))
+        f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name('cuda:{}'.format(self.args['device']))))
         print('Make log.txt and log training result\n\n')
 
-        print('GPU Information - {}\n\n'.format(torch.cuda.get_device_name(self.args['device'])))
+        print('GPU Information - {}\n\n'.format(torch.cuda.get_device_name('cuda:{}'.format(self.args['device']))))
 
         best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc = 0., 0., 0.
 
@@ -252,9 +252,9 @@ class TrainingBaseline :
         now = time.localtime()
         f.write("Start training at {:04d}/{:02d}/{:02d}--{:02d}:{:02d}:{:02d}\n\n".format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec))
         f.write("Argument Information : {}\n\n".format(self.args))
-        f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name(self.args['device'])))
+        f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name('cuda:{}'.format(self.args['device']))))
         print('Make log.txt and log training result\n\n')
-        print('GPU Information - {}\n\n'.format(torch.cuda.get_device_name(self.args['device'])))
+        print('GPU Information - {}\n\n'.format(torch.cuda.get_device_name('cuda:{}'.format(self.args['device']))))
         f.write('Optimizer : {}\n'.format(self.model.optimizer))
         f.write('Learning_scheduler : step_size : {0} | gamma : {1}\n\n'.format(self.model.scheduler.step_size, self.model.scheduler.gamma))
 
