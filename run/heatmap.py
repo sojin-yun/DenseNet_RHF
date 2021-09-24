@@ -88,8 +88,6 @@ class RunGradCAM() :
             elif (baseline_pred.item() == target.item()) and (ensemble_pred.item() == target.item()) : figsave_path = os.path.join(self.default_path, self.save_path, 'Both_correct/', str(target.item()))
             else : continue
 
-            print(figsave_path)
-
             fig = plt.figure(figsize=(12, 4))
             ax0 = fig.add_subplot(1, 3, 1)
             ax0.imshow(image_np)
