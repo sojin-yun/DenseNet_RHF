@@ -67,6 +67,8 @@ class RunGradCAM() :
         mapping_dict = json.load(load_dict)
 
         for idx, (data, target) in enumerate(tqdm(self.test_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01)) :
+
+            if self.args['device'] != 'cpu' : data, target = data.to(self.device), target.to(self.device)
             
             # Image inverse-normalizing to plot below heatmap
             image = inverse_norm.run(data).numpy()
