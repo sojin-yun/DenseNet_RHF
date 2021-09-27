@@ -66,6 +66,9 @@ class RunGradCAM() :
         load_dict = open(dict_path, 'r')
         mapping_dict = json.load(load_dict)
 
+        baseline_result = np.empty((len(self.test_loader), image_size, image_size, 1))
+        ensemble_result = np.empty((len(self.test_loader), image_size, image_size, 1))
+
         for idx, (data, target) in enumerate(tqdm(self.test_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01)) :
 
             if self.args['device'] != 'cpu' : data, target = data.to(self.device), target.to(self.device)
@@ -77,10 +80,12 @@ class RunGradCAM() :
             baseline_ret, baseline_pred = self.baseline_cam(data, target)
             baseline_ret = self.upsample(baseline_ret.unsqueeze(0)).detach().cpu()
             baseline_ret = np.transpose(baseline_ret, (0, 2, 3, 1)).squeeze(0)
+            baseline_result[idx] = baseline_ret
             
             ensemble_ret, ensemble_pred = self.ensemble_cam(data, target)
             ensemble_ret = self.upsample(ensemble_ret.unsqueeze(0)).detach().cpu()
             ensemble_ret = np.transpose(ensemble_ret, (0, 2, 3, 1)).squeeze(0)
+            ensemble_result[idx] = ensemble_ret
 
             figsave_path = ''
 
@@ -110,4 +115,7 @@ class RunGradCAM() :
             plt.savefig(figsave_path+'/{0}.png'.format(str(idx)))
             plt.close()
             #plt.show()
+
+        np.save(os.path.join(self.default_path, self.save_path, 'baseline_cam.npy'), baseline_result)
+        np.save(os.path.join(self.default_path, self.save_path, 'ensemble_cam.npy'), ensemble_result)
 
