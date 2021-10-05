@@ -10,18 +10,18 @@ class CustomDataLoader() :
         self.args = args
         self.data = args['data']
         self.server = args['server']
-        assert self.data in ['cifar100', 'mini_imagenet', 'crc'], '--data argument is invalid'
+        assert self.data in ['cifar100', 'mini_imagenet', 'kidney_stone'], '--data argument is invalid'
 
         self.transformer_components = {
             'cifar100' : {'image_size' : 64, 'mean' : (0.5071, 0.4867, 0.4408), 'std' : (0.2675, 0.2565, 0.2761)},
             'mini_imagenet' : {'image_size' : 224, 'mean' : (0.485, 0.456, 0.406), 'std' : (0.229, 0.224, 0.225)},
-            'crc' : None
+            'kidney_stone' : {'image_size' : 512, 'mean' : 0.169, 'std' : 0.259}
         }
 
         self.dataset_components = {
             'cifar100' : {'data' : torchvision.datasets.CIFAR100, 'path' : '/home/NAS_mount/sjlee/CIFAR100/'} if self.server else {'data' : torchvision.datasets.CIFAR100, 'path' : './data/CIFAR100/'},
             'mini_imagenet' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/Mini_ImageNet/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Mini_ImageNet/'},
-            'crc' : None
+            'kidney_stone' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/Kidney_Stone/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Kidney_Stone/'}
         }
 
     

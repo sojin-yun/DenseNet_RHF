@@ -24,6 +24,9 @@ class TrainingEnsemble :
         elif self.args['data'] == 'mini_imagenet' : 
             self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/mini_imagenet/' if self.args['server'] else './Save_parameters/mini_imagenet/'
             self.model_size = (3, 224, 224)
+        elif self.args['data'] == 'kidney_stone' : 
+            self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/kidney_stone/' if self.args['server'] else './Save_parameters/kidney_stone/'
+            self.model_size = (1, 512, 512)
 
         if self.device != None : 
             self.device = device
@@ -61,10 +64,16 @@ class TrainingEnsemble :
         now = time.localtime()
         f.write("Start training at {:04d}/{:02d}/{:02d}--{:02d}:{:02d}:{:02d}\n\n".format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec))
         f.write("Argument Information : {}\n\n".format(self.args))
-        f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name('cuda:{}'.format(self.args['device']))))
+        if self.args['device'] == 'cpu' :
+            f.write('GPU Information - CPU\n\n')
+        else :
+            f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name('cuda:{}'.format(self.args['device']))))
         print('Make log.txt and log training result\n\n')
 
-        print('GPU Information - {}\n\n'.format(torch.cuda.get_device_name('cuda:{}'.format(self.args['device']))))
+        if self.args['device'] == 'cpu' :
+            print('GPU Information - CPU\n\n')
+        else :
+            print('GPU Information - {}\n\n'.format(torch.cuda.get_device_name('cuda:{}'.format(self.args['device']))))
 
         best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc = 0., 0., 0.
 
@@ -215,6 +224,9 @@ class TrainingBaseline :
         elif self.args['data'] == 'mini_imagenet' : 
             self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/mini_imagenet/' if self.args['server'] else './Save_parameters/mini_imagenet/'
             self.model_size = (3, 224, 224)
+        elif self.args['data'] == 'kidney_stone' : 
+            self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/kidney_stone/' if self.args['server'] else './Save_parameters/kidney_stone/'
+            self.model_size = (1, 512, 512)
 
         if self.device != None : 
             self.device = device
@@ -234,7 +246,7 @@ class TrainingBaseline :
             os.mkdir(os.path.join(self.default_path, self.save_path, folder))
             self.ts_board = SummaryWriter(log_dir = os.path.join(self.default_path, self.save_path, folder))
 
-        if not self.args['server'] :
+        if not self.args['server'] and self.args['data'] != 'kidney_stone' :
             s = open(os.path.join(self.default_path, self.save_path, 'model_summary.txt'), 'w')
             s.write('Model : {}-baseline model. \n\n'.format(self.args['model']))
             copy_model = copy.deepcopy(self.model)
@@ -252,9 +264,15 @@ class TrainingBaseline :
         now = time.localtime()
         f.write("Start training at {:04d}/{:02d}/{:02d}--{:02d}:{:02d}:{:02d}\n\n".format(now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec))
         f.write("Argument Information : {}\n\n".format(self.args))
-        f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name('cuda:{}'.format(self.args['device']))))
+        if self.args['device'] == 'cpu' :
+            f.write('GPU Information - cpu\n\n')
+        else :
+            f.write('GPU Information - {}\n\n'.format(torch.cuda.get_device_name('cuda:{}'.format(self.args['device']))))
         print('Make log.txt and log training result\n\n')
-        print('GPU Information - {}\n\n'.format(torch.cuda.get_device_name('cuda:{}'.format(self.args['device']))))
+        if self.args['device'] == 'cpu' :
+            print('GPU Information - cpu\n\n')
+        else :
+            print('GPU Information - {}\n\n'.format(torch.cuda.get_device_name('cuda:{}'.format(self.args['device']))))
         f.write('Optimizer : {}\n'.format(self.model.optimizer))
         f.write('Learning_scheduler : step_size : {0} | gamma : {1}\n\n'.format(self.model.scheduler.step_size, self.model.scheduler.gamma))
 

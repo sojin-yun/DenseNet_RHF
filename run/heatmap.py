@@ -24,6 +24,10 @@ class RunGradCAM() :
             os.mkdir(os.path.join(self.save_path, 'Both_correct'))
             os.mkdir(os.path.join(self.save_path, 'Ensemble_correct'))
 
+        self.image_size = {'mini_imagenet' : 224, 'cifar100' : 64, 'kidney_stone' : 512}
+        self.mean = {'mini_imagenet' : (0.485, 0.456, 0.406), 'cifar100' : (0.5071, 0.4867, 0.4408), 'kidney_stone' : (0.169, 0.169, 0.169)}
+        self.std = {'mini_imagenet' : (0.229, 0.224, 0.225), 'cifar100' : (0.2675, 0.2565, 0.2761), 'kidney_stone' : (0.259, 0.259, 0.259)}
+
         self._make_folder()
         self._make_model()
 
@@ -39,8 +43,8 @@ class RunGradCAM() :
         self.ensemble_model.load_state_dict(ensemble_params['state_dict'])
 
         # [mini_imagenet, cifar100]
-        self.hooked_layer = {'baseline' : {'vgg16' : [44, 43], 'vgg19' : [53, 32], 'resnet50' : [152, 151], 'resnet101' : [288, 287], 'resnet152' : [424, 423], 'densenet121' : [492, 491], 'densenet169' : [684, 683], 'densenet201' : [812, 811]},
-                             'ensemble' : {'vgg16' : [132, 102], 'vgg19' : [141, 111], 'resnet50' : [186, 185], 'resnet101' : [322, 321], 'resnet152' : [458, 457], 'densenet121' : [525, 524], 'densenet169' : [717, 716], 'densenet201' : [845, 844]}}
+        self.hooked_layer = {'baseline' : {'vgg16' : [44, 43], 'vgg19' : [53, 32], 'resnet50' : [153, 152], 'resnet101' : [288, 287], 'resnet152' : [424, 423], 'densenet121' : [492, 491], 'densenet169' : [684, 683], 'densenet201' : [812, 811]},
+                             'ensemble' : {'vgg16' : [132, 102], 'vgg19' : [141, 111], 'resnet50' : [187, 186], 'resnet101' : [322, 321], 'resnet152' : [458, 457], 'densenet121' : [525, 524], 'densenet169' : [717, 716], 'densenet201' : [845, 844]}}
         idx = 0 if self.args['data'] == 'mini_imagenet' else 1
 
         self.baseline_cam = GradCAM(model = self.baseline_model, hooked_layer = self.hooked_layer['baseline'][self.args['model']][idx], device = self.device, ensemble = False)
@@ -48,23 +52,29 @@ class RunGradCAM() :
 
     def _make_folder(self) :
 
+        n_class = 2 if self.args['data'] == 'kidney_stone' else 100
         for ret_type in ['Both_correct/', 'Ensemble_correct/'] :
-            for idx in range(100) :
+            for idx in range(n_class) :
                 if not os.path.isdir(os.path.join(self.default_path, self.save_path, ret_type, str(idx))) :
                     os.mkdir(os.path.join(self.default_path, self.save_path, ret_type, str(idx)))
 
     def run(self) :
 
-        image_size = 224 if self.args['data'] == 'mini_imagenet' else 64
-        mean, std = ((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)) if self.args['data'] == 'mini_imagenet' else ((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))
+        #image_size = 224 if self.args['data'] == 'mini_imagenet' else 64
+        image_size = self.image_size[self.args['data']]
+        mean, std = self.mean[self.args['data']], self.std[self.args['data']]
+        #mean, std = ((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)) if self.args['data'] == 'mini_imagenet' else ((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))
         self.upsample = nn.Upsample(size = image_size, mode = 'bilinear', align_corners = False)
         
         inverse_norm = InverseNormalize(mean, std)
 
-        dict_name = 'cifar_dict.json' if self.args['data'] == 'cifar100' else 'mini_dict.json'
-        dict_path = '/home/NAS_mount/sjlee/RHF/data/{}'.format(dict_name) if self.args['server'] else 'data/{}'.format(dict_name)
-        load_dict = open(dict_path, 'r')
-        mapping_dict = json.load(load_dict)
+        if self.args['data'] == 'kidney_stone' :
+            mapping_dict = {'0' : 'No Stone', '1' : 'Stone'}
+        else :
+            dict_name = 'cifar_dict.json' if self.args['data'] == 'cifar100' else 'mini_dict.json'
+            dict_path = '/home/NAS_mount/sjlee/RHF/data/{}'.format(dict_name) if self.args['server'] else 'data/{}'.format(dict_name)
+            load_dict = open(dict_path, 'r')
+            mapping_dict = json.load(load_dict)
 
         baseline_result = np.empty((len(self.test_loader), image_size, image_size, 1))
         ensemble_result = np.empty((len(self.test_loader), image_size, image_size, 1))
