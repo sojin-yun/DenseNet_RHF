@@ -10,12 +10,14 @@ class VGG_ensemble(nn.Module):
         super(VGG_ensemble, self).__init__()
         if device != None : self.device = device
 
-        if data == 'mini_imagenet' :
+        self.data = data
+        print(self.data)
+        if self.data == 'mini_imagenet' or self.data == 'kidney_stone':
             self.select_model = {
                     '16' : {'conv_layers' : [64, 'R', 128, 'R', 256, 256,      'R', 512, 512,      'R', 512, 512, 'R'],      'boundary_layers' : [64, 128, 256, 512, 512]},
                     '19' : {'conv_layers' : [64, 'R', 128, 'R', 256, 256, 256, 'R', 512, 512, 512, 'R', 512, 512, 512, 'R'], 'boundary_layers' : [64, 128, 256, 512, 512]}
                 }
-        elif data == 'cifar100' :
+        elif self.data == 'cifar100' :
             self.select_model = {
                     '16' : {'conv_layers' : [64, 64, 128, 'R', 256, 256,      'R', 512, 512,      'R', 512, 512, 512     ], 'boundary_layers' : [128, 256, 512]},
                     '19' : {'conv_layers' : [64, 64, 128, 'R', 256, 256, 256, 'R', 512, 512, 512, 'R', 512, 512, 512, 512], 'boundary_layers' : [128, 256, 512]}
@@ -29,8 +31,9 @@ class VGG_ensemble(nn.Module):
         for m in self.boundary_features : m = m.to(self.device)
         for m in self.compression_conv : m = m.to(self.device)
 
-        if data == 'mini_imagenet' : width = 7
-        elif data == 'cifar100' : width = 8
+        if self.data == 'mini_imagenet' : width = 7
+        elif self.data == 'cifar100' : width = 8
+        elif self.data == 'kidney_stone' : width = 16
 
         self.classifier = nn.Sequential(
             nn.Linear(width * width * 512, 2048),
@@ -68,7 +71,10 @@ class VGG_ensemble(nn.Module):
     def _make_layer_conv(self, conv_layers):
         
         model = []
-        input_size = 3
+        if self.data == 'kidney_stone' :
+            input_size = 3
+        else :
+            input_size = 3
 
         for conv in conv_layers:
             if conv == 'R':

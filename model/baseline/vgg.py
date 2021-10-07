@@ -8,22 +8,25 @@ class VGG(nn.Module):
     def __init__(self, model_key, num_classes = 100, data = 'mini_imagenet'):
         super().__init__()
 
-
-        if data == 'mini_imagenet' :
+        self.data = data
+        if self.data == 'mini_imagenet' or self.data == 'kidney_stone':
             self.select_model = {
                     '16' : {'conv_layers' : [64, 64, 'M', 128, 128, 'M', 256, 256, 256,      'M', 512, 512, 512,      'M', 512, 512, 512, 'M']},
                     '19' : {'conv_layers' : [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'M']}
                 }
-        elif data == 'cifar100' :
+        elif self.data == 'cifar100' :
             self.select_model = {
                     '16' : {'conv_layers' : [64, 64, 128, 128, 'M', 256, 256, 256,      'M', 512, 512, 512,      'M', 512, 512, 512]},
                     '19' : {'conv_layers' : [64, 64, 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512]}
                 }
 
+        if self.data == 'kidney_stone' : num_classes = 2
+
         self.features = self._make_layers(self.select_model[model_key]['conv_layers'])
 
-        if data == 'mini_imagenet' : width = 7
-        elif data == 'cifar100' : width = 8
+        if self.data == 'mini_imagenet' : width = 7
+        elif self.data == 'cifar100' : width = 8
+        elif self.data == 'kidney_stone' : width = 16
 
         self.classifier = nn.Sequential(
             nn.Linear(width * width* 512, 2048),
@@ -43,7 +46,11 @@ class VGG(nn.Module):
     def _make_layers(self, select_model):
         layers = []
 
-        input_channel = 3
+        if self.data == 'kidney_stone' : 
+            input_channel = 3
+        else : 
+            input_channel = 3
+
         for l in select_model:
             if l == 'M':
                 layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
