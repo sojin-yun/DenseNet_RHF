@@ -102,11 +102,11 @@ class EvaluateMCE() :
         for c in self.corrupt_list :
             print('Evaluation on corruption-{}'.format(c))
             baseline_ret = 0.
-            ensemble_ret = (0., 0., 0.)
+            ensemble_ret = [0., 0., 0.]
             for s in tqdm(range(1, 6), desc="{:17s}".format('Evaluation State'), mininterval=0.01) :
                 data_loader = self.load_data(c, str(s))
                 baseline_ret += self.eval_baseline(data_loader)
-                ensemble_ret += self.eval_ensemble(data_loader)
+                ret = list(self.eval_ensemble(data_loader))
             print('\ncorruption-{}'.format(c))
             print('Baseline : {}'.format(baseline_ret))
             print('Ensemble : {} | {} | {}'.format(ensemble_ret[0], ensemble_ret[1], ensemble_ret[2]))
