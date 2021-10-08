@@ -124,7 +124,7 @@ class EvaluateMCE() :
             print('Ensemble : {:.4f}% | {:.4f}% | {:.4f}%            {:.4f}% | {:.4f}% | {:.4f}%\n'.format(ensemble_ret[0]/5., ensemble_ret[1]/5., ensemble_ret[2]/5., ensemble_ret[0]/5.-baseline_ret/5., ensemble_ret[1]/5.-baseline_ret/5., ensemble_ret[2]/5.-baseline_ret/5.))
             print('\nBaseline severity : {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}%'.format(baseline_list[0], baseline_list[1], baseline_list[2], baseline_list[3], baseline_list[4]))
             print('Backbone severity : {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}%'.format(backbone_list[0] - baseline_list[0], backbone_list[1] - baseline_list[1], backbone_list[2] - baseline_list[2], backbone_list[3] - baseline_list[3], backbone_list[4] - baseline_list[4]))
-            print('Backbone severity : {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}%'.format(boundary_list[0] - baseline_list[0], boundary_list[1] - baseline_list[1], boundary_list[2] - baseline_list[2], boundary_list[3] - baseline_list[3], boundary_list[4] - baseline_list[4]))
-            print('Backbone severity : {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}%\n'.format(ensemble_list[0] - baseline_list[0], ensemble_list[1] - baseline_list[1], ensemble_list[2] - baseline_list[2], ensemble_list[3] - baseline_list[3], ensemble_list[4] - baseline_list[4]))
+            print('Boundary severity : {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}%'.format(boundary_list[0] - baseline_list[0], boundary_list[1] - baseline_list[1], boundary_list[2] - baseline_list[2], boundary_list[3] - baseline_list[3], boundary_list[4] - baseline_list[4]))
+            print('Ensemble severity : {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}%\n'.format(ensemble_list[0] - baseline_list[0], ensemble_list[1] - baseline_list[1], ensemble_list[2] - baseline_list[2], ensemble_list[3] - baseline_list[3], ensemble_list[4] - baseline_list[4]))
 
             
