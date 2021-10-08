@@ -108,7 +108,7 @@ class EvaluateMCE() :
                 baseline_ret += self.eval_baseline(data_loader)
                 ret = list(self.eval_ensemble(data_loader))
             print('\ncorruption-{}'.format(c))
-            print('Baseline : {}'.format(baseline_ret))
-            print('Ensemble : {} | {} | {}'.format(ensemble_ret[0], ensemble_ret[1], ensemble_ret[2]))
+            print('Baseline : {:.4f}%'.format(baseline_ret/5.))
+            print('Ensemble : {:.4f}% | {:.4f}% | {:.4f}%'.format(ensemble_ret[0]/5., ensemble_ret[1]/5., ensemble_ret[2]/5.))
 
             
