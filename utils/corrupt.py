@@ -103,15 +103,28 @@ class EvaluateMCE() :
             print('Evaluation on corruption-{}'.format(c))
             baseline_ret = 0.
             ensemble_ret = [0., 0., 0.]
+            baseline_list = []
+            backbone_list = []
+            boundary_list = []
+            ensemble_list = []
             for s in tqdm(range(1, 6), desc="{:17s}".format('Evaluation State'), mininterval=0.01) :
                 data_loader = self.load_data(c, str(s))
-                baseline_ret += self.eval_baseline(data_loader)
-                ret = list(self.eval_ensemble(data_loader))
-                ensemble_ret[0] += ret[0]
-                ensemble_ret[1] += ret[1]
-                ensemble_ret[2] += ret[2]
+                b = self.eval_baseline(data_loader)
+                baseline_ret += b
+                baseline_list.append(b)
+                e = list(self.eval_ensemble(data_loader))
+                backbone_list.append(e[0])
+                boundary_list.append(e[1])
+                ensemble_list.append(e[2])
+                ensemble_ret[0] += e[0]
+                ensemble_ret[1] += e[1]
+                ensemble_ret[2] += e[2]
             print('\ncorruption-{}'.format(c))
             print('Baseline : {:.4f}%'.format(baseline_ret/5.))
             print('Ensemble : {:.4f}% | {:.4f}% | {:.4f}%            {:.4f}% | {:.4f}% | {:.4f}%\n'.format(ensemble_ret[0]/5., ensemble_ret[1]/5., ensemble_ret[2]/5., ensemble_ret[0]/5.-baseline_ret/5., ensemble_ret[1]/5.-baseline_ret/5., ensemble_ret[2]/5.-baseline_ret/5.))
+            print('\nBaseline severity : {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}%'.format(baseline_list[0], baseline_list[1], baseline_list[2], baseline_list[3], baseline_list[4]))
+            print('Backbone severity : {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}%'.format(backbone_list[0] - baseline_list[0], backbone_list[1] - baseline_list[1], backbone_list[2] - baseline_list[2], backbone_list[3] - baseline_list[3], backbone_list[4] - baseline_list[4]))
+            print('Backbone severity : {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}%'.format(boundary_list[0] - baseline_list[0], boundary_list[1] - baseline_list[1], boundary_list[2] - baseline_list[2], boundary_list[3] - baseline_list[3], boundary_list[4] - baseline_list[4]))
+            print('Backbone severity : {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}% | {:.4f}%\n'.format(ensemble_list[0] - baseline_list[0], ensemble_list[1] - baseline_list[1], ensemble_list[2] - baseline_list[2], ensemble_list[3] - baseline_list[3], ensemble_list[4] - baseline_list[4]))
 
             
