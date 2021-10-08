@@ -11,7 +11,6 @@ class VGG_ensemble(nn.Module):
         if device != None : self.device = device
 
         self.data = data
-        print(self.data)
         if self.data == 'mini_imagenet' or self.data == 'kidney_stone':
             self.select_model = {
                     '16' : {'conv_layers' : [64, 'R', 128, 'R', 256, 256,      'R', 512, 512,      'R', 512, 512, 'R'],      'boundary_layers' : [64, 128, 256, 512, 512]},

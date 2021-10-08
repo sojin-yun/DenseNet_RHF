@@ -15,7 +15,7 @@ def Parsing_Args(args) :
         epilog="python run.py mode")
 
     parser.add_argument(
-        'mode', choices = ['train', 'eval', 'cam']
+        'mode', choices = ['train', 'eval', 'cam', 'imagenet_c']
     )
     parser.add_argument(
         '--seed', type = int, default = 42,
