@@ -106,7 +106,10 @@ class EvaluateMCE() :
             for s in tqdm(range(1, 6), desc="{:17s}".format('Evaluation State'), mininterval=0.01) :
                 data_loader = self.load_data(c, str(s))
                 baseline_ret += self.eval_baseline(data_loader)
-                ensemble_ret += list(self.eval_ensemble(data_loader))
+                ret = list(self.eval_ensemble(data_loader))
+                ensemble_ret[0] += ret[0]
+                ensemble_ret[1] += ret[1]
+                ensemble_ret[2] += ret[2]
             print('\ncorruption-{}'.format(c))
             print('Baseline : {:.4f}%'.format(baseline_ret/5.))
             print('Ensemble : {:.4f}% | {:.4f}% | {:.4f}%'.format(ensemble_ret[0]/5., ensemble_ret[1]/5., ensemble_ret[2]/5.))
