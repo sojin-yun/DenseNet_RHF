@@ -76,6 +76,18 @@ def drive(args) :
     elif flags['mode'] == 'imagenet_c' :
         baseline_model = Select_Model(args = flags, device = device).baseline_model(model = flags['model'])      
         ensemble_model = Select_Model(args = flags, device = device).ensemble_model(model = flags['model'])
+
+        baseline_params = torch.load('{0}/weights/evaluation/{1}_baseline_mini_imagenet.pt'.format(abs_path, flags['model']), map_location = device)['state_dict']
+        ensemble_params = torch.load('{0}/weights/evaluation/{1}_ensemble_mini_imagenet.pt'.format(abs_path, flags['model']), map_location = device)['state_dict']
+
+        baseline_model_params = baseline_model.state_dict()
+        baseline_model_params.update(baseline_params)
+        baseline_model.load_state_dict(baseline_model_params)
+
+        ensemble_model_params = ensemble_model.state_dict()
+        ensemble_model_params.update(ensemble_params)
+        ensemble_model.load_state_dict(ensemble_model_params)
+        
         eval_mce = EvaluateMCE(flags, baseline_model, ensemble_model, device)
         eval_mce.run()
 
