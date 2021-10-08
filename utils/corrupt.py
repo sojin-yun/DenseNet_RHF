@@ -36,7 +36,7 @@ class EvaluateMCE() :
             self.baseline = self.baseline.to(self.device)
             self.baseline.eval()
 
-            for valid_data, valid_target in tqdm(self.valid_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01) :
+            for valid_data, valid_target in self.valid_loader :
 
                 if self.device != None : valid_data, valid_target = valid_data.to(self.device), valid_target.to(self.device)
 
@@ -69,7 +69,7 @@ class EvaluateMCE() :
             self.ensmeble = self.ensmeble.to(self.device)
             self.ensmeble.eval()
 
-            for valid_data, valid_target in tqdm(self.valid_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01) :
+            for valid_data, valid_target in self.valid_loader :
 
                 if self.device != None : valid_data, valid_target = valid_data.to(self.device), valid_target.to(self.device)
 
@@ -103,8 +103,8 @@ class EvaluateMCE() :
             print('Evaluation on corruption-{}'.format(c))
             baseline_ret = 0.
             ensemble_ret = (0., 0., 0.)
-            for s in range(1, 6) :
-                data_loader = self.load_data(c, str(3))
+            for s in tqdm(range(1, 6), desc="{:17s}".format('Evaluation State'), mininterval=0.01) :
+                data_loader = self.load_data(c, str(s))
                 baseline_ret += self.eval_baseline(data_loader)
                 ensemble_ret += self.eval_ensemble(data_loader)
             print('\ncorruption-{}'.format(c))
