@@ -112,6 +112,6 @@ class EvaluateMCE() :
                 ensemble_ret[2] += ret[2]
             print('\ncorruption-{}'.format(c))
             print('Baseline : {:.4f}%'.format(baseline_ret/5.))
-            print('Ensemble : {:.4f}% | {:.4f}% | {:.4f}%'.format(ensemble_ret[0]/5., ensemble_ret[1]/5., ensemble_ret[2]/5.))
+            print('Ensemble : {:.4f}% | {:.4f}% | {:.4f}%            {:.4f}% | {:.4f}% | {:.4f}%\n'.format(ensemble_ret[0]/5., ensemble_ret[1]/5., ensemble_ret[2]/5., ensemble_ret[0]/5.-baseline_ret/5., ensemble_ret[1]/5.-baseline_ret/5., ensemble_ret[2]/5.-baseline_ret/5.))
 
             
