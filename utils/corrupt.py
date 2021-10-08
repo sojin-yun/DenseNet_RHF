@@ -100,7 +100,7 @@ class EvaluateMCE() :
 
     def run(self) :
         for c in self.corrupt_list :
-            print('Evaluation on corruption-{}-{}'.format(c, str(3)))
+            print('Evaluation on corruption-{}'.format(c))
             baseline_ret = 0.
             ensemble_ret = (0., 0., 0.)
             for s in range(1, 6) :
