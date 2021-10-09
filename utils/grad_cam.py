@@ -9,8 +9,9 @@ class GradCAM(nn.Module) :
         # hook on target layer.
         self.model = model.to(device)
         self.ensemble = ensemble
+        self.model_type = 'ensemble' if self.ensemble else 'baseline'
         list(self.model.modules())[hooked_layer].register_forward_hook(self.forward_hook)
-        print('Hook on {0}'.format(list(self.model.modules())[hooked_layer]))
+        print('Hook on {0} - {1}'.format(list(self.model.modules())[hooked_layer]), self.model_type)
 
     def forward_hook(self, _, input_image, output):
         input_image[0].register_hook(self.hook)
