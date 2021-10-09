@@ -132,7 +132,7 @@ class ResNet_ensemble_deeper(nn.Module):
         self.boundary_fc = nn.Linear(512, num_classes)
         self.ensemble_fc = nn.Linear(2560, num_classes)
 
-        self.ensemble_relu = nn.ReLU()
+        self.ensemble_relu = nn.Identity()
 
         self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0015)
         self.loss = nn.CrossEntropyLoss()
