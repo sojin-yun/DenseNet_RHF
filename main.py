@@ -7,6 +7,7 @@ from utils.select_model import Select_Model
 from utils.random_seed import Fix_Randomness
 from utils.parse_args import Parsing_Args
 from utils.load_data import CustomDataLoader
+from utils.corrupt import EvaluateMCE
 from run.train import TrainingEnsemble, TrainingBaseline
 from run.eval import Evaluation
 from run.heatmap import RunGradCAM
