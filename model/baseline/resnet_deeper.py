@@ -92,8 +92,7 @@ class ResNet_deeper(nn.Module):
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(2048, num_classes)
 
-        self.cam_relu = nn.ReLU()
-        self.identity = nn.Identity()
+        self.cam_relu = nn.Identity()
 
         self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0015)
         self.loss = nn.CrossEntropyLoss()

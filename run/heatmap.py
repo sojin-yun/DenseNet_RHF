@@ -43,8 +43,8 @@ class RunGradCAM() :
         self.ensemble_model.load_state_dict(ensemble_params['state_dict'])
 
         # [mini_imagenet, cifar100]
-        self.hooked_layer = {'baseline' : {'vgg16' : [44, 43], 'vgg19' : [53, 32], 'resnet50' : [153, 153], 'resnet101' : [288, 287], 'resnet152' : [424, 423], 'densenet121' : [492, 491], 'densenet169' : [684, 683], 'densenet201' : [812, 811]},
-                             'ensemble' : {'vgg16' : [132, 102], 'vgg19' : [141, 111], 'resnet50' : [187, 186], 'resnet101' : [322, 321], 'resnet152' : [458, 457], 'densenet121' : [525, 524], 'densenet169' : [717, 716], 'densenet201' : [845, 844]}}
+        self.hooked_layer = {'baseline' : {'vgg16' : [44, 43], 'vgg19' : [53, 32], 'resnet50' : [152, 151], 'resnet101' : [288, 287], 'resnet152' : [424, 423], 'densenet121' : [492, 491], 'densenet169' : [684, 683], 'densenet201' : [812, 811]},
+                             'ensemble' : {'vgg16' : [132, 102], 'vgg19' : [141, 111], 'resnet50' : [186, 185], 'resnet101' : [322, 321], 'resnet152' : [458, 457], 'densenet121' : [525, 524], 'densenet169' : [717, 716], 'densenet201' : [845, 844]}}
         idx = 0 if self.args['data'] == 'mini_imagenet' else 1
 
         self.baseline_cam = GradCAM(model = self.baseline_model, hooked_layer = self.hooked_layer['baseline'][self.args['model']][idx], device = self.device, ensemble = False)
