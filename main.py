@@ -33,14 +33,16 @@ def drive(args) :
     if not flags['baseline'] :
         model = Select_Model(args = flags, device = device).ensemble_model(model = flags['model'])      
     else :
-        model = Select_Model(args = flags, device = device).baseline_model(model = flags['model'])      
+        model = Select_Model(args = flags, device = device).baseline_model(model = flags['model'])
 
     # Use Pretrained Weights
     if flags['pretrained'] :
+        model_name, data = flags['model'], flags['data']
+        if model_name == 'vgg16_recursive' : model_name = 'vgg16'
         if flags['baseline'] :
-            params = torch.load('{0}/weights/baseline/{1}_{2}.pth'.format(abs_path, flags['model'], flags['data']), map_location = device)
+            params = torch.load('{0}/weights/baseline/{1}_{2}.pth'.format(abs_path, model_name, data), map_location = device)
         else :
-            params = torch.load('{0}/weights/ensemble/{1}_{2}.pth'.format(abs_path, flags['model'], flags['data']), map_location = device)
+            params = torch.load('{0}/weights/ensemble/{1}_{2}.pth'.format(abs_path, model_name, data), map_location = device)
 
         model_params = model.state_dict()
         model_params.update(params)
