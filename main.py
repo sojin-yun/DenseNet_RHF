@@ -73,6 +73,7 @@ def drive(args) :
         cam = RunGradCAM(flags, data_loader)
         cam.run()
 
+    
     elif flags['mode'] == 'imagenet_c' :
         baseline_model = Select_Model(args = flags, device = device).baseline_model(model = flags['model'])      
         ensemble_model = Select_Model(args = flags, device = device).ensemble_model(model = flags['model'])
