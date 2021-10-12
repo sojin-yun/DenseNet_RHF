@@ -93,6 +93,7 @@ class ResNet_deeper(nn.Module):
         self.fc = nn.Linear(2048, num_classes)
 
         self.cam_relu = nn.ReLU()
+        self.identity = nn.Identity()
 
         self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0015)
         self.loss = nn.CrossEntropyLoss()
@@ -144,6 +145,7 @@ class ResNet_deeper(nn.Module):
         x = self.layer1(x)
         x = self.layer2(x)
         x = self.layer3(x)
+        x = self.identity(x)
         x = self.layer4(x)
 
         x = self.cam_relu(x)
