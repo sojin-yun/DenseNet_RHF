@@ -96,10 +96,7 @@ class VGG_ensemble(nn.Module):
 
         for conv in boundary_layers:
             model += [nn.Sequential(
-                          nn.Conv2d(conv, conv, kernel_size=3, stride=1, padding = 1), 
-                          nn.BatchNorm2d(conv),
-                          nn.ReLU(inplace = True),
-                          nn.Conv2d(conv, conv, kernel_size=3, stride=1, padding = 1), 
+                          nn.Conv2d(conv, conv, kernel_size=5, stride=1, padding = 2), 
                           nn.BatchNorm2d(conv),
                           nn.ReLU(inplace = True),
                           nn.MaxPool2d((2, 2)))]
