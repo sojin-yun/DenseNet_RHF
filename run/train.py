@@ -100,8 +100,7 @@ class TrainingEnsemble :
             n_valid_batchs = len(self.valid_loader)
             batch_size = self.args['batch_size']
 
-            #for train_iter, (train_data, train_target) in enumerate(tqdm(self.train_loader, desc="{:17s}".format('Training State'), mininterval=0.01)) :
-            for train_data, train_target in self.train_loader :
+            for train_iter, (train_data, train_target) in enumerate(tqdm(self.train_loader, desc="{:17s}".format('Training State'), mininterval=0.01)) :
                 
                 if self.device != None : train_data, train_target = train_data.to(self.device), train_target.to(self.device)
                 
