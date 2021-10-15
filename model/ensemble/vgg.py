@@ -102,9 +102,6 @@ class VGG_ensemble(nn.Module):
                           nn.Conv2d(conv, conv, kernel_size=3, stride=1, padding = 1), 
                           nn.BatchNorm2d(conv),
                           nn.ReLU(inplace = True),
-                          nn.Conv2d(conv, conv, kernel_size=3, stride=1, padding = 1), 
-                          nn.BatchNorm2d(conv),
-                          nn.ReLU(inplace = True),
                           nn.MaxPool2d((2, 2)))]
         
         for i in range(len(boundary_layers)-1):
