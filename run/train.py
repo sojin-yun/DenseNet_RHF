@@ -193,7 +193,8 @@ class TrainingEnsemble :
                 best_model_params = {
                 'epoch' : i,
                 'state_dict' : self.model.state_dict(),
-                'optimizer' : self.model.optimizer.state_dict() 
+                'optimizer' : self.model.optimizer.state_dict(),
+                'scheduler' : self.model.scheduler.state_dict()
                 }
                 torch.save(best_model_params, os.path.join(self.default_path, self.save_path, self.save_file+'.pt'))
 
@@ -354,7 +355,8 @@ class TrainingBaseline :
                 best_model_params = {
                 'epoch' : i,
                 'state_dict' : self.model.state_dict(),
-                'optimizer' : self.model.optimizer.state_dict() 
+                'optimizer' : self.model.optimizer.state_dict(), 
+                'scheduler' : self.model.scheduler.state_dict()
                 }
                 best_valid_acc = avg_valid_acc
                 best_valid_loss = avg_valid_loss
