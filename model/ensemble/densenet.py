@@ -111,7 +111,7 @@ class DenseNet_ensemble(nn.Module):
         self.boundary_fc = nn.Linear(boundary_inner_channels, num_class)
         self.ensemble_fc = nn.Linear(inner_channels + boundary_inner_channels, num_class)
 
-        self.ensemble_relu = nn.ReLU(inplace=True)
+        self.ensemble_relu = nn.Identity()
 
         self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0015)
         self.loss = nn.CrossEntropyLoss()

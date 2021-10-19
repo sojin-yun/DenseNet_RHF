@@ -80,7 +80,7 @@ class DenseNet(nn.Module):
 
         self.features = nn.Sequential(*self.features)
 
-        self.cam_relu = nn.ReLU()
+        self.cam_relu = nn.Identity()
 
         self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0015)
         self.loss = nn.CrossEntropyLoss()
