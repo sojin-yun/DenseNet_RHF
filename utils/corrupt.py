@@ -11,7 +11,7 @@ class EvaluateMCE() :
         self.device = device
         self.baseline = baseline
         self.ensmeble = ensemble
-        if self.args['server'] : self.path = '/home/NAS_mount/sjlee/CIFAR100/RHF/data/Mini_ImageNet-C'
+        if self.args['server'] : self.path = '/home/NAS_mount/sjlee/RHF/data/Mini_ImageNet-C'
         else : self.path = './data/Mini_ImageNet-C'
         self.transforms =  transforms.Compose([
             transforms.Resize((224, 224)),
