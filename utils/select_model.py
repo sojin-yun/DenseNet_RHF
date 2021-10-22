@@ -16,9 +16,11 @@ class Select_Model :
         self.is_baseline = args['baseline']
         self.data = args['data']
         self.device = device
-        if self.data == 'cifar100' : self.low_resolution = True
+        if self.data == 'cifar100' or self.data == 'mnist' : self.low_resolution = True
         else : self.low_resolution = False
-        self.numclasses = 2 if self.data == 'kidney_stone' else 100
+        if self.data == 'kidney_stone' : self.numclasses = 2
+        elif self.data == 'mnist' : self.numclasses = 10
+        else : self.numclasses = 100
 
     def __call__(self) :
         if self.is_baseline :

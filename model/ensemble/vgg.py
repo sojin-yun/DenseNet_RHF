@@ -16,7 +16,7 @@ class VGG_ensemble(nn.Module):
                     '16' : {'conv_layers' : [64, 'R', 128, 'R', 256, 256,      'R', 512, 512,      'R', 512, 512, 'R'],      'boundary_layers' : [64, 128, 256, 512, 512]},
                     '19' : {'conv_layers' : [64, 'R', 128, 'R', 256, 256, 256, 'R', 512, 512, 512, 'R', 512, 512, 512, 'R'], 'boundary_layers' : [64, 128, 256, 512, 512]}
                 }
-        elif self.data == 'cifar100' :
+        elif self.data == 'cifar100' or self.data == 'mnist':
             self.select_model = {
                     '16' : {'conv_layers' : [64, 64, 128, 'R', 256, 256,      'R', 512, 512,      'R', 512, 512, 512     ], 'boundary_layers' : [128, 256, 512]},
                     '19' : {'conv_layers' : [64, 64, 128, 'R', 256, 256, 256, 'R', 512, 512, 512, 'R', 512, 512, 512, 512], 'boundary_layers' : [128, 256, 512]}
@@ -31,7 +31,7 @@ class VGG_ensemble(nn.Module):
         for m in self.compression_conv : m = m.to(self.device)
 
         if self.data == 'mini_imagenet' : width = 7
-        elif self.data == 'cifar100' : width = 8
+        elif self.data == 'cifar100' or self.data == 'mnist' : width = 8
         elif self.data == 'kidney_stone' : width = 16
 
         self.classifier = nn.Sequential(
@@ -202,6 +202,7 @@ class BoundaryConv2d(nn.Module):
             nn.Upsample(scale_factor=self.pooling_kernel_size, mode = 'bilinear', align_corners=False),
             nn.ReLU(True)
         )
+        #self.identity = nn.Identity()
 
 
     def forward(self, x):
@@ -215,6 +216,8 @@ class BoundaryConv2d(nn.Module):
         
         # get substracted
         ret_upsample = self.up_sampling(ret_pooling)
+        #ret_sub = self.identity(torch.abs(ret_first_forward - ret_upsample))
+        #self.boundary = ret_sub
         self.boundary = torch.abs(ret_first_forward - ret_upsample)
 
         return ret_pooling
