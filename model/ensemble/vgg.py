@@ -60,7 +60,7 @@ class VGG_ensemble(nn.Module):
 
         self._initializing_weights()
         
-        self.optimizer = optim.SGD(self.parameters(), lr = 0.001, momentum = 0.9, weight_decay=0.0015)
+        self.optimizer = optim.SGD(self.parameters(), lr = 0.01, momentum = 0.9, weight_decay=0.0015)
         self.loss = nn.CrossEntropyLoss()
         self.boundary_loss = nn.CrossEntropyLoss()
         self.ensemble_loss = nn.CrossEntropyLoss()

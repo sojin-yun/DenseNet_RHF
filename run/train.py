@@ -83,7 +83,7 @@ class TrainingEnsemble :
         # for non-pretrained
         #backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight = 1.0, 0.2, 0.2
         # for pre-trained
-        backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight = 0.05, 1.0, 1.0
+        backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight = 1.0, 0.3, 0.3
         f.write('Loss Information - Backbone_loss : {0} | Boundary_loss : {1} | Ensemble_loss : {2}\n\n'.format(backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight))
         f.write('Optimizer : {}\n'.format(self.model.optimizer))
         f.write('Learning_scheduler : step_size : {0} | gamma : {1}\n\n'.format(self.model.scheduler.step_size, self.model.scheduler.gamma))
