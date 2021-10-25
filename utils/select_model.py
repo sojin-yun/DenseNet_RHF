@@ -48,7 +48,7 @@ class Select_Model :
             return VGG_ensemble(model_key = '19', num_classes = self.numclasses, device = self.device, data = self.data)
 
         elif model == 'vgg16_recursive' :
-            return VGG_ensemble_recursive(model_key = '19', num_classes = self.numclasses, device = self.device, data = self.data)
+            return VGG_ensemble_recursive(model_key = '16', num_classes = self.numclasses, device = self.device, data = self.data)
 
         elif model == 'densenet121' :
             return DenseNet_ensemble(Bottleneck_ensemble, [6, 12, 24, 16], [128, 256, 512], 32, num_class = self.numclasses, device = self.device, low_resolution = self.low_resolution)
