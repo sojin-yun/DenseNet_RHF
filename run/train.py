@@ -147,7 +147,7 @@ class TrainingEnsemble :
 
                     self.model.optimizer.zero_grad()
 
-                    valid_output, valid_boundary_output, valid_ensemble_output = self.model(valid_data)
+                    valid_output, valid_boundary_output, valid_ensemble_output, _ = self.model(valid_data)
 
                     v_loss = self.model.loss(valid_output, valid_target)
                     valid_b_loss = self.model.boundary_loss(valid_boundary_output, valid_target)
