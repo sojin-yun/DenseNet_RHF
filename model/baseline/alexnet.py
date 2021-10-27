@@ -44,16 +44,16 @@ class AlexNet(nn.Module):
 
     # define weight initialization function
     def init_weight(self):
-        for layer in self.net:
+        for layer in self.features:
             if isinstance(layer, nn.Conv2d):
                 nn.init.normal_(layer.weight, mean=0, std=0.01)
                 nn.init.constant_(layer.bias, 0)
-        nn.init.constant_(self.net[4].bias, 1)
-        nn.init.constant_(self.net[10].bias, 1)
-        nn.init.constant_(self.net[12].bias, 1)
+        nn.init.constant_(self.features[4].bias, 1)
+        nn.init.constant_(self.features[10].bias, 1)
+        nn.init.constant_(self.features[12].bias, 1)
     
     def forward(self,x):
-        x = self.net(x)
+        x = self.features(x)
         x = x.view(-1, 256 * 6* 6)
         x = self.classifier(x)
         return x
