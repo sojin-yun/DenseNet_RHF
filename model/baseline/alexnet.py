@@ -6,7 +6,7 @@ class AlexNet(nn.Module):
         super(AlexNet,self).__init__()
 
         # Conv layer
-        self.net = nn.Sequential(
+        self.features = nn.Sequential(
             nn.Conv2d(3, 96, kernel_size=11, stride=4, padding=0), # (b x 96 x 55 x 55)
             nn.ReLU(inplace=True),
             nn.LocalResponseNorm(size=5, alpha=0.0001, beta=0.75, k=2),
