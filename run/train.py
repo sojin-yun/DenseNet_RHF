@@ -109,7 +109,7 @@ class TrainingEnsemble :
                 
                 self.model.optimizer.zero_grad()
 
-                train_output, boundary_output, ensemble_output, _ = self.model(train_data)
+                train_output, boundary_output, ensemble_output = self.model(train_data)
 
                 t_loss = self.model.loss(train_output, train_target)
                 b_loss = self.model.boundary_loss(boundary_output, train_target)
@@ -147,7 +147,7 @@ class TrainingEnsemble :
 
                     self.model.optimizer.zero_grad()
 
-                    valid_output, valid_boundary_output, valid_ensemble_output, _ = self.model(valid_data)
+                    valid_output, valid_boundary_output, valid_ensemble_output = self.model(valid_data)
 
                     v_loss = self.model.loss(valid_output, valid_target)
                     valid_b_loss = self.model.boundary_loss(valid_boundary_output, valid_target)
