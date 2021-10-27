@@ -8,6 +8,7 @@ from model.baseline.resnet import ResNet, BasicBlock
 from model.baseline.resnet_deeper import ResNet_deeper, BasicBlock_deeper
 from model.baseline.densenet import DenseNet, Bottleneck
 from model.baseline.vgg import VGG
+from model.baseline.alexnet import AlexNet
 
 class Select_Model :
     def __init__(self, args, device = 'cpu') :
@@ -88,3 +89,6 @@ class Select_Model :
 
         elif model == 'densenet201' :
             return DenseNet(Bottleneck, [6, 12, 48, 32], growth_rate=32, num_class = self.numclasses, low_resolution = self.low_resolution)
+
+        elif model == 'alexnet' :
+            return AlexNet(num_classes=100)
