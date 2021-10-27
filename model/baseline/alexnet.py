@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torch.optim as optim
+from torch.optim.lr_scheduler import StepLR
 
 class AlexNet(nn.Module):
     def __init__(self, num_classes: int = 1000, dropout: float = 0.5) -> None:
@@ -31,6 +33,11 @@ class AlexNet(nn.Module):
             nn.ReLU(inplace=True),
             nn.Linear(1024, num_classes),
         )
+
+        self.optimizer = optim.SGD(self.parameters(), lr = 0.01, momentum = 0.9, weight_decay=0.0015)
+        self.loss = nn.CrossEntropyLoss()
+        self.scheduler = StepLR(self.optimizer, step_size=15, gamma=0.5)
+
         self._initialize_weights()
 
     def _initialize_weights(self) :
