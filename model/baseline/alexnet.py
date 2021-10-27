@@ -1,59 +1,51 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 class AlexNet(nn.Module):
-    def __init__(self, num_classes=100):
-        super(AlexNet,self).__init__()
+    def __init__(self, num_classes: int = 1000, dropout: float = 0.5) -> None:
+        super(AlexNet, self).__init__()
 
-        # Conv layer
         self.features = nn.Sequential(
-            nn.Conv2d(3, 96, kernel_size=11, stride=4, padding=0), # (b x 96 x 55 x 55)
+            nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
             nn.ReLU(inplace=True),
-            nn.LocalResponseNorm(size=5, alpha=0.0001, beta=0.75, k=2),
-            nn.MaxPool2d(kernel_size=3, stride=2), # (b x 96 x 27 x 27)
-
-            nn.Conv2d(96, 256, kernel_size=5, stride=1, padding=2), # (b x 256 x 27 x 27)
-            nn.ReLU(),
-            nn.LocalResponseNorm(size=5, alpha=0.0001, beta=0.75, k=2),
-            nn.MaxPool2d(kernel_size=3, stride=2), # (b x 256 x 13 x 13)
-
-            nn.Conv2d(256, 384, 3, 1, 1), # (b x 384 x 13 x 13)
-            nn.ReLU(),
-
-            nn.Conv2d(384, 384, 3, 1, 1), # (b x 384 x 13 x 13)
-            nn.ReLU(),
-
-            nn.Conv2d(384, 256, 3, 1, 1), # (b x 256 x 13 x 13)
-            nn.ReLU(),
-            nn.MaxPool2d(3, 2), # (b x 256 x 6 x 6)
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.Conv2d(64, 192, kernel_size=5, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.Conv2d(192, 384, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(384, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
         )
-
-        # fc layer
+        self.avgpool = nn.AdaptiveAvgPool2d((6, 6))
         self.classifier = nn.Sequential(
-            nn.Dropout(p=0.5, inplace=True),
-            nn.Linear(in_features=(256 * 6 * 6), out_features=2048),
-            nn.ReLU(),
-            nn.Dropout(p=0.5, inplace=True),
-            nn.Linear(in_features=2048, out_features=1024),
-            nn.ReLU(),
-            nn.Linear(in_features=1024, out_features=num_classes),
+            nn.Dropout(p=dropout),
+            nn.Linear(256 * 6 * 6, 2048),
+            nn.ReLU(inplace=True),
+            nn.Dropout(p=dropout),
+            nn.Linear(2048, 1024),
+            nn.ReLU(inplace=True),
+            nn.Linear(1024, num_classes),
         )
+        self._initialize_weights()
 
-        # weight initialization
-        self.init_weight()
+    def _initialize_weights(self) :
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.Linear):
+                nn.init.xavier_normal_(m.weight)
 
-    # define weight initialization function
-    def init_weight(self):
-        for layer in self.features:
-            if isinstance(layer, nn.Conv2d):
-                nn.init.normal_(layer.weight, mean=0, std=0.01)
-                nn.init.constant_(layer.bias, 0)
-        nn.init.constant_(self.features[4].bias, 1)
-        nn.init.constant_(self.features[10].bias, 1)
-        nn.init.constant_(self.features[12].bias, 1)
-    
-    def forward(self,x):
+    def forward(self, x):
         x = self.features(x)
-        x = x.view(-1, 256 * 6* 6)
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
         x = self.classifier(x)
         return x
