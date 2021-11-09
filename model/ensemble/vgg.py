@@ -199,10 +199,11 @@ class BoundaryConv2d(nn.Module):
         self.max_pooling = nn.MaxPool2d(self.pooling_kernel_size)
         
         self.up_sampling = nn.Sequential(
-            nn.Upsample(scale_factor=self.pooling_kernel_size, mode = 'bilinear', align_corners=False),
+            #nn.Upsample(scale_factor=self.pooling_kernel_size, mode = 'bilinear', align_corners=False),
+            nn.ConvTranspose2d(self.out_channels, self.out_channels, 3, 2, 1, 1),
             nn.ReLU(True)
         )
-        #self.identity = nn.Identity()
+        self.identity = nn.Identity()
 
 
     def forward(self, x):
@@ -216,8 +217,8 @@ class BoundaryConv2d(nn.Module):
         
         # get substracted
         ret_upsample = self.up_sampling(ret_pooling)
-        #ret_sub = self.identity(torch.abs(ret_first_forward - ret_upsample))
-        #self.boundary = ret_sub
-        self.boundary = torch.abs(ret_first_forward - ret_upsample)
+        ret_sub = self.identity(torch.abs(ret_first_forward - ret_upsample))
+        self.boundary = ret_sub
+        #self.boundary = torch.abs(ret_first_forward - ret_upsample)
 
         return ret_pooling
