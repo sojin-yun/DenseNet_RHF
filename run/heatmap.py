@@ -129,3 +129,90 @@ class RunGradCAM() :
         np.save(os.path.join(self.default_path, self.save_path, 'baseline_cam.npy'), baseline_result)
         np.save(os.path.join(self.default_path, self.save_path, 'ensemble_cam.npy'), ensemble_result)
 
+    def run_separated(self) :
+
+        #image_size = 224 if self.args['data'] == 'mini_imagenet' else 64
+        image_size = self.image_size[self.args['data']]
+        mean, std = self.mean[self.args['data']], self.std[self.args['data']]
+        #mean, std = ((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)) if self.args['data'] == 'mini_imagenet' else ((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))
+        self.upsample = nn.Upsample(size = image_size, mode = 'bilinear', align_corners = False)
+        
+        inverse_norm = InverseNormalize(mean, std)
+
+        if self.args['data'] == 'kidney_stone' :
+            mapping_dict = {'0' : 'No Stone', '1' : 'Stone'}
+        else :
+            dict_name = 'cifar_dict.json' if self.args['data'] == 'cifar100' else 'mini_dict.json'
+            dict_path = '/home/NAS_mount/sjlee/RHF/data/{}'.format(dict_name) if self.args['server'] else 'data/{}'.format(dict_name)
+            load_dict = open(dict_path, 'r')
+            mapping_dict = json.load(load_dict)
+
+        baseline_result = np.empty((len(self.test_loader), image_size, image_size, 1))
+        ensemble_result = np.empty((len(self.test_loader), image_size, image_size, 1))
+
+        for idx, (data, target) in enumerate(tqdm(self.test_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01)) :
+
+            if self.args['device'] != 'cpu' : data, target = data.to(self.device), target.to(self.device)
+            
+            # Image inverse-normalizing to plot below heatmap
+            image = inverse_norm.run(data).numpy()
+            image_np = np.transpose(image, (0, 2, 3, 1)).squeeze(0)
+            
+            baseline_ret, baseline_pred = self.baseline_cam(data, target)
+            baseline_ret = self.upsample(baseline_ret.unsqueeze(0)).detach().cpu()
+            baseline_ret = np.transpose(baseline_ret, (0, 2, 3, 1)).squeeze(0)
+            baseline_result[idx] = baseline_ret
+            
+            ensemble_ret, ensemble_ret_backbone, ensemble_ret_boundary, ensemble_pred = self.ensemble_cam.separated_forward(data, target)
+            ensemble_ret = self.upsample(ensemble_ret.unsqueeze(0)).detach().cpu()
+            ensemble_ret_backbone = self.upsample(ensemble_ret_backbone.unsqueeze(0)).detach().cpu()
+            ensemble_ret_boundary = self.upsample(ensemble_ret_boundary.unsqueeze(0)).detach().cpu()
+            ensemble_ret = np.transpose(ensemble_ret, (0, 2, 3, 1)).squeeze(0)
+            ensemble_ret_backbone = np.transpose(ensemble_ret_backbone, (0, 2, 3, 1)).squeeze(0)
+            ensemble_ret_boundary = np.transpose(ensemble_ret_boundary, (0, 2, 3, 1)).squeeze(0)
+            ensemble_result[idx] = ensemble_ret_backbone
+
+            figsave_path = ''
+
+            if (baseline_pred.item() != target.item()) and (ensemble_pred.item() == target.item()) : figsave_path = os.path.join(self.default_path, self.save_path, 'Ensemble_correct/', str(target.item()))
+            elif (baseline_pred.item() == target.item()) and (ensemble_pred.item() == target.item()) : figsave_path = os.path.join(self.default_path, self.save_path, 'Both_correct/', str(target.item()))
+            else : continue
+
+            fig = plt.figure(figsize=(20, 4))
+            ax0 = fig.add_subplot(1, 5, 1)
+            ax0.imshow(image_np)
+            ax0.set_title(mapping_dict[str(target.item())], fontsize = 18)
+            #ax0.set_title(target.item(), fontsize = 15)
+            ax0.axis('off')
+
+            ax1 = fig.add_subplot(1, 5, 2)
+            ax1.imshow(image_np)
+            ax1.imshow(baseline_ret, cmap = 'jet', alpha = 0.4)
+            ax1.set_title('Baseline', fontsize = 15)
+            ax1.axis('off')
+
+            ax2 = fig.add_subplot(1, 5, 3)
+            ax2.imshow(image_np)
+            ax2.imshow(ensemble_ret, cmap = 'jet', alpha = 0.4)
+            ax2.set_title('Ensemble', fontsize = 15)
+            ax2.axis('off')
+
+            ax3 = fig.add_subplot(1, 5, 4)
+            ax3.imshow(image_np)
+            ax3.imshow(ensemble_ret_backbone, cmap = 'jet', alpha = 0.4)
+            ax3.set_title('Ensemble-backbone', fontsize = 15)
+            ax3.axis('off')
+
+            ax4 = fig.add_subplot(1, 5, 5)
+            ax4.imshow(image_np)
+            ax4.imshow(ensemble_ret_boundary, cmap = 'jet', alpha = 0.4)
+            ax4.set_title('Ensemble-edge', fontsize = 15)
+            ax4.axis('off')
+
+            plt.savefig(figsave_path+'/{0}.png'.format(str(idx)))
+            plt.close()
+            #plt.show()
+
+        np.save(os.path.join(self.default_path, self.save_path, 'baseline_cam.npy'), baseline_result)
+        np.save(os.path.join(self.default_path, self.save_path, 'ensemble_cam.npy'), ensemble_result)
+

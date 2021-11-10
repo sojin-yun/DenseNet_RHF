@@ -74,5 +74,9 @@ def Parsing_Args(args) :
         '--cam', nargs='+', default=[],
         help = 'pretrained weight''s path to get heatmap'
     )
+    parser.add_argument(
+        '--separate', type = str_to_bool, default = False,
+        help = 'set mode to visualize heatmap from backbone and boundary activation map'
+    )
 
     return vars(parser.parse_known_args(args)[0])
