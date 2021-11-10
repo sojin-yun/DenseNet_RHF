@@ -98,14 +98,14 @@ class VGG_ensemble(nn.Module):
             model += [nn.Sequential(
                           nn.Conv2d(conv, conv, kernel_size=5, stride=1, padding = 2), 
                           nn.BatchNorm2d(conv),
-                          nn.ReLU(inplace = True),
+                          nn.LeakyReLU(inplace = True),
                           nn.MaxPool2d((2, 2)))]
         
         for i in range(len(boundary_layers)-1):
             comp += [nn.Sequential(
                           nn.Conv2d(boundary_layers[i]+boundary_layers[i+1], boundary_layers[i+1], kernel_size=1, stride=1, padding=0),
                           nn.BatchNorm2d(boundary_layers[i+1]),
-                          nn.ReLU(inplace = True))]
+                          nn.LeakyReLU(inplace = True))]
 
         return model, comp
 
@@ -199,11 +199,11 @@ class BoundaryConv2d(nn.Module):
         self.max_pooling = nn.MaxPool2d(self.pooling_kernel_size)
         
         self.up_sampling = nn.Sequential(
-            #nn.Upsample(scale_factor=self.pooling_kernel_size, mode = 'bilinear', align_corners=False),
-            nn.ConvTranspose2d(self.out_channels, self.out_channels, 3, 2, 1, 1),
+            nn.Upsample(scale_factor=self.pooling_kernel_size, mode = 'bilinear', align_corners=False),
+            #nn.ConvTranspose2d(self.out_channels, self.out_channels, 3, 2, 1, 1),
             nn.ReLU(True)
         )
-        self.identity = nn.Identity()
+        #self.identity = nn.Identity()
 
 
     def forward(self, x):
@@ -217,8 +217,8 @@ class BoundaryConv2d(nn.Module):
         
         # get substracted
         ret_upsample = self.up_sampling(ret_pooling)
-        ret_sub = self.identity(torch.abs(ret_first_forward - ret_upsample))
-        self.boundary = ret_sub
-        #self.boundary = torch.abs(ret_first_forward - ret_upsample)
+        #ret_sub = self.identity(torch.abs(ret_first_forward - ret_upsample))
+        #self.boundary = ret_sub
+        self.boundary = torch.abs(ret_first_forward - ret_upsample)
 
         return ret_pooling
