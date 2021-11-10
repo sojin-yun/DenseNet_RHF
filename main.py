@@ -71,7 +71,10 @@ def drive(args) :
 
     elif flags['mode'] == 'cam' :
         cam = RunGradCAM(flags, data_loader)
-        cam.run()
+        if flags['separate'] :
+            cam.run_separated()
+        else :
+            cam.run()
 
     
     elif flags['mode'] == 'imagenet_c' :
