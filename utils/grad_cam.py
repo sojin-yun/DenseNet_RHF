@@ -68,6 +68,8 @@ class GradCAM(nn.Module) :
         self.forward_boundary = self.forward_result[512:, :, :]
         self.backbone_result = self.backward_result[:, :512, :, :]
         self.boundary_result = self.backward_result[:, 512:, :, :]
+        print(self.backward_result.shape)
+        print(self.forward_result.shape)
 
         if len(self.backward_result.shape) == 3:
             a_k = torch.mean(self.backbone_result.unsqueeze(0), dim=(2, 3), keepdim=True)
