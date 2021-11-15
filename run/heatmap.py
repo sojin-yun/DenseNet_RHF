@@ -116,13 +116,13 @@ class RunGradCAM() :
 
             ax1 = fig.add_subplot(1, 3, 2)
             ax1.imshow(image_np)
-            ax1.imshow(baseline_ret, cmap = 'gray', alpha = 0.4)
+            ax1.imshow(baseline_ret, cmap = 'jet', alpha = 0.4)
             ax1.set_title('Baseline', fontsize = 15)
             ax1.axis('off')
 
             ax2 = fig.add_subplot(1, 3, 3)
             ax2.imshow(image_np)
-            ax2.imshow(ensemble_ret, cmap = 'gray', alpha = 0.4)
+            ax2.imshow(ensemble_ret, cmap = 'jet', alpha = 0.4)
             ax2.set_title('Ensemble', fontsize = 15)
             ax2.axis('off')
 
@@ -191,25 +191,25 @@ class RunGradCAM() :
 
             ax1 = fig.add_subplot(1, 5, 2)
             ax1.imshow(image_np)
-            ax1.imshow(baseline_ret, cmap = 'gray', alpha = 0.4)
+            ax1.imshow(baseline_ret, cmap = 'jet', alpha = 0.4)
             ax1.set_title('Baseline', fontsize = 15)
             ax1.axis('off')
 
             ax2 = fig.add_subplot(1, 5, 3)
             ax2.imshow(image_np)
-            ax2.imshow(ensemble_ret, cmap = 'gray', alpha = 0.4)
+            ax2.imshow(ensemble_ret, cmap = 'jet', alpha = 0.4)
             ax2.set_title('Ensemble', fontsize = 15)
             ax2.axis('off')
 
             ax3 = fig.add_subplot(1, 5, 4)
             ax3.imshow(image_np)
-            ax3.imshow(ensemble_ret_backbone, cmap = 'gray', alpha = 0.4)
+            ax3.imshow(ensemble_ret_backbone, cmap = 'jet', alpha = 0.4)
             ax3.set_title('Ensemble-backbone', fontsize = 15)
             ax3.axis('off')
 
             ax4 = fig.add_subplot(1, 5, 5)
             ax4.imshow(image_np)
-            ax4.imshow(ensemble_ret_boundary, cmap = 'gray', alpha = 0.4)
+            ax4.imshow(ensemble_ret_boundary, cmap = 'jet', alpha = 0.4)
             ax4.set_title('Ensemble-edge', fontsize = 15)
             ax4.axis('off')
 
