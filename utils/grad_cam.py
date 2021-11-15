@@ -37,6 +37,7 @@ class GradCAM(nn.Module) :
         
         loss.backward()
 
+
         if len(self.backward_result.shape) == 3:
             a_k = torch.mean(self.backward_result.unsqueeze(0), dim=(2, 3), keepdim=True)
         else:
@@ -63,11 +64,11 @@ class GradCAM(nn.Module) :
             loss += output[idx, pred]
         
         loss.backward()
-
-        self.forward_backbone = self.forward_result[:2048, :, :]
-        self.forward_boundary = self.forward_result[2048:, :, :]
-        self.backbone_result = self.backward_result[:, :2048, :, :]
-        self.boundary_result = self.backward_result[:, 2048:, :, :]
+        channel_devide = 512
+        self.forward_backbone = self.forward_result[:channel_devide, :, :]
+        self.forward_boundary = self.forward_result[channel_devide:, :, :]
+        self.backbone_result = self.backward_result[:, :channel_devide, :, :]
+        self.boundary_result = self.backward_result[:, channel_devide:, :, :]
 
 
         if len(self.backward_result.shape) == 3:
