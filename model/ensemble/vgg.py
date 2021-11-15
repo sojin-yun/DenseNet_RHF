@@ -199,8 +199,8 @@ class BoundaryConv2d(nn.Module):
         self.max_pooling = nn.MaxPool2d(self.pooling_kernel_size)
         
         self.up_sampling = nn.Sequential(
-            nn.Upsample(scale_factor=self.pooling_kernel_size, mode = 'bilinear', align_corners=False),
-            #nn.ConvTranspose2d(self.out_channels, self.out_channels, 3, 2, 1, 1),
+            #nn.Upsample(scale_factor=self.pooling_kernel_size, mode = 'bilinear', align_corners=False),
+            nn.ConvTranspose2d(self.out_channels, self.out_channels, 3, 2, 1, 1),
             nn.ReLU(True)
         )
         #self.identity = nn.Identity()
