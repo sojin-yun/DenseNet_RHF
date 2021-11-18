@@ -4,11 +4,13 @@ from model.ensemble.resnet_deeper import ResNet_ensemble_deeper, BasicBlock_ense
 from model.ensemble.densenet import DenseNet_ensemble, Bottleneck_ensemble
 from model.ensemble.vgg import VGG_ensemble
 from model.ensemble.vgg_recursive import VGG_ensemble_recursive
+#from model.ensemble.squeezenet import SqueezeNet, Fire, _squeezenet
 from model.baseline.resnet import ResNet, BasicBlock
 from model.baseline.resnet_deeper import ResNet_deeper, BasicBlock_deeper
 from model.baseline.densenet import DenseNet, Bottleneck
 from model.baseline.vgg import VGG
 from model.baseline.alexnet import AlexNet
+from model.baseline.squeezenet import SqueezeNet, Fire, _squeezenet
 
 class Select_Model :
     def __init__(self, args, device = 'cpu') :
@@ -92,3 +94,9 @@ class Select_Model :
 
         elif model == 'alexnet' :
             return AlexNet(num_classes=100)
+
+        elif model == 'squeezenet10' :
+            return _squeezenet('1_0')
+
+        elif model == 'squeezenet11' :
+            return _squeezenet('1_1')
