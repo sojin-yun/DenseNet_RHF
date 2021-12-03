@@ -1,6 +1,7 @@
 
 from model.ensemble.resnet import ResNet_ensemble, BasicBlock_ensemble
 from model.ensemble.resnet_deeper import ResNet_ensemble_deeper, BasicBlock_ensemble_deeper
+from model.ensemble.resnet_deeper_ext import ResNet_ensemble_deeper_ext, BasicBlock_ensemble_deeper_ext
 from model.ensemble.densenet import DenseNet_ensemble, Bottleneck_ensemble
 from model.ensemble.vgg import VGG_ensemble
 from model.ensemble.vgg_recursive import VGG_ensemble_recursive
@@ -43,6 +44,15 @@ class Select_Model :
 
         elif model == 'resnet152' :
             return ResNet_ensemble_deeper(BasicBlock_ensemble_deeper, [3, 8, 36, 3], [128, 256, 512], self.numclasses, None, self.device, low_resolution = self.low_resolution)
+
+        elif model == 'resnet50_ext' :
+            return ResNet_ensemble_deeper_ext(BasicBlock_ensemble_deeper_ext, [3, 4, 6, 3], [64, 64, 128, 256, 512], self.numclasses, None, self.device, low_resolution = self.low_resolution)
+
+        elif model == 'resnet101_ext' :
+            return ResNet_ensemble_deeper_ext(BasicBlock_ensemble_deeper_ext, [3, 4, 23, 3], [64, 64, 128, 256, 512], self.numclasses, None, self.device, low_resolution = self.low_resolution)
+
+        elif model == 'resnet152_ext' :
+            return ResNet_ensemble_deeper_ext(BasicBlock_ensemble_deeper_ext, [3, 8, 36, 3], [64, 64, 128, 256, 512], self.numclasses, None, self.device, low_resolution = self.low_resolution)
 
         elif model == 'vgg16' :
             return VGG_ensemble(model_key = '16', num_classes = self.numclasses, device = self.device, data = self.data)
