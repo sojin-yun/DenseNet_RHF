@@ -284,7 +284,7 @@ class TrainingBaseline :
         else :
             print('GPU Information - {}\n\n'.format(torch.cuda.get_device_name('cuda:{}'.format(self.args['device']))))
         f.write('Optimizer : {}\n'.format(self.model.optimizer))
-        f.write('Learning_scheduler : step_size : {0} | gamma : {1}\n\n'.format(self.model.scheduler.step_size, self.model.scheduler.gamma))
+        #f.write('Learning_scheduler : step_size : {0} | gamma : {1}\n\n'.format(self.model.scheduler.step_size, self.model.scheduler.gamma))
 
         best_valid_acc, best_valid_loss = 0., 100.
 
