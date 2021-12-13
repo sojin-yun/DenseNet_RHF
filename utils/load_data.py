@@ -10,7 +10,7 @@ class CustomDataLoader() :
         self.args = args
         self.data = args['data']
         self.server = args['server']
-        assert self.data in ['cifar100', 'mini_imagenet', 'kidney_stone', 'mnist'], '--data argument is invalid'
+        assert self.data in ['cifar100', 'mini_imagenet', 'mini_imagenet_vit', 'kidney_stone', 'mnist'], '--data argument is invalid'
 
         self.transformer_components = {
             'cifar100' : {'image_size' : 64, 'mean' : (0.5071, 0.4867, 0.4408), 'std' : (0.2675, 0.2565, 0.2761)},
