@@ -16,6 +16,7 @@ class CustomDataLoader() :
             'cifar100' : {'image_size' : 64, 'mean' : (0.5071, 0.4867, 0.4408), 'std' : (0.2675, 0.2565, 0.2761)},
             'mnist' : {'image_size' : 64, 'mean' : (0.0783, 0.0719, 0.0681), 'std' : (0.2245, 0.2134, 0.2067)},
             'mini_imagenet' : {'image_size' : 224, 'mean' : (0.485, 0.456, 0.406), 'std' : (0.229, 0.224, 0.225)},
+            'mini_imagenet_vit' : {'image_size' : 384, 'mean' : (0.485, 0.456, 0.406), 'std' : (0.229, 0.224, 0.225)},
             'kidney_stone' : {'image_size' : 512, 'mean' : 0.169, 'std' : 0.259}
         }
 
@@ -23,6 +24,7 @@ class CustomDataLoader() :
             'cifar100' : {'data' : torchvision.datasets.CIFAR100, 'path' : '/home/NAS_mount/sjlee/CIFAR100/'} if self.server else {'data' : torchvision.datasets.CIFAR100, 'path' : './data/CIFAR100/'},
             'mnist' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/color_mnist/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/color_mnist/'},
             'mini_imagenet' : {'data' : datasets.ImageFolder, 'path' : './data/Mini_ImageNet/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Mini_ImageNet/'},
+            'mini_imagenet_vit' : {'data' : datasets.ImageFolder, 'path' : './data/Mini_ImageNet/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Mini_ImageNet/'},
             'kidney_stone' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/Kidney_Stone/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Kidney_Stone/'}
         }
 
