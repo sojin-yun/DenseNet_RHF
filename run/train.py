@@ -27,6 +27,9 @@ class TrainingEnsemble :
         elif self.args['data'] == 'mini_imagenet' : 
             self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/mini_imagenet/' if self.args['server'] else './Save_parameters/mini_imagenet/'
             self.model_size = (3, 224, 224)
+        elif self.args['data'] == 'mini_imagenet_vit' : 
+            self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/mini_imagenet/' if self.args['server'] else './Save_parameters/mini_imagenet/'
+            self.model_size = (3, 384, 384)
         elif self.args['data'] == 'kidney_stone' : 
             self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/kidney_stone/' if self.args['server'] else './Save_parameters/kidney_stone/'
             self.model_size = (1, 512, 512)
@@ -228,6 +231,9 @@ class TrainingBaseline :
         elif self.args['data'] == 'mini_imagenet' : 
             self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/mini_imagenet/' if self.args['server'] else './Save_parameters/mini_imagenet/'
             self.model_size = (3, 224, 224)
+        elif self.args['data'] == 'mini_imagenet_vit' : 
+            self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/mini_imagenet/' if self.args['server'] else './Save_parameters/mini_imagenet/'
+            self.model_size = (3, 384, 384)
         elif self.args['data'] == 'kidney_stone' : 
             self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/kidney_stone/' if self.args['server'] else './Save_parameters/kidney_stone/'
             self.model_size = (1, 512, 512)
