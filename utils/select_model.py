@@ -12,6 +12,7 @@ from model.baseline.densenet import DenseNet, Bottleneck
 from model.baseline.vgg import VGG
 from model.baseline.alexnet import AlexNet
 from model.baseline.squeezenet import SqueezeNet, Fire, _squeezenet
+from model.baseline.vit import VisionTransformer
 
 class Select_Model :
     def __init__(self, args, device = 'cpu') :
@@ -71,6 +72,10 @@ class Select_Model :
 
         elif model == 'densenet201' :
             return DenseNet_ensemble(Bottleneck_ensemble, [6, 12, 48, 32], [128, 256, 896], 32, num_class = self.numclasses, device = self.device, low_resolution = self.low_resolution)
+        
+        else :
+            assert True, 'ModelTypeError : model type is not implemented. please check and try again.'
+
 
 
     def baseline_model(self, model) :
@@ -110,3 +115,9 @@ class Select_Model :
 
         elif model == 'squeezenet11' :
             return _squeezenet('1_1')
+
+        elif model == 'vit' :
+            return VisionTransformer('B_16_imagenet1k', pretrained=True)
+
+        else :
+            assert True, 'ModelTypeError : model type is not implemented. please check and try again.'
