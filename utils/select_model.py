@@ -5,6 +5,7 @@ from model.ensemble.resnet_deeper_ext import ResNet_ensemble_deeper_ext, BasicBl
 from model.ensemble.densenet import DenseNet_ensemble, Bottleneck_ensemble
 from model.ensemble.vgg import VGG_ensemble
 from model.ensemble.vgg_recursive import VGG_ensemble_recursive
+from model.ensemble.squeezenet import SqueezeNet_ensemble, Fire_ensemble, _squeezenet_ensemble
 #from model.ensemble.squeezenet import SqueezeNet, Fire, _squeezenet
 from model.baseline.resnet import ResNet, BasicBlock
 from model.baseline.resnet_deeper import ResNet_deeper, BasicBlock_deeper
@@ -73,6 +74,12 @@ class Select_Model :
         elif model == 'densenet201' :
             return DenseNet_ensemble(Bottleneck_ensemble, [6, 12, 48, 32], [128, 256, 896], 32, num_class = self.numclasses, device = self.device, low_resolution = self.low_resolution)
         
+        elif model == 'squeezenet10' :
+            return _squeezenet_ensemble('1_0')
+
+        elif model == 'squeezenet11' :
+            return _squeezenet_ensemble('1_1')
+
         else :
             assert True, 'ModelTypeError : model type is not implemented. please check and try again.'
 

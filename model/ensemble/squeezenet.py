@@ -5,7 +5,7 @@ import torch.optim as optim
 from torch.optim.lr_scheduler import StepLR
 from utils.module import ReviveConv2d, ReviveAvgPool2d, ReviveMaxPool2d
 
-class Fire(nn.Module):
+class Fire_ensemble(nn.Module):
     def __init__(self, inplanes: int, squeeze_planes: int, expand1x1_planes: int, expand3x3_planes: int) -> None:
         super().__init__()
         self.inplanes = inplanes
@@ -23,7 +23,7 @@ class Fire(nn.Module):
         )
 
 
-class SqueezeNet(nn.Module):
+class SqueezeNet_ensemble(nn.Module):
     def __init__(self, version: str = "1_0", num_classes: int = 100, dropout: float = 0.5, device = None) -> None:
         super().__init__()
         self.num_classes = num_classes
@@ -33,16 +33,16 @@ class SqueezeNet(nn.Module):
                 ReviveConv2d(3, 96, kernel_size=7, stride=2),
                 nn.ReLU(inplace=True),
                 ReviveMaxPool2d(kernel_size=3, stride=2, ceil_mode=True, upsample_size=109),
-                Fire(96, 16, 64, 64),
-                Fire(128, 16, 64, 64),
-                Fire(128, 32, 128, 128),
+                Fire_ensemble(96, 16, 64, 64),
+                Fire_ensemble(128, 16, 64, 64),
+                Fire_ensemble(128, 32, 128, 128),
                 ReviveMaxPool2d(kernel_size=3, stride=2, ceil_mode=True, upsample_size=54),
-                Fire(256, 32, 128, 128),
-                Fire(256, 48, 192, 192),
-                Fire(384, 48, 192, 192),
-                Fire(384, 64, 256, 256),
+                Fire_ensemble(256, 32, 128, 128),
+                Fire_ensemble(256, 48, 192, 192),
+                Fire_ensemble(384, 48, 192, 192),
+                Fire_ensemble(384, 64, 256, 256),
                 ReviveMaxPool2d(kernel_size=3, stride=2, ceil_mode=True, upsample_size=27),
-                Fire(512, 64, 256, 256),
+                Fire_ensemble(512, 64, 256, 256),
             )
             added_channel = 512
             boundary_layers = [96, 96, 256, 512]
@@ -51,16 +51,16 @@ class SqueezeNet(nn.Module):
                 ReviveConv2d(3, 64, kernel_size=3, stride=2),
                 nn.ReLU(inplace=True),
                 ReviveMaxPool2d(kernel_size=3, stride=2, ceil_mode=True, upsample_size=111),
-                Fire(64, 16, 64, 64),
-                Fire(128, 16, 64, 64),
+                Fire_ensemble(64, 16, 64, 64),
+                Fire_ensemble(128, 16, 64, 64),
                 ReviveMaxPool2d(kernel_size=3, stride=2, ceil_mode=True, upsample_size=55),
-                Fire(128, 32, 128, 128),
-                Fire(256, 32, 128, 128),
+                Fire_ensemble(128, 32, 128, 128),
+                Fire_ensemble(256, 32, 128, 128),
                 ReviveMaxPool2d(kernel_size=3, stride=2, ceil_mode=True, upsample_size=27),
-                Fire(256, 48, 192, 192),
-                Fire(384, 48, 192, 192),
-                Fire(384, 64, 256, 256),
-                Fire(512, 64, 256, 256),
+                Fire_ensemble(256, 48, 192, 192),
+                Fire_ensemble(384, 48, 192, 192),
+                Fire_ensemble(384, 64, 256, 256),
+                Fire_ensemble(512, 64, 256, 256),
             )
             added_channel = 256
             boundary_layers = [64, 64, 128, 256]
@@ -71,10 +71,12 @@ class SqueezeNet(nn.Module):
             raise ValueError(f"Unsupported SqueezeNet version {version}: 1_0 or 1_1 expected")
 
         # Final convolution is initialized differently from the rest
-        final_conv = nn.Conv2d(512+added_channel, self.num_classes, kernel_size=1)
-        self.classifier = nn.Sequential(
-            nn.Dropout(p=dropout), final_conv, nn.ReLU(inplace=True), nn.AdaptiveAvgPool2d((1, 1))
-        )
+        final_conv = nn.Conv2d(512, self.num_classes, kernel_size=1)
+        boundary_final_conv = nn.Conv2d(added_channel, self.num_classes, kernel_size=1)
+        ensemble_final_conv = nn.Conv2d(512+added_channel, self.num_classes, kernel_size=1)
+        self.classifier = nn.Sequential( nn.Dropout(p=dropout), final_conv, nn.ReLU(inplace=True), nn.AdaptiveAvgPool2d((1, 1)))
+        self.boundary_classifier = nn.Sequential( nn.Dropout(p=dropout), boundary_final_conv, nn.ReLU(inplace=True), nn.AdaptiveAvgPool2d((1, 1)))
+        self.ensemble_classifier = nn.Sequential( nn.Dropout(p=dropout), ensemble_final_conv, nn.ReLU(inplace=True), nn.AdaptiveAvgPool2d((1, 1)))
         self.boundary_features, self.compression_conv = self._make_boundary_conv(boundary_layers = boundary_layers)
         self.boundary_features, self.compression_conv = nn.ModuleList(self.boundary_features), nn.ModuleList(self.compression_conv)
         
@@ -85,6 +87,8 @@ class SqueezeNet(nn.Module):
         
         self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0015)
         self.loss = nn.CrossEntropyLoss()
+        self.boundary_loss = nn.CrossEntropyLoss()
+        self.ensemble_loss = nn.CrossEntropyLoss()
         self.scheduler = StepLR(self.optimizer, step_size=15, gamma=0.5)
         
 
@@ -123,10 +127,10 @@ class SqueezeNet(nn.Module):
 
         for conv in boundary_layers:
             model += [nn.Sequential(
-                          nn.Conv2d(conv, conv, kernel_size=5, stride=1, padding = 2, groups = conv), 
+                          nn.Conv2d(conv, conv, kernel_size=5, stride = 1, padding = 2), 
                           nn.BatchNorm2d(conv),
                           nn.LeakyReLU(inplace = True),
-                          nn.Conv2d(conv, conv, kernel_size=1, stride = 1, padding = 0),
+                          nn.Conv2d(conv, conv, kernel_size=5, stride = 1, padding = 2),
                           nn.BatchNorm2d(conv),
                           nn.LeakyReLU(inplace = True),
                           nn.MaxPool2d((2, 2)))]
@@ -159,13 +163,18 @@ class SqueezeNet(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.features(x)
+        x_f = x
+        x = self.classifier(x)
         self.boundary_maps = self._get_boundary_location()
         b = self.boundary_forward()
-        out = torch.cat([x, b], dim = 1)
-        out = self.classifier(out)
-        return torch.flatten(out, 1)
+        b_f = b
+        b = self.boundary_classifier(b)
+        out = torch.cat([x_f, b_f], dim = 1)
+        out = self.ensemble_classifier(out)
+        x, b, out = torch.flatten(x, 1), torch.flatten(b, 1), torch.flatten(out, 1)
+        return x, b, out
 
 
-def _squeezenet(version: str, device = None) -> SqueezeNet:
-    model = SqueezeNet(version, device = device)
+def _squeezenet_ensemble(version: str, device = None) -> SqueezeNet_ensemble:
+    model = SqueezeNet_ensemble(version, device = device)
     return model
