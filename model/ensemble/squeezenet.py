@@ -75,8 +75,8 @@ class SqueezeNet_ensemble(nn.Module):
         boundary_final_conv = nn.Conv2d(added_channel, self.num_classes, kernel_size=1)
         ensemble_final_conv = nn.Conv2d(512+added_channel, self.num_classes, kernel_size=1)
         self.classifier = nn.Sequential( nn.Dropout(p=dropout), final_conv, nn.ReLU(inplace=True), nn.AdaptiveAvgPool2d((1, 1)))
-        self.boundary_classifier = nn.Sequential( nn.Dropout(p=dropout), boundary_final_conv, nn.ReLU(inplace=True), nn.AdaptiveAvgPool2d((1, 1)))
-        self.ensemble_classifier = nn.Sequential( nn.Dropout(p=dropout), ensemble_final_conv, nn.ReLU(inplace=True), nn.AdaptiveAvgPool2d((1, 1)))
+        self.boundary_classifier = nn.Sequential(boundary_final_conv, nn.ReLU(inplace=True), nn.AdaptiveAvgPool2d((1, 1)))
+        self.ensemble_classifier = nn.Sequential(ensemble_final_conv, nn.ReLU(inplace=True), nn.AdaptiveAvgPool2d((1, 1)))
         self.boundary_features, self.compression_conv = self._make_boundary_conv(boundary_layers = boundary_layers)
         self.boundary_features, self.compression_conv = nn.ModuleList(self.boundary_features), nn.ModuleList(self.compression_conv)
         
@@ -127,10 +127,16 @@ class SqueezeNet_ensemble(nn.Module):
 
         for conv in boundary_layers:
             model += [nn.Sequential(
-                          nn.Conv2d(conv, conv, kernel_size=5, stride = 1, padding = 2), 
+                          nn.Conv2d(conv, conv, kernel_size=3, stride = 1, padding = 1, groups = conv), 
                           nn.BatchNorm2d(conv),
                           nn.LeakyReLU(inplace = True),
-                          nn.Conv2d(conv, conv, kernel_size=5, stride = 1, padding = 2),
+                          nn.Conv2d(conv, conv, kernel_size=1, stride = 1, padding = 0), 
+                          nn.BatchNorm2d(conv),
+                          nn.LeakyReLU(inplace = True),
+                          nn.Conv2d(conv, conv, kernel_size=3, stride = 1, padding = 1, groups = conv), 
+                          nn.BatchNorm2d(conv),
+                          nn.LeakyReLU(inplace = True),
+                          nn.Conv2d(conv, conv, kernel_size=1, stride = 1, padding = 0), 
                           nn.BatchNorm2d(conv),
                           nn.LeakyReLU(inplace = True),
                           nn.MaxPool2d((2, 2)))]
