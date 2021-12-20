@@ -83,13 +83,13 @@ class Select_Model :
         if model == 'resnet18' :
             return ResNet(BasicBlock, [2, 2, 2, 2], self.numclasses, None)
 
-        elif model == 'resnet50' :
+        elif model == 'resnet50' or model == 'resnet50_ext' :
             return ResNet_deeper(BasicBlock_deeper, [3, 4, 6, 3], self.numclasses, None, low_resolution = self.low_resolution)
 
-        elif model == 'resnet101' :
+        elif model == 'resnet101' or model == 'resnet101_ext' :
             return ResNet_deeper(BasicBlock_deeper, [3, 4, 23, 3], self.numclasses, None, low_resolution = self.low_resolution)
 
-        elif model == 'resnet152' :
+        elif model == 'resnet152' or model == 'resnet152_ext' :
             return ResNet_deeper(BasicBlock_deeper, [3, 8, 36, 3], self.numclasses, None, low_resolution = self.low_resolution)
 
         elif model == 'vgg16' :
