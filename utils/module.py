@@ -74,7 +74,7 @@ class ReviveConv2d(nn.Module) :
         self.device = device
         self.dtype = dtype
         self.conv = nn.Conv2d(in_channels = self.in_channels, out_channels = self.out_channels, kernel_size = self.kernel_size, stride = 2, padding = self.padding,
-                                    dilation = self.dilation, groups = self.groups, bias = self.bias, padding_mode = self.padding_mode, dtype = self.dtype)
+                                    dilation = self.dilation, groups = self.groups, bias = self.bias, padding_mode = self.padding_mode)
         if batch_norm :
             self.dsize_bn = nn.BatchNorm2d(self.out_channels)
             self.usize_bn = nn.BatchNorm2d(self.out_channels)
