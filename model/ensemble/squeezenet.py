@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.init as init
 import torch.optim as optim
-from torch.optim.lr_scheduler import StepLR
+from torch.optim.lr_scheduler import StepLR, CosineAnnealingLR
 from utils.module import ReviveConv2d, ReviveAvgPool2d, ReviveMaxPool2d
 
 class Fire_ensemble(nn.Module):
@@ -89,7 +89,8 @@ class SqueezeNet_ensemble(nn.Module):
         self.loss = nn.CrossEntropyLoss()
         self.boundary_loss = nn.CrossEntropyLoss()
         self.ensemble_loss = nn.CrossEntropyLoss()
-        self.scheduler = StepLR(self.optimizer, step_size=15, gamma=0.5)
+        #self.scheduler = StepLR(self.optimizer, step_size=15, gamma=0.5)
+        self.scheduler = CosineAnnealingLR(self.optimizer, T_max = 10, eta_min = 0)
         
 
         for m in self.modules():
