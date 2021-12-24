@@ -1,4 +1,5 @@
 import torch
+from torch.optim.lr_scheduler import CosineAnnealingLR, StepLR
 from torch.utils import data
 from tqdm import tqdm
 import os
@@ -89,7 +90,8 @@ class TrainingEnsemble :
         backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight = 1.0, 0.5, 0.5
         f.write('Loss Information - Backbone_loss : {0} | Boundary_loss : {1} | Ensemble_loss : {2}\n\n'.format(backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight))
         f.write('Optimizer : {}\n'.format(self.model.optimizer))
-        f.write('Learning_scheduler : step_size : {0} | gamma : {1}\n\n'.format(self.model.scheduler.step_size, self.model.scheduler.gamma))
+        if isinstance(self.model.scheduler, StepLR) :
+            f.write('Learning_scheduler : step_size : {0} | gamma : {1}\n\n'.format(self.model.scheduler.step_size, self.model.scheduler.gamma))
         for i in range(self.epoch) :
 
             train_loss, valid_loss = 0.0, 0.0
@@ -284,7 +286,8 @@ class TrainingBaseline :
         else :
             print('GPU Information - {}\n\n'.format(torch.cuda.get_device_name('cuda:{}'.format(self.args['device']))))
         f.write('Optimizer : {}\n'.format(self.model.optimizer))
-        f.write('Learning_scheduler : step_size : {0} | gamma : {1}\n\n'.format(self.model.scheduler.step_size, self.model.scheduler.gamma))
+        if isinstance(self.model.scheduler, StepLR) :
+            f.write('Learning_scheduler : step_size : {0} | gamma : {1}\n\n'.format(self.model.scheduler.step_size, self.model.scheduler.gamma))
 
         best_valid_acc, best_valid_loss = 0., 100.
 
