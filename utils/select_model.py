@@ -26,6 +26,7 @@ class Select_Model :
         else : self.low_resolution = False
         if self.data == 'kidney_stone' : self.numclasses = 2
         elif self.data == 'mnist' : self.numclasses = 10
+        elif self.data == 'cub200' : self.numclasses = 200
         else : self.numclasses = 100
 
     def __call__(self) :
@@ -75,10 +76,10 @@ class Select_Model :
             return DenseNet_ensemble(Bottleneck_ensemble, [6, 12, 48, 32], [128, 256, 896], 32, num_class = self.numclasses, device = self.device, low_resolution = self.low_resolution)
         
         elif model == 'squeezenet10' :
-            return _squeezenet_ensemble('1_0')
+            return _squeezenet_ensemble('1_0', self.device, self.numclasses)
 
         elif model == 'squeezenet11' :
-            return _squeezenet_ensemble('1_1')
+            return _squeezenet_ensemble('1_1', self.device, self.numclasses)
 
         else :
             assert True, 'ModelTypeError : model type is not implemented. please check and try again.'
@@ -118,10 +119,10 @@ class Select_Model :
             return AlexNet(num_classes=100)
 
         elif model == 'squeezenet10' :
-            return _squeezenet('1_0')
+            return _squeezenet('1_0', self.numclasses)
 
         elif model == 'squeezenet11' :
-            return _squeezenet('1_1')
+            return _squeezenet('1_1', self.numclasses)
 
         elif model == 'vit' :
             return VisionTransformer('B_16_imagenet1k', pretrained=True)

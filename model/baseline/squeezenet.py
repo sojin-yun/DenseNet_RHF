@@ -89,8 +89,8 @@ class SqueezeNet(nn.Module):
         return torch.flatten(x, 1)
 
 
-def _squeezenet(version: str) -> SqueezeNet:
-    model = SqueezeNet(version)
+def _squeezenet(version: str, num_classes) -> SqueezeNet:
+    model = SqueezeNet(version, num_classes = num_classes)
     return model
 
 

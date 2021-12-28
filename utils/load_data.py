@@ -10,14 +10,15 @@ class CustomDataLoader() :
         self.args = args
         self.data = args['data']
         self.server = args['server']
-        assert self.data in ['cifar100', 'mini_imagenet', 'mini_imagenet_vit', 'kidney_stone', 'mnist'], '--data argument is invalid'
+        assert self.data in ['cifar100', 'mini_imagenet', 'mini_imagenet_vit', 'kidney_stone', 'mnist', 'cub200'], '--data argument is invalid'
 
         self.transformer_components = {
             'cifar100' : {'image_size' : 64, 'mean' : (0.5071, 0.4867, 0.4408), 'std' : (0.2675, 0.2565, 0.2761)},
             'mnist' : {'image_size' : 64, 'mean' : (0.0783, 0.0719, 0.0681), 'std' : (0.2245, 0.2134, 0.2067)},
             'mini_imagenet' : {'image_size' : 224, 'mean' : (0.485, 0.456, 0.406), 'std' : (0.229, 0.224, 0.225)},
             'mini_imagenet_vit' : {'image_size' : 384, 'mean' : (0.485, 0.456, 0.406), 'std' : (0.229, 0.224, 0.225)},
-            'kidney_stone' : {'image_size' : 512, 'mean' : 0.169, 'std' : 0.259}
+            'kidney_stone' : {'image_size' : 512, 'mean' : 0.169, 'std' : 0.259},
+            'cub200' : {'image_size' : 224, 'mean' : (0.485, 0.456, 0.406), 'std' : (0.229, 0.224, 0.225)}
         }
 
         self.dataset_components = {
@@ -25,7 +26,8 @@ class CustomDataLoader() :
             'mnist' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/color_mnist/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/color_mnist/'},
             'mini_imagenet' : {'data' : datasets.ImageFolder, 'path' : './data/Mini_ImageNet/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Mini_ImageNet/'},
             'mini_imagenet_vit' : {'data' : datasets.ImageFolder, 'path' : './data/Mini_ImageNet/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Mini_ImageNet/'},
-            'kidney_stone' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/Kidney_Stone/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Kidney_Stone/'}
+            'kidney_stone' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/Kidney_Stone/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Kidney_Stone/'},
+            'cub200' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/cub200/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/cub200/'}
         }
 
     

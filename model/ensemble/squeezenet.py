@@ -176,6 +176,6 @@ class SqueezeNet_ensemble(nn.Module):
         return x, b, out
 
 
-def _squeezenet_ensemble(version: str, device = None) -> SqueezeNet_ensemble:
-    model = SqueezeNet_ensemble(version, device = device)
+def _squeezenet_ensemble(version: str, device, num_classes) -> SqueezeNet_ensemble:
+    model = SqueezeNet_ensemble(version, device = device, num_classes = num_classes)
     return model

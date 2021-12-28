@@ -34,6 +34,9 @@ class TrainingEnsemble :
         elif self.args['data'] == 'kidney_stone' : 
             self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/kidney_stone/' if self.args['server'] else './Save_parameters/kidney_stone/'
             self.model_size = (1, 512, 512)
+        elif self.args['data'] == 'cub200' : 
+            self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/cub200/' if self.args['server'] else './Save_parameters/cub200/'
+            self.model_size = (3, 224, 224)
 
         if self.device != None : 
             self.device = device
@@ -239,6 +242,9 @@ class TrainingBaseline :
         elif self.args['data'] == 'kidney_stone' : 
             self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/kidney_stone/' if self.args['server'] else './Save_parameters/kidney_stone/'
             self.model_size = (1, 512, 512)
+        elif self.args['data'] == 'cub200' : 
+            self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/cub200/' if self.args['server'] else './Save_parameters/cub200/'
+            self.model_size = (3, 224, 224)
 
         if self.device != None : 
             self.device = device

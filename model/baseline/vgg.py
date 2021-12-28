@@ -9,7 +9,7 @@ class VGG(nn.Module):
         super().__init__()
 
         self.data = data
-        if self.data == 'mini_imagenet' or self.data == 'kidney_stone':
+        if self.data == 'mini_imagenet' or self.data == 'kidney_stone' or self.data == 'cub200':
             self.select_model = {
                     '16' : {'conv_layers' : [64, 64, 'M', 128, 128, 'M', 256, 256, 256,      'M', 512, 512, 512,      'M', 512, 512, 512, 'M']},
                     '19' : {'conv_layers' : [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'M']}
@@ -24,7 +24,7 @@ class VGG(nn.Module):
 
         self.features = self._make_layers(self.select_model[model_key]['conv_layers'])
 
-        if self.data == 'mini_imagenet' : width = 7
+        if self.data == 'mini_imagenet' or self.data == 'cub200' : width = 7
         elif self.data == 'cifar100' : width = 8
         elif self.data == 'kidney_stone' : width = 16
 

@@ -11,7 +11,7 @@ class VGG_ensemble(nn.Module):
         if device != None : self.device = device
 
         self.data = data
-        if self.data == 'mini_imagenet' or self.data == 'kidney_stone':
+        if self.data == 'mini_imagenet' or self.data == 'kidney_stone' or self.data == 'cub200':
             self.select_model = {
                     '16' : {'conv_layers' : [64, 'R', 128, 'R', 256, 256,      'R', 512, 512,      'R', 512, 512, 'R'],      'boundary_layers' : [64, 128, 256, 512, 512]},
                     '19' : {'conv_layers' : [64, 'R', 128, 'R', 256, 256, 256, 'R', 512, 512, 512, 'R', 512, 512, 512, 'R'], 'boundary_layers' : [64, 128, 256, 512, 512]}
@@ -30,7 +30,7 @@ class VGG_ensemble(nn.Module):
         for m in self.boundary_features : m = m.to(self.device)
         for m in self.compression_conv : m = m.to(self.device)
 
-        if self.data == 'mini_imagenet' : width = 7
+        if self.data == 'mini_imagenet' or self.data == 'cub200' : width = 7
         elif self.data == 'cifar100' or self.data == 'mnist' : width = 8
         elif self.data == 'kidney_stone' : width = 16
 
