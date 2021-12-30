@@ -60,12 +60,13 @@ class VGG_ensemble(nn.Module):
 
         self._initializing_weights()
         
-        self.optimizer = optim.SGD(self.parameters(), lr = 0.01, momentum = 0.9, weight_decay=0.0015)
+        #self.optimizer = optim.SGD(self.parameters(), lr = 1e-3, momentum = 0.9, weight_decay=0.00001)
+        self.optimizer = optim.SGD(self.parameters(), lr = 0.01, momentum = 0.9, weight_decay=0.0005)
         self.loss = nn.CrossEntropyLoss()
         self.boundary_loss = nn.CrossEntropyLoss()
         self.ensemble_loss = nn.CrossEntropyLoss()
-        self.scheduler = StepLR(self.optimizer, step_size=15, gamma=0.5)
-
+        #self.scheduler = StepLR(self.optimizer, step_size=15, gamma=0.5)
+        self.scheduler = MultiStepLR(self.optimizer, milestones=[60, 90], gamma=0.1)
 
     def _make_layer_conv(self, conv_layers):
         
