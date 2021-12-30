@@ -94,12 +94,13 @@ class ResNet_deeper(nn.Module):
 
         self.cam_relu = nn.Identity()
 
-        self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0015)
+        #self.optimizer = optim.SGD(self.parameters(), lr = 1e-3, momentum = 0.9, weight_decay=0.00001)
+        self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0001)
         self.loss = nn.CrossEntropyLoss()
         self.boundary_loss = nn.CrossEntropyLoss()
         self.ensemble_loss = nn.CrossEntropyLoss()
-        self.scheduler = StepLR(self.optimizer, step_size=15, gamma=0.5)
-        #self.scheduler = MultiStepLR(self.optimizer, milestones=[1, 2, 3], gamma=0.5)
+        #self.scheduler = StepLR(self.optimizer, step_size=15, gamma=0.5)
+        self.scheduler = MultiStepLR(self.optimizer, milestones=[60, 90], gamma=0.1)
 
         # weight initialization
         self._initializing_weights()

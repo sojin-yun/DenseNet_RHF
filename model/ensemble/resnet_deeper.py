@@ -134,12 +134,13 @@ class ResNet_ensemble_deeper(nn.Module):
 
         self.ensemble_relu = nn.Identity()
 
-        self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0015)
+        #self.optimizer = optim.SGD(self.parameters(), lr = 1e-3, momentum = 0.9, weight_decay=0.00001)
+        self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0001)
         self.loss = nn.CrossEntropyLoss()
         self.boundary_loss = nn.CrossEntropyLoss()
         self.ensemble_loss = nn.CrossEntropyLoss()
-        self.scheduler = StepLR(self.optimizer, step_size=15, gamma=0.5)
-        #self.scheduler = MultiStepLR(self.optimizer, milestones=[1, 2, 3], gamma=0.5)
+        #self.scheduler = StepLR(self.optimizer, step_size=15, gamma=0.5)
+        self.scheduler = MultiStepLR(self.optimizer, milestones=[60, 90], gamma=0.1)
 
         # weight initialization
         self._initializing_weight()
@@ -204,9 +205,12 @@ class ResNet_ensemble_deeper(nn.Module):
         for conv in boundary_layers:
             model += [nn.Sequential(
                           # Strided-conv in ResNet structure
+                          nn.Conv2d(conv, conv, kernel_size=5, stride=1, padding = 2), 
+                          nn.BatchNorm2d(conv),
+                          nn.LeakyReLU(inplace = True),
                           nn.Conv2d(conv, conv, kernel_size=5, stride=2, padding = 2), 
                           nn.BatchNorm2d(conv),
-                          nn.ReLU(inplace = True),)
+                          nn.LeakyReLU(inplace = True),)
                           #nn.MaxPool2d((2, 2)))
                           ]
         
@@ -214,7 +218,7 @@ class ResNet_ensemble_deeper(nn.Module):
             comp += [nn.Sequential(
                           nn.Conv2d(boundary_layers[i]+boundary_layers[i+1], boundary_layers[i+1], kernel_size=1, stride=1, padding=0),
                           nn.BatchNorm2d(boundary_layers[i+1]),
-                          nn.ReLU(inplace = True))]
+                          nn.LeakyReLU(inplace = True))]
 
         return model, comp
 
