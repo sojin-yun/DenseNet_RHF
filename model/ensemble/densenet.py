@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.optim.lr_scheduler import StepLR
+from torch.optim.lr_scheduler import StepLR, MultiStepLR
 from torchsummary import summary
 import torchsummary
 
@@ -35,10 +35,7 @@ class Transition_ensemble(nn.Module):
         self.conv_1x1 = nn.Conv2d(in_channels, out_channels, 1, bias=False)
         self.avg_pool = nn.AvgPool2d(2, stride=2)
 
-        self.up_sampling = nn.Sequential(
-            nn.Upsample(scale_factor=2, mode = 'bilinear', align_corners=False),
-            nn.ReLU(True)
-        )
+        self.up_sampling = nn.Upsample(scale_factor=2, mode = 'bilinear', align_corners=False)
 
         self.boundary = None
 
@@ -113,11 +110,13 @@ class DenseNet_ensemble(nn.Module):
 
         self.ensemble_relu = nn.Identity()
 
-        self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0015)
+        #self.optimizer = optim.SGD(self.parameters(), lr = 1e-3, momentum = 0.9, weight_decay=0.00001)
+        self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0001)
         self.loss = nn.CrossEntropyLoss()
         self.boundary_loss = nn.CrossEntropyLoss()
         self.ensemble_loss = nn.CrossEntropyLoss()
-        self.scheduler = StepLR(self.optimizer, step_size=15, gamma=0.5)
+        self.scheduler = MultiStepLR(self.optimizer, milestones=[60, 90], gamma=0.1)
+        #self.scheduler = MultiStepLR(self.optimizer, milestones=[100, 150], gamma=0.1)
 
         # Initialization weights
         self._initializing_weights()
@@ -126,7 +125,7 @@ class DenseNet_ensemble(nn.Module):
     def _initializing_weights(self) :
 
         for m in self.modules():
-            if isinstance(m, nn.Conv2d):
+            if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.constant_(m.weight, 1)
