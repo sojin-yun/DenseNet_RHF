@@ -7,6 +7,7 @@ import time
 from torchsummary import summary
 from torch.utils.tensorboard import SummaryWriter
 import copy
+import pandas as pd
 
 class TrainingEnsemble :
 
@@ -84,6 +85,9 @@ class TrainingEnsemble :
             print('GPU Information - CPU\n\n')
         else :
             print('GPU Information - {}\n\n'.format(torch.cuda.get_device_name('cuda:{}'.format(self.args['device']))))
+
+        excel_name = os.path.join(self.default_path, self.save_path, 'log.xlsx')
+        data_frame = []
 
         best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc = 0., 0., 0.
 
@@ -189,6 +193,9 @@ class TrainingEnsemble :
             avg_tarin_loss = ensemble_loss/n_train_batchs
             avg_valid_loss = valid_ensemble_loss/n_train_batchs
 
+            data_frame.append([i + 1, avg_train_acc, avg_valid_acc, avg_boundary_train_acc, avg_boundary_valid_acc, avg_ensemble_train_acc, avg_ensemble_valid_acc])
+
+
             if self.args['tensorboard'] :
                     self.ts_board.add_scalars('Accuracy', {'train_acc' : avg_ensemble_train_acc, 
                                                            'valid_acc' : avg_ensemble_valid_acc}, i)
@@ -214,6 +221,9 @@ class TrainingEnsemble :
             training_result = 'epoch.{0:3d} \t train_ac : {1:.4f}% \t  valid_ac : {2:.4f}% \t bdr_train : {3:.4f}% \t bdr_valid : {4:.4f}% \t ens_train : {5:.4f}% \t ens_valid : {6:.4f}% \t lr : {7:.6f}\n'.format(i+1, avg_train_acc, avg_valid_acc, avg_boundary_train_acc, avg_boundary_valid_acc, avg_ensemble_train_acc, avg_ensemble_valid_acc, curr_lr)
             f.write(training_result)
             print(training_result)
+
+        pd_data_frame = pd.DataFrame(data_frame, columns = ['Epoch', 'train', 'valid', 'b_train', 'b_valid', 'e_train', 'e_valid'])
+        pd_data_frame.to_excel(excel_name, index = False)
 
         # Training is finished.
         f.write('\nBest valid acc : {0:.4f}% \t Best boundary acc : {1:.4f}% \t Best ensemble acc : {2:.4f}%\n'.format(best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc))
@@ -278,6 +288,9 @@ class TrainingBaseline :
                 s.write(l+'\n')
             s.close()
 
+        excel_name = os.path.join(self.default_path, self.save_path, 'log.xlsx')
+        data_frame = []
+
         print('\n\nMake model_summary.txt and log.txt')
         f = open(os.path.join(self.default_path, self.save_path, 'log.txt'), 'w')
         print(os.path.join(self.default_path, self.save_path, 'log.txt'))
@@ -296,6 +309,7 @@ class TrainingBaseline :
         f.write('Optimizer : {}\n'.format(self.model.optimizer))
         if isinstance(self.model.scheduler, StepLR) :
             f.write('Learning_scheduler : step_size : {0} | gamma : {1}\n\n'.format(self.model.scheduler.step_size, self.model.scheduler.gamma))
+
 
         best_valid_acc, best_valid_loss = 0., 100.
 
@@ -361,6 +375,8 @@ class TrainingBaseline :
             avg_tarin_loss = train_loss/n_train_batchs
             avg_valid_loss = valid_loss/n_valid_batchs
 
+            data_frame.append([i + 1, avg_train_acc, avg_valid_acc, avg_tarin_loss, avg_valid_loss])
+
             if self.args['tensorboard'] :
                 self.ts_board.add_scalars('Accuracy', {'train_acc' : avg_train_acc, 
                                                        'valid_acc' : avg_valid_acc}, i)
@@ -385,6 +401,9 @@ class TrainingBaseline :
             training_result = 'epoch.{0:3d} \t train_ac : {1:.4f}% \t  valid_ac : {2:.4f}% \t lr : {3:.6f}\n'.format(i+1, avg_train_acc, avg_valid_acc, curr_lr)
             f.write(training_result)
             print(training_result)
+
+        pd_data_frame = pd.DataFrame(data_frame, columns = ['Epoch', 'train_acc', 'valid_acc', 'train_loss', 'valid_loss'])
+        pd_data_frame.to_excel(excel_name, index = False)
 
         # Training is finished.
         f.write('\nBest valid acc : {0:.4f}% \t Best valid loss : {1:.6f} \n'.format(best_valid_acc, best_valid_loss))
