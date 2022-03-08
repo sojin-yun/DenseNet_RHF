@@ -17,7 +17,7 @@ class CustomDataLoader() :
             'mnist' : {'image_size' : 64, 'mean' : (0.0783, 0.0719, 0.0681), 'std' : (0.2245, 0.2134, 0.2067)},
             'mini_imagenet' : {'image_size' : 224, 'mean' : (0.485, 0.456, 0.406), 'std' : (0.229, 0.224, 0.225)},
             'mini_imagenet_vit' : {'image_size' : 384, 'mean' : (0.485, 0.456, 0.406), 'std' : (0.229, 0.224, 0.225)},
-            'kidney_stone' : {'image_size' : 512, 'mean' : 0.159, 'std' : 0.245},
+            'kidney_stone' : {'image_size' : 512, 'mean' : 0.161, 'std' : 0.246},
             'cub200' : {'image_size' : 224, 'mean' : (0.485, 0.456, 0.406), 'std' : (0.229, 0.224, 0.225)}
         }
 
