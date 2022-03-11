@@ -115,8 +115,8 @@ class DenseNet_ensemble(nn.Module):
         self.loss = nn.CrossEntropyLoss()
         self.boundary_loss = nn.CrossEntropyLoss()
         self.ensemble_loss = nn.CrossEntropyLoss()
-        self.scheduler = MultiStepLR(self.optimizer, milestones=[60, 90], gamma=0.1)
-        #self.scheduler = MultiStepLR(self.optimizer, milestones=[100, 150], gamma=0.1)
+        #self.scheduler = MultiStepLR(self.optimizer, milestones=[60, 90], gamma=0.1)
+        self.scheduler = MultiStepLR(self.optimizer, milestones=[100, 150], gamma=0.1)
 
         # Initialization weights
         self._initializing_weights()

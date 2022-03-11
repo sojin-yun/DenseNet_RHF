@@ -85,8 +85,8 @@ class DenseNet(nn.Module):
         #self.optimizer = optim.SGD(self.parameters(), lr = 1e-3, momentum = 0.9, weight_decay=0.00001)
         self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0001)
         self.loss = nn.CrossEntropyLoss()
-        self.scheduler = MultiStepLR(self.optimizer, milestones=[60, 90], gamma=0.1)
-        #self.scheduler = MultiStepLR(self.optimizer, milestones=[100, 150], gamma=0.1)
+        #elf.scheduler = MultiStepLR(self.optimizer, milestones=[60, 90], gamma=0.1)
+        self.scheduler = MultiStepLR(self.optimizer, milestones=[100, 150], gamma=0.1)
 
         # Initializing_weights
         self._initializing_weights()
