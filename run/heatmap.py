@@ -25,8 +25,8 @@ class RunGradCAM() :
             os.mkdir(os.path.join(self.save_path, 'Ensemble_correct'))
 
         self.image_size = {'mini_imagenet' : 224, 'cifar100' : 64, 'kidney_stone' : 512}
-        self.mean = {'mini_imagenet' : (0.485, 0.456, 0.406), 'cifar100' : (0.5071, 0.4867, 0.4408), 'kidney_stone' : (0.169, 0.169, 0.169)}
-        self.std = {'mini_imagenet' : (0.229, 0.224, 0.225), 'cifar100' : (0.2675, 0.2565, 0.2761), 'kidney_stone' : (0.259, 0.259, 0.259)}
+        self.mean = {'mini_imagenet' : (0.485, 0.456, 0.406), 'cifar100' : (0.5071, 0.4867, 0.4408), 'kidney_stone' : (0.161, 0.161, 0.161)}
+        self.std = {'mini_imagenet' : (0.229, 0.224, 0.225), 'cifar100' : (0.2675, 0.2565, 0.2761), 'kidney_stone' : (0.246, 0.246, 0.246)}
 
         self._make_folder()
         self._make_model()
@@ -47,9 +47,9 @@ class RunGradCAM() :
         self.ensemble_model.load_state_dict(ensemble_params['state_dict'])
 
         # [mini_imagenet, cifar100]
-        self.hooked_layer = {'baseline' : {'vgg16' : [44, 43], 'vgg19' : [53, 32], 'resnet50' : [197, 151], 'resnet101' : [288, 287], 'resnet152' : [424, 423], 'densenet121' : [492, 491], 'densenet169' : [684, 683], 'densenet201' : [812, 811]},
-                             'ensemble' : {'vgg16' : [142, 102], 'vgg19' : [141, 111], 'resnet50' : [218, 185], 'resnet101' : [322, 321], 'resnet152' : [458, 457], 'densenet121' : [525, 524], 'densenet169' : [717, 716], 'densenet201' : [845, 844]}}
-        idx = 0 if self.args['data'] == 'mini_imagenet' else 1
+        self.hooked_layer = {'baseline' : {'vgg16' : [44, 43], 'vgg19' : [53, 32], 'resnet50' : [152, 152], 'resnet101' : [288, 287], 'resnet152' : [424, 423], 'densenet121' : [492, 491], 'densenet169' : [684, 683], 'densenet201' : [812, 811], 'rensenet' : [180, 180]},
+                             'ensemble' : {'vgg16' : [142, 102], 'vgg19' : [141, 111], 'resnet50' : [201, 198], 'resnet101' : [322, 321], 'resnet152' : [458, 457], 'densenet121' : [519, 518], 'densenet169' : [717, 716], 'densenet201' : [845, 844], 'rensenet' : [216, 216]}}
+        idx = 1 if self.args['data'] == 'cifar100' else 0
 
         self.baseline_cam = GradCAM(model = self.baseline_model, hooked_layer = self.hooked_layer['baseline'][self.args['model']][idx], device = self.device, ensemble = False)
         self.ensemble_cam = GradCAM(model = self.ensemble_model, hooked_layer = self.hooked_layer['ensemble'][self.args['model']][idx], device = self.device, ensemble = True)
@@ -94,19 +94,19 @@ class RunGradCAM() :
             baseline_ret, baseline_pred = self.baseline_cam(data, target)
             baseline_ret = self.upsample(baseline_ret.unsqueeze(0)).detach().cpu()
             baseline_ret = np.transpose(baseline_ret, (0, 2, 3, 1)).squeeze(0)
-            #
+            
             baseline_threshold = baseline_ret.max()*(0.5)
             baseline_ret = np.where(baseline_ret < baseline_threshold, 0., baseline_ret)
-            #
+            
             baseline_result[idx] = baseline_ret
             
             ensemble_ret, ensemble_pred = self.ensemble_cam(data, target)
             ensemble_ret = self.upsample(ensemble_ret.unsqueeze(0)).detach().cpu()
             ensemble_ret = np.transpose(ensemble_ret, (0, 2, 3, 1)).squeeze(0)
-            #
+            
             ensemble_threshold = ensemble_ret.max()*(0.5)
             ensemble_ret = np.where(ensemble_ret < ensemble_threshold, 0., ensemble_ret)
-            #
+
             ensemble_result[idx] = ensemble_ret
 
             figsave_path = ''
@@ -117,20 +117,20 @@ class RunGradCAM() :
 
             fig = plt.figure(figsize=(12, 4))
             ax0 = fig.add_subplot(1, 3, 1)
-            ax0.imshow(image_np)
+            ax0.imshow((image_np * 255.).astype('uint8'))
             ax0.set_title(mapping_dict[str(target.item())], fontsize = 18)
             #ax0.set_title(target.item(), fontsize = 15)
             ax0.axis('off')
 
             ax1 = fig.add_subplot(1, 3, 2)
-            ax1.imshow(image_np)
-            ax1.imshow(baseline_ret, cmap = 'jet', alpha = 0.4)
+            ax1.imshow((image_np * 255.).astype('uint8'))
+            ax1.imshow((baseline_ret * 255.).astype('uint8'), cmap = 'jet', alpha = 0.4)
             ax1.set_title('Baseline', fontsize = 15)
             ax1.axis('off')
 
             ax2 = fig.add_subplot(1, 3, 3)
-            ax2.imshow(image_np)
-            ax2.imshow(ensemble_ret, cmap = 'jet', alpha = 0.4)
+            ax2.imshow((image_np * 255.).astype('uint8'))
+            ax2.imshow((ensemble_ret * 255.).astype('uint8'), cmap = 'jet', alpha = 0.4)
             ax2.set_title('Ensemble', fontsize = 15)
             ax2.axis('off')
 
