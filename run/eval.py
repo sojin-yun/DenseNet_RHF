@@ -1,11 +1,13 @@
 import torch
+import torch.nn.functional as F
 from torch.utils import data
 from tqdm import tqdm
 import os
 import time
 from torchsummary import summary
-from sklearn.metrics import f1_score, precision_score, recall_score
+from sklearn.metrics import f1_score, precision_score, recall_score, PrecisionRecallDisplay
 import numpy as np
+import matplotlib.pyplot as plt
 
 class Evaluation :
 
@@ -113,8 +115,8 @@ class AveragePrecision :
         self.model = model
         self.device = device
         self.n_threshold = n_threshold
-        self.bin = [0.1*(i+1) for i in range(n_threshold)]
-        #_, self.valid_loader = data_loader
+        self.bins = [0.1*(i+1) for i in range(n_threshold)]
+        _, self.valid_loader = data_loader
 
     def __call__(self) :
         if self.args['baseline'] : self.run_baseline()
@@ -123,8 +125,8 @@ class AveragePrecision :
     def run_ensemble(self) :
 
         batch_size = self.args['batch_size']
-        pr_curve = dict()
-        total_precision, total_recall, total_f1score = 0., 0., 0.
+        precision, recall, f1score = 0., 0., 0.
+        total_pr, total_rc, total_f1 = [], [], []
 
         with torch.no_grad() :
 
@@ -133,22 +135,91 @@ class AveragePrecision :
 
             for threshold in self.bins :
 
-                for valid_iter, (valid_data, valid_target) in enumerate(tqdm(self.valid_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01)) :
+                target, prediction = None, None
+
+                for valid_data, valid_target in self.valid_loader :
 
                     if self.device != None : valid_data, valid_target = valid_data.to(self.device), valid_target.to(self.device)
 
                     self.model.optimizer.zero_grad()
 
                     _, _, valid_ensemble_output = self.model(valid_data)
+                    valid_ensemble_output = F.softmax(valid_ensemble_output, dim = 1)
 
-                    _, v_ensemble_pred = torch.max(valid_ensemble_output, dim = 1)
+                    #_, v_ensemble_pred = torch.max(valid_ensemble_output, dim = 1)
+                    valid_ensemble_output = valid_ensemble_output[:, 1]
+                    valid_ensemble_output = torch.where(valid_ensemble_output >= threshold, 1, 0)
 
-                np_target, np_pred = np.array(valid_target.cpu()), np.array(v_ensemble_pred.cpu())
-                
-                total_precision += precision_score(np_target, np_pred)
-                total_recall += recall_score(np_target, np_pred)
-                total_f1score += f1_score(np_target, np_pred)
+                    if target == None : target = valid_target
+                    else : target = torch.cat([target, valid_target], dim = 0)
 
-                precision, recall, f1score = total_precision/len(self.valid_loader)*100., total_recall/len(self.valid_loader)*100., total_f1score/len(self.valid_loader)*100.
+                    if prediction == None : prediction = valid_ensemble_output
+                    else : prediction = torch.cat([prediction, valid_ensemble_output], dim = 0)
 
-            print('\n\nEvaluation Result --- Ensemble Precision : {0:.4f}% | Ensemble Recall : {1:.4f}% | Ensemble F1-Score : {2:.4f}%'.format(precision, recall, f1score))
+                np_target, np_pred = np.array(target.cpu()), np.array(prediction.cpu())
+
+                precision = precision_score(np_target, np_pred)
+                recall = recall_score(np_target, np_pred)
+                f1score = f1_score(np_target, np_pred)
+
+                print('\nAbout threshold [{3:.1f}] --- ensemble Precision : {0:.4f}% | ensemble Recall : {1:.4f}% | ensemble F1-Score : {2:.4f}%'.format(precision*100., recall*100., f1score*100., threshold))
+
+                total_pr.append(precision)
+                total_rc.append(recall)
+                total_f1.append(f1score)
+
+            total_pr, total_rc, total_f1 = np.array(total_pr), np.array(total_rc), np.array(total_f1)
+            
+            plt.plot(total_pr, total_rc)
+            plt.show()
+
+    def run_baseline(self) :
+
+        batch_size = self.args['batch_size']
+        precision, recall, f1score = 0., 0., 0.
+        total_pr, total_rc, total_f1 = [], [], []
+
+        with torch.no_grad() :
+
+            self.model = self.model.to(self.device)
+            self.model.eval()
+
+            for threshold in self.bins :
+
+                target, prediction = None, None
+
+                for valid_data, valid_target in self.valid_loader :
+
+                    if self.device != None : valid_data, valid_target = valid_data.to(self.device), valid_target.to(self.device)
+
+                    self.model.optimizer.zero_grad()
+
+                    valid_output = self.model(valid_data)
+                    valid_output = F.softmax(valid_output, dim = 1)
+
+                    #_, v_ensemble_pred = torch.max(valid_ensemble_output, dim = 1)
+                    valid_output = valid_output[:, 1]
+                    valid_output = torch.where(valid_output >= threshold, 1, 0)
+
+                    if target == None : target = valid_target
+                    else : target = torch.cat([target, valid_target], dim = 0)
+
+                    if prediction == None : prediction = valid_output
+                    else : prediction = torch.cat([prediction, valid_output], dim = 0)
+
+                np_target, np_pred = np.array(target.cpu()), np.array(prediction.cpu())
+
+                precision = precision_score(np_target, np_pred)
+                recall = recall_score(np_target, np_pred)
+                f1score = f1_score(np_target, np_pred)
+
+                print('\nAbout threshold [{3:.1f}] --- ensemble Precision : {0:.4f}% | ensemble Recall : {1:.4f}% | ensemble F1-Score : {2:.4f}%'.format(precision*100., recall*100., f1score*100., threshold))
+
+                total_pr.append(precision)
+                total_rc.append(recall)
+                total_f1.append(f1score)
+
+            total_pr, total_rc, total_f1 = np.array(total_pr), np.array(total_rc), np.array(total_f1)
+            
+            plt.plot(total_pr, total_rc)
+            plt.show()

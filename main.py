@@ -71,7 +71,7 @@ def drive(args) :
         if flags['mode'] == 'eval' :
             Evaluation(flags, model ,data_loader, device)()
         elif flags['mode'] == 'map' :
-            AveragePrecision(flags, model, data_loader, 9, device)
+            AveragePrecision(flags, model, data_loader, 9, device)()
 
     elif flags['mode'] == 'cam' :
         cam = RunGradCAM(flags, data_loader)
