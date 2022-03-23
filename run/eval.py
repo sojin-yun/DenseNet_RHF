@@ -106,3 +106,49 @@ class Evaluation :
 
         print('\n\nEvaluation Result --- Valid Loss : {0:.4f} | Valid Acc : {1:.4f}%'.format(avg_valid_loss, avg_valid_acc))
         print('\n\nEvaluation Result --- Baseline Precision : {0:.4f}% | Baseline Recall : {1:.4f}% | Baseline F1-Score : {2:.4f}%'.format(precision, recall, f1score))
+
+class AveragePrecision :
+    def __init__(self, args, model, data_loader, n_threshold, device = None) :
+        self.args = args
+        self.model = model
+        self.device = device
+        self.n_threshold = n_threshold
+        self.bin = [0.1*(i+1) for i in range(n_threshold)]
+        #_, self.valid_loader = data_loader
+
+    def __call__(self) :
+        if self.args['baseline'] : self.run_baseline()
+        else : self.run_ensemble()
+
+    def run_ensemble(self) :
+
+        batch_size = self.args['batch_size']
+        pr_curve = dict()
+        total_precision, total_recall, total_f1score = 0., 0., 0.
+
+        with torch.no_grad() :
+
+            self.model = self.model.to(self.device)
+            self.model.eval()
+
+            for threshold in self.bins :
+
+                for valid_iter, (valid_data, valid_target) in enumerate(tqdm(self.valid_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01)) :
+
+                    if self.device != None : valid_data, valid_target = valid_data.to(self.device), valid_target.to(self.device)
+
+                    self.model.optimizer.zero_grad()
+
+                    _, _, valid_ensemble_output = self.model(valid_data)
+
+                    _, v_ensemble_pred = torch.max(valid_ensemble_output, dim = 1)
+
+                np_target, np_pred = np.array(valid_target.cpu()), np.array(v_ensemble_pred.cpu())
+                
+                total_precision += precision_score(np_target, np_pred)
+                total_recall += recall_score(np_target, np_pred)
+                total_f1score += f1_score(np_target, np_pred)
+
+                precision, recall, f1score = total_precision/len(self.valid_loader)*100., total_recall/len(self.valid_loader)*100., total_f1score/len(self.valid_loader)*100.
+
+            print('\n\nEvaluation Result --- Ensemble Precision : {0:.4f}% | Ensemble Recall : {1:.4f}% | Ensemble F1-Score : {2:.4f}%'.format(precision, recall, f1score))

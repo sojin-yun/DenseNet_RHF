@@ -9,7 +9,7 @@ from utils.parse_args import Parsing_Args
 from utils.load_data import CustomDataLoader
 from utils.corrupt import EvaluateMCE
 from run.train import TrainingEnsemble, TrainingBaseline
-from run.eval import Evaluation
+from run.eval import AveragePrecision, Evaluation
 from run.heatmap import RunGradCAM
 from model.ensemble.resnet import ResNet_ensemble, BasicBlock_ensemble
 from model.baseline.resnet import ResNet, BasicBlock
@@ -59,7 +59,7 @@ def drive(args) :
         else :
             TrainingBaseline(flags, model, data_loader, device)()
 
-    elif flags['mode'] == 'eval' :
+    elif flags['mode'] == 'eval' or flags['mode'] == 'map' :
         load_checkpoint = flags['weight']
         if load_checkpoint != None :
             checkpoint = torch.load('{0}/weights/evaluation/{1}'.format(abs_path, flags['weight']), map_location = device)
@@ -68,7 +68,10 @@ def drive(args) :
             model_params.update(params)
             model.load_state_dict(model_params)
             print('Pretrained weights are loaded for evaluation.')
-        Evaluation(flags, model ,data_loader, device)()
+        if flags['mode'] == 'eval' :
+            Evaluation(flags, model ,data_loader, device)()
+        elif flags['mode'] == 'map' :
+            AveragePrecision(flags, model, data_loader, 9, device)
 
     elif flags['mode'] == 'cam' :
         cam = RunGradCAM(flags, data_loader)
