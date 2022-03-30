@@ -3,6 +3,7 @@ import torchvision
 from torchvision import transforms, datasets
 from torch.utils.data import DataLoader
 from torchvision.transforms.transforms import RandomResizedCrop
+from utils.module import RandomInversion
 
 class CustomDataLoader() :
     def __init__(self, args : list) :
@@ -10,7 +11,7 @@ class CustomDataLoader() :
         self.args = args
         self.data = args['data']
         self.server = args['server']
-        assert self.data in ['cifar100', 'mini_imagenet', 'mini_imagenet_vit', 'kidney_stone', 'mnist', 'cub200'], '--data argument is invalid'
+        assert self.data in ['cifar100', 'mini_imagenet', 'mini_imagenet_vit', 'kidney_stone', 'mnist', 'cub200', 'lung'], '--data argument is invalid'
 
         self.transformer_components = {
             'cifar100' : {'image_size' : 64, 'mean' : (0.5071, 0.4867, 0.4408), 'std' : (0.2675, 0.2565, 0.2761)},
@@ -18,7 +19,8 @@ class CustomDataLoader() :
             'mini_imagenet' : {'image_size' : 224, 'mean' : (0.485, 0.456, 0.406), 'std' : (0.229, 0.224, 0.225)},
             'mini_imagenet_vit' : {'image_size' : 384, 'mean' : (0.485, 0.456, 0.406), 'std' : (0.229, 0.224, 0.225)},
             'kidney_stone' : {'image_size' : 512, 'mean' : 0.161, 'std' : 0.246},
-            'cub200' : {'image_size' : 224, 'mean' : (0.485, 0.456, 0.406), 'std' : (0.229, 0.224, 0.225)}
+            'cub200' : {'image_size' : 224, 'mean' : (0.485, 0.456, 0.406), 'std' : (0.229, 0.224, 0.225)},
+            'lung' : {'image_size' : 512, 'mean' : 0.270, 'std' : 0.309}
         }
 
         self.dataset_components = {
@@ -27,7 +29,8 @@ class CustomDataLoader() :
             'mini_imagenet' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/Mini_ImageNet/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Mini_ImageNet/'},
             'mini_imagenet_vit' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/Mini_ImageNet/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Mini_ImageNet/'},
             'kidney_stone' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/Kidney_Stone/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Kidney_Stone/'},
-            'cub200' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/cub200/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/cub200/'}
+            'cub200' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/cub200/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/cub200/'},
+            'lung' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/Lung_Cancer/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Lung_Cancer/'}
         }
 
     
@@ -48,7 +51,8 @@ class CustomDataLoader() :
                 transforms.RandomCrop(size = (self.image_size, self.image_size), padding = 8),
                 transforms.RandomHorizontalFlip(0.5),
                 transforms.ToTensor(),
-                transforms.Normalize(self.data_mean, self.data_std),
+                #transforms.Normalize(self.data_mean, self.data_std),
+                RandomInversion()
             ])
 
         valid_transformer = transforms.Compose([
