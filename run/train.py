@@ -35,6 +35,9 @@ class TrainingEnsemble :
         elif self.args['data'] == 'kidney_stone' : 
             self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/kidney_stone/' if self.args['server'] else './Save_parameters/kidney_stone/'
             self.model_size = (1, 512, 512)
+        elif self.args['data'] == 'lung' : 
+            self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/lung/' if self.args['server'] else './Save_parameters/lung/'
+            self.model_size = (1, 512, 512)
         elif self.args['data'] == 'cub200' : 
             self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/cub200/' if self.args['server'] else './Save_parameters/cub200/'
             self.model_size = (3, 224, 224)
@@ -254,6 +257,9 @@ class TrainingBaseline :
         elif self.args['data'] == 'kidney_stone' : 
             self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/kidney_stone/' if self.args['server'] else './Save_parameters/kidney_stone/'
             self.model_size = (1, 512, 512)
+        elif self.args['data'] == 'lung' : 
+            self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/lung/' if self.args['server'] else './Save_parameters/lung/'
+            self.model_size = (1, 512, 512)
         elif self.args['data'] == 'cub200' : 
             self.default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/cub200/' if self.args['server'] else './Save_parameters/cub200/'
             self.model_size = (3, 224, 224)
@@ -276,7 +282,7 @@ class TrainingBaseline :
             os.mkdir(os.path.join(self.default_path, self.save_path, folder))
             self.ts_board = SummaryWriter(log_dir = os.path.join(self.default_path, self.save_path, folder))
 
-        if not self.args['server'] and self.args['data'] != 'kidney_stone' :
+        if not self.args['server'] and self.args['data'] != 'kidney_stone' and self.args['data'] != 'lung' :
             s = open(os.path.join(self.default_path, self.save_path, 'model_summary.txt'), 'w')
             s.write('Model : {}-baseline model. \n\n'.format(self.args['model']))
             copy_model = copy.deepcopy(self.model)
