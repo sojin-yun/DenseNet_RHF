@@ -51,8 +51,8 @@ class CustomDataLoader() :
                 transforms.RandomCrop(size = (self.image_size, self.image_size), padding = 8),
                 transforms.RandomHorizontalFlip(0.5),
                 transforms.ToTensor(),
-                #transforms.Normalize(self.data_mean, self.data_std),
-                RandomInversion()
+                transforms.Normalize(self.data_mean, self.data_std),
+                #RandomInversion()
             ])
 
         valid_transformer = transforms.Compose([
