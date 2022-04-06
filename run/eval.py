@@ -5,7 +5,7 @@ from tqdm import tqdm
 import os
 import time
 from torchsummary import summary
-from sklearn.metrics import f1_score, precision_score, recall_score, PrecisionRecallDisplay
+from sklearn.metrics import f1_score, precision_score, recall_score
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -223,3 +223,18 @@ class AveragePrecision :
             
             plt.plot(total_pr, total_rc)
             plt.show()
+
+class Metrics :
+    
+    def __init__(self, predict, label) :
+        self.predict = np.array(predict.cpu())
+        self.label = np.array(label.cpu())
+
+    def precision(self) :
+        return precision_score(self.label, self.predict)
+
+    def recall(self) :
+        return recall_score(self.label, self.predict)
+
+    def f1_score(self) :
+        return f1_score(self.label, self.predict)
