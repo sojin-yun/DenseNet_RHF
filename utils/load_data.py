@@ -4,6 +4,7 @@ from torchvision import transforms, datasets
 from torch.utils.data import DataLoader
 from torchvision.transforms.transforms import RandomResizedCrop
 from utils.module import RandomInversion
+from utils.mchannel_loader import DataLoaderSegmentation
 
 class CustomDataLoader() :
     def __init__(self, args : list) :
@@ -30,7 +31,7 @@ class CustomDataLoader() :
             'mini_imagenet_vit' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/Mini_ImageNet/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Mini_ImageNet/'},
             'kidney_stone' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/Kidney_Stone/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Kidney_Stone/'},
             'cub200' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/cub200/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/cub200/'},
-            'lung' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/Lung_Cancer/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Lung_Cancer/'}
+            'lung' : {'data' : DataLoaderSegmentation, 'path' : '/home/NAS_mount/sjyun/Lung_Nodule/Task06_Lung_0412/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Lung_Cancer/'}
         }
 
     
