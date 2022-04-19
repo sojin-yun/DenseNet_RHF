@@ -6,10 +6,9 @@ import torch
 from torch.utils.data import Dataset
 
 class DataLoaderSegmentation(Dataset):
-    def __init__(self, root, transform=None, data=None, only_train = True):
+    def __init__(self, root, transform=None, data=None):
         super(DataLoaderSegmentation, self).__init__()
         self.transforms = transform
-        self.only_train = only_train
 
         # fname.png
         self.filenames0 = os.listdir(os.path.join(root,'0'))
@@ -262,11 +261,7 @@ class DataLoaderSegmentation(Dataset):
             mask = np.concatenate((prev_mask, mask), axis=2)
             mask = np.concatenate((mask, next_mask), axis=2)
 
-            if self.transforms is not None:
-                data = self.transforms(data)
-
-            if self.only_train : return data, label
-            else : return data, label, mask
+            return data, label, mask
                 
 
     def __len__(self):
