@@ -1,3 +1,4 @@
+from sklearn.metrics import f1_score
 import torch
 from torch.optim.lr_scheduler import CosineAnnealingLR, StepLR
 from torch.utils import data
@@ -8,6 +9,7 @@ from torchsummary import summary
 from torch.utils.tensorboard import SummaryWriter
 import copy
 import pandas as pd
+from .eval import Metrics
 
 class TrainingEnsemble :
 
@@ -93,6 +95,7 @@ class TrainingEnsemble :
         data_frame = []
 
         best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc = 0., 0., 0.
+        best_precision, best_recall = 0., 0.
 
         # for non-pretrained
         #backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight = 1.0, 0.2, 0.2
@@ -158,6 +161,8 @@ class TrainingEnsemble :
 
                 self.model.eval()
 
+                target, prediction = None, None
+
                 for valid_iter, (valid_data, valid_target) in enumerate(tqdm(self.valid_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01)) :
 
                     if self.device != None : valid_data, valid_target = valid_data.to(self.device), valid_target.to(self.device)
@@ -181,11 +186,18 @@ class TrainingEnsemble :
                     valid_boundary_acc += (torch.sum(v_boundary_pred == valid_target.data)).item()*(100.0 / batch_size)
                     valid_ensemble_acc += (torch.sum(v_ensemble_pred == valid_target.data)).item()*(100.0 / batch_size)
 
+                    ###
+                    if target == None : target = valid_target
+                    else : target = torch.cat([target, valid_target], dim = 0)
+
+                    if prediction == None : prediction = v_ensemble_pred
+                    else : prediction = torch.cat([prediction, v_ensemble_pred], dim = 0)
+                    ###
+
                     if self.args['tensorboard'] :
                         self.ts_board.add_scalars('Loss/valid', {'v_loss' : v_loss.item(), 
                                                                  'v_boundary_loss' : valid_b_loss.item(), 
                                                                  'v_ensemble_loss' : valid_e_loss.item()}, i * n_valid_batchs + valid_iter)
-
 
             avg_train_acc = train_acc/n_train_batchs
             avg_boundary_train_acc = boundary_acc/n_train_batchs
@@ -196,7 +208,12 @@ class TrainingEnsemble :
             avg_tarin_loss = ensemble_loss/n_train_batchs
             avg_valid_loss = valid_ensemble_loss/n_train_batchs
 
-            data_frame.append([i + 1, avg_train_acc, avg_valid_acc, avg_boundary_train_acc, avg_boundary_valid_acc, avg_ensemble_train_acc, avg_ensemble_valid_acc])
+            metric = Metrics(prediction, target)
+            precision = metric.precision()*100.
+            recall = metric.recall()*100.
+            f1score = metric.f1_score()*100.
+
+            data_frame.append([i + 1, avg_train_acc, avg_valid_acc, avg_boundary_train_acc, avg_boundary_valid_acc, avg_ensemble_train_acc, avg_ensemble_valid_acc, precision, recall, f1score])
 
 
             if self.args['tensorboard'] :
@@ -214,18 +231,38 @@ class TrainingEnsemble :
             if avg_ensemble_valid_acc > best_ensemble_valid_acc : 
                 best_ensemble_valid_acc = avg_ensemble_valid_acc
                 best_model_params = {
-                'epoch' : i,
+                'epoch' : i+1,
                 'state_dict' : self.model.state_dict(),
                 'optimizer' : self.model.optimizer.state_dict(),
                 'scheduler' : self.model.scheduler.state_dict()
                 }
                 torch.save(best_model_params, os.path.join(self.default_path, self.save_path, self.save_file+'.pt'))
+            # if precision > best_precision :
+            #     best_precision = precision
+            #     best_model_params = {
+            #         'epoch' : i+1,
+            #         'state_dict' : self.model.state_dict()
+            #     }
+            #     torch.save(best_model_params, os.path.join(self.default_path, self.save_path, self.save_file+'_{}_epoch.pt'.format(i+1)))
+            # if recall > best_recall :
+            #     best_recall = recall
+            #     best_model_params = {
+            #         'epoch' : i+1,
+            #         'state_dict' : self.model.state_dict()
+            #     }
+            epoch_model_params = {
+                'epoch' : i+1,
+                'state_dict' : self.model.state_dict()
+            }
+            torch.save(epoch_model_params, os.path.join(self.default_path, self.save_path, self.save_file+'_{}_epoch.pt'.format(i+1)))
+                
+                
 
             training_result = 'epoch.{0:3d} \t train_ac : {1:.4f}% \t  valid_ac : {2:.4f}% \t bdr_train : {3:.4f}% \t bdr_valid : {4:.4f}% \t ens_train : {5:.4f}% \t ens_valid : {6:.4f}% \t lr : {7:.6f}\n'.format(i+1, avg_train_acc, avg_valid_acc, avg_boundary_train_acc, avg_boundary_valid_acc, avg_ensemble_train_acc, avg_ensemble_valid_acc, curr_lr)
             f.write(training_result)
             print(training_result)
 
-        pd_data_frame = pd.DataFrame(data_frame, columns = ['Epoch', 'train', 'valid', 'b_train', 'b_valid', 'e_train', 'e_valid'])
+        pd_data_frame = pd.DataFrame(data_frame, columns = ['Epoch', 'train', 'valid', 'b_train', 'b_valid', 'e_train', 'e_valid', 'precision', 'recall', 'f1_score'])
         pd_data_frame.to_excel(excel_name, index = False)
 
         # Training is finished.
@@ -358,6 +395,8 @@ class TrainingBaseline :
 
                 self.model.eval()
 
+                target, prediction = None, None
+
                 for valid_iter, (valid_data, valid_target) in enumerate(tqdm(self.valid_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01)) :
 
                     if self.device != None : valid_data, valid_target = valid_data.to(self.device), valid_target.to(self.device)
@@ -373,6 +412,14 @@ class TrainingBaseline :
                     valid_loss += v_loss.item()
                     valid_acc += (torch.sum(v_pred == valid_target.data)).item()*(100.0 / batch_size)
 
+                    ###
+                    if target == None : target = valid_target
+                    else : target = torch.cat([target, valid_target], dim = 0)
+
+                    if prediction == None : prediction = v_pred
+                    else : prediction = torch.cat([prediction, v_pred], dim = 0)
+                    ###
+
                     if self.args['tensorboard'] :
                         self.ts_board.add_scalar('Loss/valid', v_loss.item(), i * n_valid_batchs + valid_iter)
 
@@ -381,7 +428,13 @@ class TrainingBaseline :
             avg_tarin_loss = train_loss/n_train_batchs
             avg_valid_loss = valid_loss/n_valid_batchs
 
-            data_frame.append([i + 1, avg_train_acc, avg_valid_acc, avg_tarin_loss, avg_valid_loss])
+            metric = Metrics(prediction, target)
+            precision = metric.precision()*100.
+            recall = metric.recall()*100.
+            f1score = metric.f1_score()*100.
+
+            data_frame.append([i + 1, avg_train_acc, avg_valid_acc, avg_tarin_loss, avg_valid_loss, precision, recall, f1score])
+            
 
             if self.args['tensorboard'] :
                 self.ts_board.add_scalars('Accuracy', {'train_acc' : avg_train_acc, 
@@ -395,7 +448,7 @@ class TrainingBaseline :
 
             if avg_valid_acc > best_valid_acc : 
                 best_model_params = {
-                'epoch' : i,
+                'epoch' : i+1,
                 'state_dict' : self.model.state_dict(),
                 'optimizer' : self.model.optimizer.state_dict(), 
                 'scheduler' : self.model.scheduler.state_dict()
@@ -403,12 +456,18 @@ class TrainingBaseline :
                 best_valid_acc = avg_valid_acc
                 best_valid_loss = avg_valid_loss
                 torch.save(best_model_params, os.path.join(self.default_path, self.save_path, self.save_file+'.pt'))
+
+            epoch_model_params = {
+                'epoch' : i+1,
+                'state_dict' : self.model.state_dict()
+            }
+            torch.save(epoch_model_params, os.path.join(self.default_path, self.save_path, self.save_file+'_{}_epoch.pt'.format(i+1)))
             
             training_result = 'epoch.{0:3d} \t train_ac : {1:.4f}% \t  valid_ac : {2:.4f}% \t lr : {3:.6f}\n'.format(i+1, avg_train_acc, avg_valid_acc, curr_lr)
             f.write(training_result)
             print(training_result)
 
-        pd_data_frame = pd.DataFrame(data_frame, columns = ['Epoch', 'train_acc', 'valid_acc', 'train_loss', 'valid_loss'])
+        pd_data_frame = pd.DataFrame(data_frame, columns = ['Epoch', 'train_acc', 'valid_acc', 'train_loss', 'valid_loss', 'precision', 'recall', 'f1_score'])
         pd_data_frame.to_excel(excel_name, index = False)
 
         # Training is finished.
