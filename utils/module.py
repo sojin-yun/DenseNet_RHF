@@ -98,3 +98,17 @@ class ReviveConv2d(nn.Module) :
         self.recovered_map = torch.abs((sparse-dense))
         return out
 
+class RandomInversion(torch.nn.Module):
+
+    def __init__(self, p = 0.5, v_min = 0.0, v_max = 1.0):
+        super().__init__()
+        self.p = p
+        self.v_max = v_max
+        self.v_min = v_min
+
+    def forward(self, img):
+        if self.p < torch.rand(1):
+            return img
+        else :
+            return (self.v_max + self.v_min) - img
+
