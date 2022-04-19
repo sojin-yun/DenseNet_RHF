@@ -78,5 +78,9 @@ def Parsing_Args(args) :
         '--separate', type = str_to_bool, default = False,
         help = 'set mode to visualize heatmap from backbone and boundary activation map'
     )
+    parser.add_argument(
+        '--mask', type = str_to_bool, default = False,
+        help = 'set mode to load mask label simulaneously when compute grad-cam'
+    )
 
     return vars(parser.parse_known_args(args)[0])
