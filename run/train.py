@@ -366,6 +366,8 @@ class TrainingBaseline :
                 if self.args['mask'] : train_data, train_target, _ = samples
                 else : train_data, train_target = samples
 
+                print('train.py ', train_data.shape, train_target.shape)
+
                 if self.device != None : train_data, train_target = train_data.to(self.device), train_target.to(self.device)
                 
                 self.model.optimizer.zero_grad()
