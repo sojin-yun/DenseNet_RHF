@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-from torch.optim.lr_scheduler import MultiStepLR, StepLR
+from torch.optim.lr_scheduler import MultiStepLR, StepLR, CosineAnnealingLR
 
 
 def conv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) :
@@ -38,7 +38,12 @@ class BasicBlock_ensemble_deeper(nn.Module):
         if self.stride == 2:
             self.conv1_strided = conv1x1(inplanes, midplanes)
             self.bn1_strided = norm_layer(midplanes)
-            self.upsample = nn.Upsample(scale_factor=self.stride, mode = 'bilinear', align_corners=False)
+            #self.upsample = nn.Upsample(scale_factor=self.stride, mode = 'bilinear', align_corners=False)
+            self.upsample = nn.Sequential(
+            nn.Upsample(scale_factor=self.stride, mode = 'bilinear', align_corners=False)
+            # nn.ConvTranspose2d(midplanes, midplanes, 3, 2, 1, 1),
+            # nn.ReLU()
+        )
     
 
     def _copy_weight(self) :
@@ -139,8 +144,8 @@ class ResNet_ensemble_deeper(nn.Module):
         self.loss = nn.CrossEntropyLoss()
         self.boundary_loss = nn.CrossEntropyLoss()
         self.ensemble_loss = nn.CrossEntropyLoss()
-        #self.scheduler = StepLR(self.optimizer, step_size=15, gamma=0.5)
-        self.scheduler = MultiStepLR(self.optimizer, milestones=[60, 90], gamma=0.1)
+        self.scheduler = CosineAnnealingLR(self.optimizer, T_max = 50, eta_min = 0)
+        #self.scheduler = MultiStepLR(self.optimizer, milestones=[60, 90], gamma=0.1)
 
         # weight initialization
         self._initializing_weight()
@@ -149,7 +154,7 @@ class ResNet_ensemble_deeper(nn.Module):
     def _initializing_weight(self) :
 
         for m in self.modules():
-            if isinstance(m, nn.Conv2d):
+            if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d) :
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.constant_(m.weight, 1)
@@ -208,10 +213,10 @@ class ResNet_ensemble_deeper(nn.Module):
                           nn.Conv2d(conv, conv, kernel_size=5, stride=1, padding = 2), 
                           nn.BatchNorm2d(conv),
                           nn.LeakyReLU(inplace = True),
-                          nn.Conv2d(conv, conv, kernel_size=5, stride=2, padding = 2), 
+                          nn.Conv2d(conv, conv, kernel_size=5, stride=1, padding = 2), 
                           nn.BatchNorm2d(conv),
-                          nn.LeakyReLU(inplace = True),)
-                          #nn.MaxPool2d((2, 2)))
+                          nn.LeakyReLU(inplace = True),
+                          nn.MaxPool2d((2, 2)))
                           ]
         
         for i in range(len(boundary_layers)-1):

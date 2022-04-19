@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-from torch.optim.lr_scheduler import MultiStepLR, StepLR
+from torch.optim.lr_scheduler import MultiStepLR, StepLR, CosineAnnealingLR
 
 
 def conv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) :
@@ -97,8 +97,8 @@ class ResNet_deeper(nn.Module):
         #self.optimizer = optim.SGD(self.parameters(), lr = 1e-3, momentum = 0.9, weight_decay=0.00001)
         self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0001)
         self.loss = nn.CrossEntropyLoss()
-        #self.scheduler = StepLR(self.optimizer, step_size=15, gamma=0.5)
-        self.scheduler = MultiStepLR(self.optimizer, milestones=[60, 90], gamma=0.1)
+        self.scheduler = CosineAnnealingLR(self.optimizer, T_max = 50, eta_min = 0)
+        #self.scheduler = MultiStepLR(self.optimizer, milestones=[60, 90], gamma=0.1)
 
         # weight initialization
         self._initializing_weights()
