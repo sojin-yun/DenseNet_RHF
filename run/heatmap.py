@@ -173,7 +173,7 @@ class RunGradCAM() :
             # Image inverse-normalizing to plot below heatmap
             image = inverse_norm.run(data).numpy()
             image_np = np.transpose(image, (0, 2, 3, 1)).squeeze(0)
-            mask_np = np.transpose(mask, (0, 2, 3, 1)).squeeze(0)
+            mask_np = np.transpose(mask.numpy(), (0, 2, 3, 1)).squeeze(0)
             
             baseline_ret, baseline_pred = self.baseline_cam(data, target)
             baseline_ret = self.upsample(baseline_ret.unsqueeze(0)).detach().cpu()
@@ -199,41 +199,41 @@ class RunGradCAM() :
             elif (baseline_pred.item() == target.item()) and (ensemble_pred.item() == target.item()) : figsave_path = os.path.join(self.default_path, self.save_path, 'Both_correct/', str(target.item()))
             else : continue
 
-            fig = plt.figure(figsize=(12, 4))
-            ax0 = fig.add_subplot(1, 3, 1)
+            fig = plt.figure(figsize=(12, 8))
+            ax0 = fig.add_subplot(2, 3, 1)
             ax0.imshow((image_np * 255.).astype('uint8'))
             ax0.set_title(mapping_dict[str(target.item())], fontsize = 18)
             #ax0.set_title(target.item(), fontsize = 15)
             ax0.axis('off')
 
-            ax1 = fig.add_subplot(1, 3, 2)
+            ax1 = fig.add_subplot(2, 3, 2)
             ax1.imshow((image_np * 255.).astype('uint8'))
             ax1.imshow((baseline_ret * 255.).astype('uint8'), cmap = 'jet', alpha = 0.4)
             ax1.set_title('Baseline', fontsize = 15)
             ax1.axis('off')
 
-            ax2 = fig.add_subplot(1, 3, 3)
+            ax2 = fig.add_subplot(2, 3, 3)
             ax2.imshow((image_np * 255.).astype('uint8'))
             ax2.imshow((ensemble_ret * 255.).astype('uint8'), cmap = 'jet', alpha = 0.4)
             ax2.set_title('Ensemble', fontsize = 15)
             ax2.axis('off')
 
-            ax3 = fig.add_subplot(1, 3, 1)
-            ax3.imshow((mask_np * 255.).astype('uint8'))
+            ax3 = fig.add_subplot(2, 3, 4)
+            ax3.imshow((mask_np * 255.).astype('uint8'), cmap = 'gray')
             ax3.set_title(mapping_dict[str(target.item())], fontsize = 18)
             #ax3.set_title(target.item(), fontsize = 15)
             ax3.axis('off')
 
-            ax4 = fig.add_subplot(1, 3, 2)
-            ax4.imshow((mask_np * 255.).astype('uint8'))
+            ax4 = fig.add_subplot(2, 3, 5)
+            ax4.imshow((mask_np * 255.).astype('uint8'), cmap = 'gray')
             ax4.imshow((baseline_ret * 255.).astype('uint8'), cmap = 'jet', alpha = 0.4)
-            ax4.set_title('Baseline', fontsize = 15)
+            ax4.set_title('5th / 69.7-67.5-82.4', fontsize = 12)
             ax4.axis('off')
 
-            ax5 = fig.add_subplot(1, 3, 3)
-            ax5.imshow((mask_np * 255.).astype('uint8'))
+            ax5 = fig.add_subplot(2, 3, 6)
+            ax5.imshow((mask_np * 255.).astype('uint8'), cmap = 'gray')
             ax5.imshow((ensemble_ret * 255.).astype('uint8'), cmap = 'jet', alpha = 0.4)
-            ax5.set_title('Ensemble', fontsize = 15)
+            ax5.set_title('10th / 75.2-68.9-98.4', fontsize = 12)
             ax5.axis('off')
 
             plt.savefig(figsave_path+'/{0}.png'.format(str(idx)))
