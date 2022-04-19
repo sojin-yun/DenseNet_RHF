@@ -48,7 +48,6 @@ class DataLoaderSegmentation(Dataset):
     def __getitem__(self, index):
             img_path = self.img_files[index]
             mask_path = self.mask_files[index]
-            print(mask_path)
             label = self.labels[index]
 
             data_fname = img_path.split("/")[-1] #.png

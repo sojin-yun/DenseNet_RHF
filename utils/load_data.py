@@ -39,10 +39,12 @@ class CustomDataLoader() :
         self.image_size = self.transformer_components[self.data]['image_size']
         self.data_mean, self.data_std = self.transformer_components[self.data]['mean'], self.transformer_components[self.data]['std']
 
-        if self.data == 'mnist' :
+        if self.data == 'lung' :
             train_transformer = transforms.Compose([
+                transforms.ToPILImage(),
                 transforms.Resize((self.image_size, self.image_size)),
                 transforms.RandomCrop(size = (self.image_size, self.image_size), padding = 8),
+                transforms.RandomHorizontalFlip(0.5),
                 transforms.ToTensor(),
                 transforms.Normalize(self.data_mean, self.data_std),
             ])
