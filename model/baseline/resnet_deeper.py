@@ -138,8 +138,6 @@ class ResNet_deeper(nn.Module):
 
     def forward(self, x):
 
-        print(x.shape)
-
         x = self.former_block(x)
 
         x = self.layer1(x)
