@@ -362,9 +362,12 @@ class TrainingBaseline :
             batch_size = self.args['batch_size']
 
             for train_iter, (samples) in enumerate(tqdm(self.train_loader, desc="{:17s}".format('Training State'), mininterval=0.01)) :
+
                 
                 if self.args['mask'] : train_data, train_target, _ = samples
                 else : train_data, train_target = samples
+
+                print(train_data.shape, train_target.shape)
 
                 if self.device != None : train_data, train_target = train_data.to(self.device), train_target.to(self.device)
                 

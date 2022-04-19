@@ -261,6 +261,9 @@ class DataLoaderSegmentation(Dataset):
             mask = np.concatenate((prev_mask, mask), axis=2)
             mask = np.concatenate((mask, next_mask), axis=2)
 
+            if self.transforms is not None :
+                data = self.transforms(data)
+
             return data, label, mask
                 
 
