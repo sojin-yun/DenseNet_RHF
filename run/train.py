@@ -246,7 +246,8 @@ class TrainingEnsemble :
                 'epoch' : i+1,
                 'state_dict' : self.model.state_dict()
             }
-            torch.save(epoch_model_params, os.path.join(self.default_path, self.save_path, self.save_file+'_{}_epoch.pt'.format(i+1)))
+            if i >= 99 :
+                torch.save(epoch_model_params, os.path.join(self.default_path, self.save_path, self.save_file+'_{}_epoch.pt'.format(i+1)))
                 
                 
 
@@ -362,6 +363,7 @@ class TrainingBaseline :
             batch_size = self.args['batch_size']
 
             for train_iter, (samples) in enumerate(tqdm(self.train_loader, desc="{:17s}".format('Training State'), mininterval=0.01)) :
+
                 
                 if self.args['mask'] : train_data, train_target, _ = samples
                 else : train_data, train_target = samples
@@ -459,7 +461,8 @@ class TrainingBaseline :
                 'epoch' : i+1,
                 'state_dict' : self.model.state_dict()
             }
-            torch.save(epoch_model_params, os.path.join(self.default_path, self.save_path, self.save_file+'_{}_epoch.pt'.format(i+1)))
+            if i >= 99 :
+                torch.save(epoch_model_params, os.path.join(self.default_path, self.save_path, self.save_file+'_{}_epoch.pt'.format(i+1)))
             
             training_result = 'epoch.{0:3d} \t train_ac : {1:.4f}% \t  valid_ac : {2:.4f}% \t lr : {3:.6f}\n'.format(i+1, avg_train_acc, avg_valid_acc, curr_lr)
             f.write(training_result)

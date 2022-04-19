@@ -4,6 +4,7 @@ from torchvision import transforms, datasets
 from torch.utils.data import DataLoader
 from torchvision.transforms.transforms import RandomResizedCrop
 from utils.module import RandomInversion
+from utils.mchannel_loader import DataLoaderSegmentation
 
 class CustomDataLoader() :
     def __init__(self, args : list) :
@@ -30,7 +31,7 @@ class CustomDataLoader() :
             'mini_imagenet_vit' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/Mini_ImageNet/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Mini_ImageNet/'},
             'kidney_stone' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/Kidney_Stone/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Kidney_Stone/'},
             'cub200' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/cub200/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/cub200/'},
-            'lung' : {'data' : datasets.ImageFolder, 'path' : '/home/NAS_mount/sjlee/RHF/data/Lung_Cancer/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Lung_Cancer/'}
+            'lung' : {'data' : DataLoaderSegmentation, 'path' : '/home/NAS_mount/sjyun/Lung_Nodule/Task06_Lung_0412/'} if self.server else {'data' : datasets.ImageFolder, 'path' : './data/Lung_Cancer/'}
         }
 
     
@@ -38,10 +39,12 @@ class CustomDataLoader() :
         self.image_size = self.transformer_components[self.data]['image_size']
         self.data_mean, self.data_std = self.transformer_components[self.data]['mean'], self.transformer_components[self.data]['std']
 
-        if self.data == 'mnist' :
+        if self.data == 'lung' :
             train_transformer = transforms.Compose([
+                transforms.ToPILImage(),
                 transforms.Resize((self.image_size, self.image_size)),
                 transforms.RandomCrop(size = (self.image_size, self.image_size), padding = 8),
+                transforms.RandomHorizontalFlip(0.5),
                 transforms.ToTensor(),
                 transforms.Normalize(self.data_mean, self.data_std),
             ])
@@ -56,6 +59,7 @@ class CustomDataLoader() :
             ])
 
         valid_transformer = transforms.Compose([
+            transforms.ToPILImage(),
             transforms.Resize((self.image_size, self.image_size)),
             transforms.ToTensor(),
             transforms.Normalize(self.data_mean, self.data_std)
@@ -69,7 +73,11 @@ class CustomDataLoader() :
         if self.data == 'cifar100' :
             train_dataset = self.dataset_components[self.data]['data'](root = self.dataset_components[self.data]['path'], download = True, train = True, transform = transforms[0])
             valid_dataset = self.dataset_components[self.data]['data'](root = self.dataset_components[self.data]['path'], download = True, train = False, transform = transforms[1])
+        elif self.data == 'lung' :
+            train_dataset = self.dataset_components[self.data]['data'](root = os.path.join(self.dataset_components[self.data]['path'], 'train/'), transform = transforms[0], data = 'train')
+            valid_dataset = self.dataset_components[self.data]['data'](root = os.path.join(self.dataset_components[self.data]['path'], 'val/'), transform = transforms[1], data = 'val')
         else :
+        
             train_dataset = self.dataset_components[self.data]['data'](root = os.path.join(self.dataset_components[self.data]['path'], 'train/'), transform = transforms[0])
             valid_dataset = self.dataset_components[self.data]['data'](root = os.path.join(self.dataset_components[self.data]['path'], 'val/'), transform = transforms[1])
 
