@@ -95,7 +95,6 @@ class TrainingEnsemble :
         data_frame = []
 
         best_valid_acc, best_boundary_valid_acc, best_ensemble_valid_acc = 0., 0., 0.
-        best_precision, best_recall = 0., 0.
 
         # for non-pretrained
         #backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight = 1.0, 0.2, 0.2
@@ -123,8 +122,11 @@ class TrainingEnsemble :
             n_valid_batchs = len(self.valid_loader)
             batch_size = self.args['batch_size']
 
-            for train_iter, (train_data, train_target) in enumerate(tqdm(self.train_loader, desc="{:17s}".format('Training State'), mininterval=0.01)) :
+            for train_iter, (samples) in enumerate(tqdm(self.train_loader, desc="{:17s}".format('Training State'), mininterval=0.01)) :
                 
+                if self.args['mask'] : train_data, train_target, _ = samples
+                else : train_data, train_target = samples
+
                 if self.device != None : train_data, train_target = train_data.to(self.device), train_target.to(self.device)
                 
                 self.model.optimizer.zero_grad()
@@ -163,8 +165,10 @@ class TrainingEnsemble :
 
                 target, prediction = None, None
 
-                for valid_iter, (valid_data, valid_target) in enumerate(tqdm(self.valid_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01)) :
+                for valid_iter, (v_samples) in enumerate(tqdm(self.valid_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01)) :
 
+                    if self.args['mask'] : valid_data, valid_target, _ = v_samples
+                    else : valid_data, valid_target = v_samples
                     if self.device != None : valid_data, valid_target = valid_data.to(self.device), valid_target.to(self.device)
 
                     self.model.optimizer.zero_grad()
@@ -237,19 +241,7 @@ class TrainingEnsemble :
                 'scheduler' : self.model.scheduler.state_dict()
                 }
                 torch.save(best_model_params, os.path.join(self.default_path, self.save_path, self.save_file+'.pt'))
-            # if precision > best_precision :
-            #     best_precision = precision
-            #     best_model_params = {
-            #         'epoch' : i+1,
-            #         'state_dict' : self.model.state_dict()
-            #     }
-            #     torch.save(best_model_params, os.path.join(self.default_path, self.save_path, self.save_file+'_{}_epoch.pt'.format(i+1)))
-            # if recall > best_recall :
-            #     best_recall = recall
-            #     best_model_params = {
-            #         'epoch' : i+1,
-            #         'state_dict' : self.model.state_dict()
-            #     }
+
             epoch_model_params = {
                 'epoch' : i+1,
                 'state_dict' : self.model.state_dict()
@@ -369,8 +361,11 @@ class TrainingBaseline :
             n_valid_batchs = len(self.valid_loader)
             batch_size = self.args['batch_size']
 
-            for train_iter, (train_data, train_target) in enumerate(tqdm(self.train_loader, desc="{:17s}".format('Training State'), mininterval=0.01)) :
+            for train_iter, (samples) in enumerate(tqdm(self.train_loader, desc="{:17s}".format('Training State'), mininterval=0.01)) :
                 
+                if self.args['mask'] : train_data, train_target, _ = samples
+                else : train_data, train_target = samples
+
                 if self.device != None : train_data, train_target = train_data.to(self.device), train_target.to(self.device)
                 
                 self.model.optimizer.zero_grad()
@@ -397,7 +392,10 @@ class TrainingBaseline :
 
                 target, prediction = None, None
 
-                for valid_iter, (valid_data, valid_target) in enumerate(tqdm(self.valid_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01)) :
+                for valid_iter, (v_samples) in enumerate(tqdm(self.valid_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01)) :
+
+                    if self.args['mask'] : valid_data, valid_target, _ = v_samples
+                    else : valid_data, valid_target = v_samples
 
                     if self.device != None : valid_data, valid_target = valid_data.to(self.device), valid_target.to(self.device)
 
