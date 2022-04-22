@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.optim.lr_scheduler import StepLR, MultiStepLR
+from torch.optim.lr_scheduler import StepLR, MultiStepLR, CosineAnnealingLR
 from torchsummary import summary
 import torchsummary
 
@@ -85,8 +85,8 @@ class DenseNet(nn.Module):
         #self.optimizer = optim.SGD(self.parameters(), lr = 1e-3, momentum = 0.9, weight_decay=0.00001)
         self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0001)
         self.loss = nn.CrossEntropyLoss()
-        #elf.scheduler = MultiStepLR(self.optimizer, milestones=[60, 90], gamma=0.1)
-        self.scheduler = MultiStepLR(self.optimizer, milestones=[100, 150], gamma=0.1)
+        self.scheduler = CosineAnnealingLR(self.optimizer, T_max = 50, eta_min = 0)
+        #self.scheduler = MultiStepLR(self.optimizer, milestones=[100, 150], gamma=0.1)
 
         # Initializing_weights
         self._initializing_weights()

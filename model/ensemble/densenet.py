@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.optim.lr_scheduler import StepLR, MultiStepLR
+from torch.optim.lr_scheduler import StepLR, MultiStepLR, CosineAnnealingLR
 from torchsummary import summary
 import torchsummary
 
@@ -115,8 +115,8 @@ class DenseNet_ensemble(nn.Module):
         self.loss = nn.CrossEntropyLoss()
         self.boundary_loss = nn.CrossEntropyLoss()
         self.ensemble_loss = nn.CrossEntropyLoss()
-        #self.scheduler = MultiStepLR(self.optimizer, milestones=[60, 90], gamma=0.1)
-        self.scheduler = MultiStepLR(self.optimizer, milestones=[100, 150], gamma=0.1)
+        self.scheduler = CosineAnnealingLR(self.optimizer, T_max = 50, eta_min = 0)
+        #self.scheduler = MultiStepLR(self.optimizer, milestones=[100, 150], gamma=0.1)
 
         # Initialization weights
         self._initializing_weights()
@@ -168,10 +168,15 @@ class DenseNet_ensemble(nn.Module):
 
         for conv in boundary_layers:
             model += [nn.Sequential(
+                          # Strided-conv in ResNet structure
                           nn.Conv2d(conv, conv, kernel_size=5, stride=1, padding = 2), 
                           nn.BatchNorm2d(conv),
-                          nn.ReLU(inplace = True),
-                          nn.MaxPool2d((2, 2)))]
+                          nn.LeakyReLU(inplace = True),
+                          nn.Conv2d(conv, conv, kernel_size=5, stride=1, padding = 2), 
+                          nn.BatchNorm2d(conv),
+                          nn.LeakyReLU(inplace = True),
+                          nn.MaxPool2d((2, 2)))
+                          ]
         
         for i in range(len(boundary_layers)-1):
             comp += [nn.Sequential(
