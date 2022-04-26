@@ -173,7 +173,7 @@ class RunGradCAM() :
             # Image inverse-normalizing to plot below heatmap
             image = inverse_norm.run(data).numpy()
             image_np = np.transpose(image, (0, 2, 3, 1)).squeeze(0)
-            mask_np = np.transpose(mask.numpy(), (0, 2, 3, 1)).squeeze(0)
+            mask_np = np.transpose(mask.numpy(), (1, 2, 0))
             
             baseline_ret, baseline_pred = self.baseline_cam(data, target)
             baseline_ret = self.upsample(baseline_ret.unsqueeze(0)).detach().cpu()
