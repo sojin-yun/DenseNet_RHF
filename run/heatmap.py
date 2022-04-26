@@ -30,10 +30,10 @@ class RunGradCAM() :
 
         self._make_folder()
         self._make_model()
-        # for i, m in enumerate(list(self.ensemble_model.modules())) :
-        #     print('---------------------------', i, '--------------------------')
-        #     print(m)
-        # return
+        for i, m in enumerate(list(self.ensemble_model.modules())) :
+            print('---------------------------', i, '--------------------------')
+            print(m)
+        return
 
     def _make_model(self) :
 
