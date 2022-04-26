@@ -75,8 +75,8 @@ def drive(args) :
 
     elif flags['mode'] == 'cam' :
         cam = RunGradCAM(flags, data_loader)
-        if flags['separate'] :
-            cam.run_separated()
+        if flags['mask'] :
+            cam.run_with_mask()
         else :
             cam.run()
 
