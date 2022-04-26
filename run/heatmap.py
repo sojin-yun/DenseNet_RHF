@@ -174,7 +174,6 @@ class RunGradCAM() :
             image = inverse_norm.run(data).numpy()
             image_np = np.transpose(image, (0, 2, 3, 1)).squeeze(0)
             mask_np = mask.numpy().squeeze(0)
-            print(mask_np.max(), mask_np.min())
             
             baseline_ret, baseline_pred = self.baseline_cam(data, target)
             baseline_ret = self.upsample(baseline_ret.unsqueeze(0)).detach().cpu()
