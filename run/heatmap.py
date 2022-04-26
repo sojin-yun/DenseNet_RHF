@@ -220,19 +220,19 @@ class RunGradCAM() :
             ax2.axis('off')
 
             ax3 = fig.add_subplot(2, 3, 4)
-            ax3.imshow((mask_np * 255.).astype('uint8'), cmap = 'gray')
+            ax3.imshow(mask_np, cmap = 'gray')
             ax3.set_title(mapping_dict[str(target.item())], fontsize = 18)
             #ax3.set_title(target.item(), fontsize = 15)
             ax3.axis('off')
 
             ax4 = fig.add_subplot(2, 3, 5)
-            ax4.imshow((mask_np * 255.).astype('uint8'), cmap = 'gray')
+            ax4.imshow(mask_np, cmap = 'gray')
             ax4.imshow((baseline_ret * 255.).astype('uint8'), cmap = 'jet', alpha = 0.4)
             ax4.set_title('111th epoch / Acc : 66.67%', fontsize = 12)
             ax4.axis('off')
 
             ax5 = fig.add_subplot(2, 3, 6)
-            ax5.imshow((mask_np * 255.).astype('uint8'), cmap = 'gray')
+            ax5.imshow(mask_np, cmap = 'gray')
             ax5.imshow((ensemble_ret * 255.).astype('uint8'), cmap = 'jet', alpha = 0.4)
             ax5.set_title('106th epoch / Acc : 75.59%', fontsize = 12)
             ax5.axis('off')
