@@ -6,6 +6,7 @@ from model.ensemble.densenet import DenseNet_ensemble, Bottleneck_ensemble
 from model.ensemble.vgg import VGG_ensemble
 from model.ensemble.vgg_recursive import VGG_ensemble_recursive
 from model.ensemble.squeezenet import SqueezeNet_ensemble, Fire_ensemble, _squeezenet_ensemble
+from model.ensemble.rensenet import RenseNet_ensemble, BasicBlock_Rense_Ensemble, Transition_Rense_Ensemble
 #from model.ensemble.squeezenet import SqueezeNet, Fire, _squeezenet
 from model.baseline.resnet import ResNet, BasicBlock
 from model.baseline.resnet_deeper import ResNet_deeper, BasicBlock_deeper
@@ -14,6 +15,7 @@ from model.baseline.vgg import VGG
 from model.baseline.alexnet import AlexNet
 from model.baseline.squeezenet import SqueezeNet, Fire, _squeezenet
 from model.baseline.vit import VisionTransformer
+from model.baseline.rensenet import RenseNet, BasicBlock_Rense, Transition_Rense
 
 class Select_Model :
     def __init__(self, args, device = 'cpu') :
@@ -25,6 +27,7 @@ class Select_Model :
         if self.data == 'cifar100' or self.data == 'mnist' : self.low_resolution = True
         else : self.low_resolution = False
         if self.data == 'kidney_stone' : self.numclasses = 2
+        elif self.data == 'lung' : self.numclasses = 2
         elif self.data == 'mnist' : self.numclasses = 10
         elif self.data == 'cub200' : self.numclasses = 200
         else : self.numclasses = 100
@@ -81,6 +84,9 @@ class Select_Model :
         elif model == 'squeezenet11' :
             return _squeezenet_ensemble('1_1', self.device, self.numclasses)
 
+        elif model == 'rensenet' :
+            return RenseNet_ensemble(BasicBlock_Rense_Ensemble, [3, 4, 6, 3], [30, 39, 55], device = self.device, num_class = self.numclasses)
+        
         else :
             assert True, 'ModelTypeError : model type is not implemented. please check and try again.'
 
@@ -125,7 +131,10 @@ class Select_Model :
             return _squeezenet('1_1', self.numclasses)
 
         elif model == 'vit' :
-            return VisionTransformer('B_16_imagenet1k', pretrained=True)
+            return VisionTransformer(image_size=512, num_classes=2)
+
+        elif model == 'rensenet' :
+            return RenseNet(BasicBlock_Rense, [3, 4, 6, 3], device = self.device, num_class = self.numclasses)
 
         else :
             assert True, 'ModelTypeError : model type is not implemented. please check and try again.'
