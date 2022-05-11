@@ -4,7 +4,7 @@ from torchvision import transforms, datasets
 from torch.utils.data import DataLoader
 from torchvision.transforms.transforms import RandomResizedCrop
 from utils.module import RandomInversion
-from utils.mchannel_loader import DataLoaderSegmentation
+from utils.mchannel_loader2 import DataLoaderSegmentation
 
 class CustomDataLoader() :
     def __init__(self, args : list) :
