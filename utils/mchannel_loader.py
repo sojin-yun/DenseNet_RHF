@@ -27,7 +27,7 @@ class DataLoaderSegmentation(Dataset):
             self.origin_mask0 = os.listdir(self.dir_origin_mask)
 
         # data path
-        self.img_files = [os.path.join(root,'0', f0).replace("\\","/") for f0 in self.filenames0 if f0 != 'Thumbs.db'] + [os.path.join(root,'1', f1).replace("\\","/") for f1 in self.filenames1 if f1 != 'Thumbs.db']
+        self.img_files = [os.path.join(root,'0', f0).replace("\\","/") for f0 in self.filenames0 if f0 != 'Thumbs.db'] + [os.path.join(root,'1', f1).replace("\\","/") for f1 in self.filenames1 if f1 != 'Thumbs.db' and f1 != 'mask' and f1 != 'mask2' and f1 != 'mask3']
         self.mask_files = []
         self.labels = []
         for img_path in self.img_files:
