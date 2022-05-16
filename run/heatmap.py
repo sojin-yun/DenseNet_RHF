@@ -227,13 +227,13 @@ class RunGradCAM() :
             ax4 = fig.add_subplot(2, 3, 5)
             ax4.imshow(mask_np, cmap = 'gray')
             ax4.imshow((baseline_ret * 255.).astype('uint8'), cmap = 'jet', alpha = 0.4)
-            ax4.set_title('101th epoch / Acc : 76.98%', fontsize = 12)
+            ax4.set_title('120th epoch / Acc : 74.00%', fontsize = 12)
             ax4.axis('off')
 
             ax5 = fig.add_subplot(2, 3, 6)
             ax5.imshow(mask_np, cmap = 'gray')
             ax5.imshow((ensemble_ret * 255.).astype('uint8'), cmap = 'jet', alpha = 0.4)
-            ax5.set_title('100th epoch / Acc : 77.58%', fontsize = 12)
+            ax5.set_title('114th epoch / Acc : 78.57%', fontsize = 12)
             ax5.axis('off')
 
             plt.savefig(figsave_path+'/{0}.png'.format(str(idx)))
