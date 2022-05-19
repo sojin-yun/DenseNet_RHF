@@ -21,7 +21,7 @@ class BasicBlock_sRense(nn.Module):
 
 class switched_RenseNet(nn.Module):
     
-    def __init__(self, block, num_block, growth_rate=12, compression=0.5, num_classes=2, device = None):
+    def __init__(self, block, num_block, growth_rate=12, compression=0.5, num_class=2, device = None):
         super(switched_RenseNet).__init__()
 
         self.growth_rate = growth_rate
@@ -52,7 +52,7 @@ class switched_RenseNet(nn.Module):
         self.glob_pool = nn.AdaptiveAvgPool2d((1, 1))
         self.linear = nn.Sequential( 
             nn.Linear(self.inner_channels, int(self.inner_channels/2)), nn.ReLU(), 
-            nn.Linear(int(self.inner_channels/2), num_classes)
+            nn.Linear(int(self.inner_channels/2), num_class)
         )
 
         self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0001)
