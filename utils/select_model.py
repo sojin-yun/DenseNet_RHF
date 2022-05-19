@@ -6,7 +6,8 @@ from model.ensemble.densenet import DenseNet_ensemble, Bottleneck_ensemble
 from model.ensemble.vgg import VGG_ensemble
 from model.ensemble.vgg_recursive import VGG_ensemble_recursive
 from model.ensemble.squeezenet import SqueezeNet_ensemble, Fire_ensemble, _squeezenet_ensemble
-from model.ensemble.rensenet import RenseNet_ensemble, BasicBlock_Rense_Ensemble, Transition_Rense_Ensemble
+from model.ensemble.rensenet import RenseNet_ensemble, BasicBlock_Rense_ensemble, Transition_Rense_ensemble
+from model.ensemble.switched_rensenet import switched_RenseNet_ensemble, BasicBlock_sRense_ensemble, Transition_sRense_ensemble
 #from model.ensemble.squeezenet import SqueezeNet, Fire, _squeezenet
 from model.baseline.resnet import ResNet, BasicBlock
 from model.baseline.resnet_deeper import ResNet_deeper, BasicBlock_deeper
@@ -86,7 +87,10 @@ class Select_Model :
             return _squeezenet_ensemble('1_1', self.device, self.numclasses)
 
         elif model == 'rensenet' :
-            return RenseNet_ensemble(BasicBlock_Rense_Ensemble, [3, 4, 6, 3], [30, 39, 55], device = self.device, num_class = self.numclasses)
+            return RenseNet_ensemble(BasicBlock_Rense_ensemble, [3, 4, 6, 3], [30, 39, 55], device = self.device, num_class = self.numclasses)
+
+        elif model == 'srensenet' :
+            return switched_RenseNet_ensemble(BasicBlock_sRense_ensemble, [3, 4, 6, 3], [30, 39, 55], device = self.device, num_class = self.numclasses)
         
         else :
             assert True, 'ModelTypeError : model type is not implemented. please check and try again.'

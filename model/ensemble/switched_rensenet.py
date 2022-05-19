@@ -2,37 +2,27 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import StepLR, MultiStepLR, CosineAnnealingLR
-from torchsummary import summary
-import torchsummary
 
-class BasicBlock_Rense_ensemble(nn.Module):
+class BasicBlock_sRense_ensemble(nn.Module):
 
-    def __init__(self, in_channels, growth_rate, stride=1):
-        super(BasicBlock_Rense_ensemble, self).__init__()
+    def __init__(self, in_channels, growth_rate):
+        super(BasicBlock_sRense_ensemble, self).__init__()
 
         out_channels = growth_rate
 
-        #residual function
-        self.residual_function = nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=stride, padding=1, bias=False),
-            nn.BatchNorm2d(out_channels), nn.ReLU(),
-            nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1, bias=False),
-            nn.BatchNorm2d(out_channels)
-        )
-
-        #shortcut
-        self.shortcut = nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=stride, bias=False),
-            nn.BatchNorm2d(out_channels)
+        self.BRC_layer = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True)
         )
 
     def forward(self, x):
-        return torch.cat([x, nn.ReLU()(self.residual_function(x) + self.shortcut(x))], 1)
+        return torch.cat([x, self.BRC_layer(x)], 1)
 
-class RenseNet_ensemble(nn.Module):
+class switched_RenseNet_ensemble(nn.Module):
     
     def __init__(self, block, num_block, boundary_layers, growth_rate=12, compression=0.5, num_class=2, device = None):
-        super(RenseNet_ensemble, self).__init__()
+        super(switched_RenseNet_ensemble, self).__init__()
 
         self.growth_rate = growth_rate
         self.compression = compression
@@ -44,21 +34,25 @@ class RenseNet_ensemble(nn.Module):
         self.bn1 = nn.BatchNorm2d(24)
         self.relu1 = nn.ReLU(inplace=True)
 
+        # renseblock and transition layers
+        self.skip1 = self._make_skip_connection(num_block[0])
         self.rense1 = self._make_rense_layers(block, num_block[0])
         self.transit1 = self._make_transit_layers()
+        self.skip2 = self._make_skip_connection(num_block[1])
         self.rense2 = self._make_rense_layers(block, num_block[1])
         self.transit2 = self._make_transit_layers()
+        self.skip3 = self._make_skip_connection(num_block[2])
         self.rense3 = self._make_rense_layers(block, num_block[2])
         self.transit3 = self._make_transit_layers()
+        self.skip4 = self._make_skip_connection(num_block[3])
         self.rense4 = self._make_rense_layers(block, num_block[3])
-
-        self.catch = nn.Identity() #양수 음수 상관없이 다 통과
-
+    
         self.glob_pool = nn.AdaptiveAvgPool2d((1, 1))
         self.linear = nn.Sequential( 
             nn.Linear(self.inner_channels, int(self.inner_channels/2)), nn.ReLU(), 
             nn.Linear(int(self.inner_channels/2), num_class)
         )
+
 
         self.boundary_features, self.compression_conv = self._make_boundary_conv(boundary_layers = boundary_layers)
         self.boundary_features, self.compression_conv = nn.ModuleList(self.boundary_features), nn.ModuleList(self.compression_conv)
@@ -69,12 +63,10 @@ class RenseNet_ensemble(nn.Module):
 
         self.ensemble_relu = nn.Identity()
 
-        #self.optimizer = optim.SGD(self.parameters(), lr = 1e-3, momentum = 0.9, weight_decay=0.00001)
         self.optimizer = optim.SGD(self.parameters(), lr = 1e-2, momentum = 0.9, weight_decay=0.0001)
         self.loss = nn.CrossEntropyLoss()
         self.boundary_loss = nn.CrossEntropyLoss()
         self.ensemble_loss = nn.CrossEntropyLoss()
-        #self.scheduler = MultiStepLR(self.optimizer, milestones=[100, 150], gamma=0.1)
         self.scheduler = CosineAnnealingLR(self.optimizer, T_max = 50, eta_min = 0)
 
         # Initialization weights
@@ -110,7 +102,6 @@ class RenseNet_ensemble(nn.Module):
             elif isinstance(m, nn.Linear):
                 nn.init.xavier_normal_(m.weight)
 
-
     def _make_rense_layers(self, block, nblocks):
 
         rense_block = nn.Sequential()
@@ -118,21 +109,30 @@ class RenseNet_ensemble(nn.Module):
         for index in range(nblocks):
             rense_block.add_module('basic_block_layer_{}'.format(index), block(self.inner_channels, self.growth_rate))
             self.inner_channels += self.growth_rate
-
+        
         return rense_block
-    
+
+    def _make_skip_connection(self, nblocks):
+        
+        in_channels = self.inner_channels
+        out_channels = in_channels + nblocks * self.growth_rate
+
+        skip_connection = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False),
+            nn.BatchNorm2d(out_channels), nn.ReLU(inplace=True))
+        
+        return skip_connection
 
     def _make_transit_layers(self):
 
         out_channels = int(self.compression * self.inner_channels)
 
-        downsample = Transition_Rense_ensemble(self.inner_channels, out_channels)
+        downsample = Transition_sRense_ensemble(self.inner_channels, out_channels)
         
         self.inner_channels = out_channels
 
         return downsample
 
-    
     def _make_boundary_conv(self, boundary_layers):
         
         model = []
@@ -162,7 +162,7 @@ class RenseNet_ensemble(nn.Module):
     def _get_boundary_location(self):
         boundary_maps = []
         for m in self.modules():
-            if isinstance(m, Transition_Rense_ensemble):
+            if isinstance(m, Transition_sRense_ensemble):
                 boundary_maps.append(m.boundary)
         return boundary_maps
 
@@ -182,16 +182,16 @@ class RenseNet_ensemble(nn.Module):
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu1(x)
-
-        x = self.rense1(x)
+        
+        x = self.relu1(self.rense1(x) + self.skip1(x))
         x = self.transit1(x)
-        x = self.rense2(x)
+        x = self.relu1(self.rense2(x) + self.skip2(x))
         x = self.transit2(x)
-        x = self.rense3(x)
+        x = self.relu1(self.rense3(x) + self.skip3(x))
         x = self.transit3(x)
-        x = self.rense4(x)
+        x = self.relu1(self.rense4(x) + self.skip4(x))
         x_f = x
-
+        
         x = self.glob_pool(x)
         x = x.view(x.size(0), -1)
         x = self.linear(x)
@@ -212,13 +212,13 @@ class RenseNet_ensemble(nn.Module):
         ensemble = ensemble.view(ensemble.size(0), -1)
         ensemble = self.ensemble_fc(ensemble)
 
-        return x, b, ensemble 
+        return x, b, ensemble  
 
-class Transition_Rense_ensemble(nn.Module):
+class Transition_sRense_ensemble(nn.Module):
 
     def __init__(self, in_channels, out_channels) :
 
-        super(Transition_Rense_ensemble, self).__init__()
+        super(Transition_sRense_ensemble, self).__init__()
 
         self.batch_norm = nn.BatchNorm2d(in_channels)
         self.conv_1x1 = nn.Conv2d(in_channels, out_channels, 1, bias=False)
@@ -227,7 +227,6 @@ class Transition_Rense_ensemble(nn.Module):
         self.up_sampling = nn.Upsample(scale_factor=2, mode = 'bilinear', align_corners=False)
 
         self.boundary = None
-
 
     def forward(self, x):
 
