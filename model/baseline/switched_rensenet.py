@@ -21,7 +21,7 @@ class BasicBlock_sRense(nn.Module):
 
 class switched_RenseNet(nn.Module):
     
-    def __init__(self, block, num_block, growth_rate=12, compression=0.5, num_classes=2):
+    def __init__(self, block, num_block, growth_rate=12, compression=0.5, num_classes=2, device = None):
         super(switched_RenseNet).__init__()
 
         self.growth_rate = growth_rate
