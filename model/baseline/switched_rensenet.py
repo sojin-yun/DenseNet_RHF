@@ -28,6 +28,8 @@ class switched_RenseNet(nn.Module):
         self.compression = compression
         self.inner_channels = 2 * growth_rate # 24
 
+        if device != None : self.device = device
+
         self.conv1 = nn.Conv2d(3, 24, kernel_size=7, padding=3, stride=2, bias=False)
         self.bn1 = nn.BatchNorm2d(24)
         self.relu1 = nn.ReLU(inplace=True)
