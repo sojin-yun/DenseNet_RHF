@@ -139,8 +139,7 @@ class Transition_sRense(nn.Module):
         # Transition block's feed forward
         x = self.batch_norm(x)
         x = self.conv_1x1(x)
-
-        print(x.shape)
+        
         # AvgPool2d, following forward path
         x = self.avg_pool(x)
 
