@@ -60,8 +60,8 @@ class GAIN(nn.Module):
         return output_cl, loss_cl, Ac, predictions
 
     def softmask(self, Ac, images):
-        Ac_min = Ac.min()
-        Ac_max = Ac.max()
+        Ac_min = torch.amin(Ac, dim = (1, 2, 3), keepdim=True)
+        Ac_max = torch.amax(Ac, dim = (1, 2, 3), keepdim=True)
         try:
             scaled_ac = (Ac - Ac_min) / (Ac_max - Ac_min)
         except ZeroDivisionError:
