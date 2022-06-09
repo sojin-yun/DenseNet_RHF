@@ -31,7 +31,7 @@ def drive(args) :
 
     # Model Selection
     if flags['model'] == 'resnet50' :
-        cam_model = ResNet_deeper(BasicBlock_deeper, [3, 4, 6, 3], 100, None, low_resolution = False)
+        cam_model = ResNet_deeper(BasicBlock_deeper, [3, 4, 6, 3], 50, None, low_resolution = False)
         model_params = cam_model.state_dict()
         model_params.update(params)
         cam_model.load_state_dict(model_params)
@@ -39,7 +39,7 @@ def drive(args) :
         gain_model = GAIN(device, cam_model, 152)
 
     elif flags['model'] == 'densenet121' :
-        cam_model = DenseNet(Bottleneck, [6, 12, 24, 16], growth_rate=32, num_class = 100, low_resolution = False)
+        cam_model = DenseNet(Bottleneck, [6, 12, 24, 16], growth_rate=32, num_class = 50, low_resolution = False)
         model_params = cam_model.state_dict()
         model_params.update(params)
         cam_model.load_state_dict(model_params)
