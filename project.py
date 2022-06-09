@@ -25,14 +25,33 @@ def drive(args) :
 
     abs_path = '/home/NAS_mount/sjlee/RHF' if flags['server'] else '.'
 
+    if flags['pretrained'] :
+        model_name, data = flags['model'], flags['data']
+        if flags['data'] == 'cub200' : data = 'mini_imagenet'
+        if model_name == 'vgg16_recursive' : model_name = 'vgg16'
+        if flags['baseline'] :
+            params = torch.load('{0}/weights/baseline/{1}_{2}.pth'.format(abs_path, model_name, data), map_location = device)
+        else :
+            params = torch.load('{0}/weights/ensemble/{1}_{2}.pth'.format(abs_path, model_name, data), map_location = device)
+
+
     # Model Selection
     if flags['model'] == 'resnet50' :
         cam_model = ResNet_deeper(BasicBlock_deeper, [3, 4, 6, 3], 100, None, low_resolution = False)
+        model_params = cam_model.state_dict()
+        model_params.update(params)
+        cam_model.load_state_dict(model_params)
+        print('Pretrained weights are loaded.')
         gain_model = GAIN(device, cam_model, 152)
 
     elif flags['model'] == 'densenet121' :
         cam_model = DenseNet(Bottleneck, [6, 12, 24, 16], growth_rate=32, num_class = 100, low_resolution = False)
+        model_params = cam_model.state_dict()
+        model_params.update(params)
+        cam_model.load_state_dict(model_params)
+        print('Pretrained weights are loaded.')
         gain_model = GAIN(device, cam_model, 492)
+
 
     cam_model, gain_model = cam_model.to(device), gain_model.to(device)
 
