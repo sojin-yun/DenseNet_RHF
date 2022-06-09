@@ -38,6 +38,7 @@ def drive(args) :
     folder = 'tensor_board'
     os.mkdir(os.path.join(default_path, save_path, folder))
     ts_board = SummaryWriter(log_dir = os.path.join(default_path, save_path, folder))
+    
 
     # Model Selection
     if flags['model'] == 'resnet50' :
@@ -47,6 +48,7 @@ def drive(args) :
         cam_model.load_state_dict(model_params)
         print('Pretrained weights are loaded.')
         gain_model = GAIN(device, cam_model, 152)
+
 
     elif flags['model'] == 'densenet121' :
         cam_model = DenseNet(Bottleneck, [6, 12, 24, 16], growth_rate=32, num_class = 50, low_resolution = False)
@@ -61,6 +63,10 @@ def drive(args) :
 
     # Use Pretrained Weights
     print('Training Start')
+
+    best_valid_score = 0.
+    best_epoch =  0
+
     for i in range(epoch) :
 
             train_loss, valid_loss = 0.0, 0.0
@@ -87,7 +93,7 @@ def drive(args) :
 
                 gain_model.model.optimizer.step()
                 
-                train_acc = (torch.sum(pred == train_target.data).item()*(100.0 / batch_size))
+                train_acc += (torch.sum(pred == train_target.data).item()*(100.0 / batch_size))
                 ts_board.add_scalar('train/total_loss', total_loss.item(), i * n_train_batchs + train_iter)
                 ts_board.add_scalar('train/cl_loss', loss_cl.item(), i * n_train_batchs + train_iter)
                 ts_board.add_scalar('train/am_loss', loss_am.item(), i * n_train_batchs + train_iter)
@@ -108,7 +114,7 @@ def drive(args) :
 
                     v_total_loss, v_loss_cl, v_loss_am, Ac, v_preds = gain_model(valid_data, valid_target)
 
-                    valid_acc = (torch.sum(v_preds == valid_target.data).item()*(100.0 / batch_size))
+                    valid_acc += (torch.sum(v_preds == valid_target.data).item()*(100.0 / batch_size))
                     ts_board.add_scalar('valid/valid_total_loss', v_total_loss.item(), i * n_train_batchs + valid_iter)
                     ts_board.add_scalar('valid/valid_cl_loss', v_loss_cl.item(), i * n_train_batchs + valid_iter)
                     ts_board.add_scalar('valid/valid_am_loss', v_loss_am.item(), i * n_train_batchs + valid_iter)
@@ -116,6 +122,10 @@ def drive(args) :
 
             avg_train_acc = train_acc/n_train_batchs
             avg_valid_acc = valid_acc/n_valid_batchs
+
+            if avg_valid_acc > best_valid_score : 
+                best_valid_score = avg_valid_acc
+                best_epoch = i
 
             ts_board.add_scalars('Accuracy', {'train_acc' : avg_train_acc, 
                                               'valid_acc' : avg_valid_acc}, i)
@@ -130,7 +140,7 @@ def drive(args) :
                 'state_dict' : gain_model.state_dict()
             }
             torch.save(epoch_model_params, os.path.join(default_path, save_path, save_file+'_{}_epoch.pt'.format(i+1)))
-            
+            print('epoch.{0:3d} \t train_ac : {1:.4f}% \t  valid_ac : {2:.4f}% \t lr : {3:.6f}\n'.format(i+1, avg_train_acc, avg_valid_acc, curr_lr))
 
 if __name__ == '__main__' :
     drive(sys.argv[1:])
