@@ -78,7 +78,7 @@ def drive(args) :
                 gain_model.model.optimizer.step()
                 
                 train_acc = (torch.sum(pred == train_target.data).item()*(100.0 / batch_size))
-                print('loss_total : {:.4f} \t loss_cl : {:.4f} \t loss_am : {:.4f}'.format(total_loss, loss_cl, loss_am))
+                print('loss_total : {:.4f} \t loss_cl : {:.4f} \t loss_am : {:.4f} \t accuracy : {:.4f%}'.format(total_loss, loss_cl, loss_am, train_acc))
 
             with torch.enable_grad() :
 
