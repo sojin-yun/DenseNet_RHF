@@ -20,7 +20,7 @@ class GAIN(nn.Module):
         
         #for softmask
         self.sigma = 0.7
-        self.omega = 10
+        self.omega = 1e5
 
         #hook
         list(self.model.modules())[hooked_layer].register_forward_hook(self.forward_hook)
@@ -62,11 +62,13 @@ class GAIN(nn.Module):
     def softmask(self, Ac, images):
         Ac_min = torch.amin(Ac, dim = (1, 2, 3), keepdim=True)
         Ac_max = torch.amax(Ac, dim = (1, 2, 3), keepdim=True)
+        Ac_min = Ac.min()
+        Ac_max = Ac.max()
         try:
             scaled_ac = (Ac - Ac_min) / (Ac_max - Ac_min)
         except ZeroDivisionError:
             scaled_ac = torch.zeros_like(Ac)
-        mask = torch.sigmoid(torch.exp(self.omega * (scaled_ac - self.sigma)))
+        mask = torch.sigmoid(self.omega * (scaled_ac - self.sigma))
         masked_image = images - images * mask
         return masked_image
 

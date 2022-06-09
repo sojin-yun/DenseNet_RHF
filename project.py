@@ -26,6 +26,7 @@ def drive(args) :
 
     abs_path = '/home/NAS_mount/sjlee/RHF' if flags['server'] else '.'
     save_path = flags['dst']
+    save_file = flags['file']
 
     model_name, data = flags['model'], flags['data']
     params = torch.load('{0}/weights/baseline/{1}_{2}.pth'.format(abs_path, model_name, data), map_location = device)
@@ -72,26 +73,25 @@ def drive(args) :
             n_valid_batchs = len(valid_loader)
             batch_size = flags['batch_size']
 
-            # for train_iter, (samples) in enumerate(tqdm(train_loader, desc="{:17s}".format('Training State'), mininterval=0.01)) :
+            for train_iter, (samples) in enumerate(tqdm(train_loader, desc="{:17s}".format('Training State'), mininterval=0.01)) :
 
                 
-            #     if flags['mask'] : train_data, train_target, _ = samples
-            #     else : train_data, train_target = samples
+                if flags['mask'] : train_data, train_target, _ = samples
+                else : train_data, train_target = samples
 
-            #     if device != None : train_data, train_target = train_data.to(device), train_target.to(device)
+                if device != None : train_data, train_target = train_data.to(device), train_target.to(device)
                 
-            #     total_loss, loss_cl, loss_am, _, pred = gain_model(train_data, train_target)
+                total_loss, loss_cl, loss_am, _, pred = gain_model(train_data, train_target)
 
-            #     total_loss.backward()
+                total_loss.backward()
 
-            #     gain_model.model.optimizer.step()
+                gain_model.model.optimizer.step()
                 
-            #     train_acc = (torch.sum(pred == train_target.data).item()*(100.0 / batch_size))
-            #     ts_board.add_scalar('train/total_loss', total_loss.item(), i * n_train_batchs + train_iter)
-            #     ts_board.add_scalar('train/cl_loss', loss_cl.item(), i * n_train_batchs + train_iter)
-            #     ts_board.add_scalar('train/am_loss', loss_am.item(), i * n_train_batchs + train_iter)
+                train_acc = (torch.sum(pred == train_target.data).item()*(100.0 / batch_size))
+                ts_board.add_scalar('train/total_loss', total_loss.item(), i * n_train_batchs + train_iter)
+                ts_board.add_scalar('train/cl_loss', loss_cl.item(), i * n_train_batchs + train_iter)
+                ts_board.add_scalar('train/am_loss', loss_am.item(), i * n_train_batchs + train_iter)
 
-            #     print('loss_total : {:.4f} \t loss_cl : {:.4f} \t loss_am : {:.4f} \t accuracy : {:.4f}%'.format(total_loss, loss_cl, loss_am, train_acc))
 
             with torch.enable_grad() :
 
@@ -113,16 +113,24 @@ def drive(args) :
                     ts_board.add_scalar('valid/valid_cl_loss', v_loss_cl.item(), i * n_train_batchs + valid_iter)
                     ts_board.add_scalar('valid/valid_am_loss', v_loss_am.item(), i * n_train_batchs + valid_iter)
 
-                    print('loss_total : {:.4f} \t loss_cl : {:.4f} \t loss_am : {:.4f} \t accuracy : {:.4f}%'.format(v_total_loss, v_loss_cl, v_loss_am, valid_acc))
-
 
             avg_train_acc = train_acc/n_train_batchs
             avg_valid_acc = valid_acc/n_valid_batchs
+
+            ts_board.add_scalars('Accuracy', {'train_acc' : avg_train_acc, 
+                                              'valid_acc' : avg_valid_acc}, i)
 
             curr_lr = gain_model.model.optimizer.param_groups[0]['lr']
             training_result = 'epoch.{0:3d} \t train_ac : {1:.4f}% \t  valid_ac : {2:.4f}% \t lr : {3:.6f}\n'.format(i+1, avg_train_acc, avg_valid_acc, curr_lr)
 
             gain_model.model.scheduler.step()
+
+            epoch_model_params = {
+                'epoch' : i+1,
+                'state_dict' : gain_model.state_dict()
+            }
+            torch.save(epoch_model_params, os.path.join(default_path, save_path, save_file+'_{}_epoch.pt'.format(i+1)))
+            
 
 if __name__ == '__main__' :
     drive(sys.argv[1:])
