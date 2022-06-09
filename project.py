@@ -115,9 +115,9 @@ def drive(args) :
                     v_total_loss, v_loss_cl, v_loss_am, Ac, v_preds = gain_model(valid_data, valid_target)
 
                     valid_acc += (torch.sum(v_preds == valid_target.data).item()*(100.0 / batch_size))
-                    ts_board.add_scalar('valid/valid_total_loss', v_total_loss.item(), i * n_train_batchs + valid_iter)
-                    ts_board.add_scalar('valid/valid_cl_loss', v_loss_cl.item(), i * n_train_batchs + valid_iter)
-                    ts_board.add_scalar('valid/valid_am_loss', v_loss_am.item(), i * n_train_batchs + valid_iter)
+                    ts_board.add_scalar('valid/valid_total_loss', v_total_loss.item(), i * n_valid_batchs + valid_iter)
+                    ts_board.add_scalar('valid/valid_cl_loss', v_loss_cl.item(), i * n_valid_batchs + valid_iter)
+                    ts_board.add_scalar('valid/valid_am_loss', v_loss_am.item(), i * n_valid_batchs + valid_iter)
 
 
             avg_train_acc = train_acc/n_train_batchs
