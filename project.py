@@ -25,9 +25,8 @@ def drive(args) :
 
     abs_path = '/home/NAS_mount/sjlee/RHF' if flags['server'] else '.'
 
-    if flags['pretrained'] :
-        model_name, data = flags['model'], flags['data']
-        params = torch.load('{0}/weights/baseline/{1}_{2}.pth'.format(abs_path, model_name, data), map_location = device)
+    model_name, data = flags['model'], flags['data']
+    params = torch.load('{0}/weights/baseline/{1}_{2}.pth'.format(abs_path, model_name, data), map_location = device)
 
 
     # Model Selection
