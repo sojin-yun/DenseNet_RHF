@@ -34,6 +34,8 @@ def drive(args) :
         cam_model = DenseNet(Bottleneck, [6, 12, 24, 16], growth_rate=32, num_class = 100, low_resolution = False)
         gain_model = GAIN(device, cam_model, 492)
 
+    cam_model, gain_model = cam_model.to(device), gain_model.to(device)
+
     # Use Pretrained Weights
     print('Training Start')
     for i in range(epoch) :
