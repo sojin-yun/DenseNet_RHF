@@ -1,6 +1,7 @@
 import sys
 import os
 
+from torch.utils.tensorboard import SummaryWriter
 from utils.select_model import Select_Model
 from utils.random_seed import Fix_Randomness
 from utils.parse_args import Parsing_Args
@@ -24,10 +25,18 @@ def drive(args) :
     train_loader, valid_loader = data_loader
 
     abs_path = '/home/NAS_mount/sjlee/RHF' if flags['server'] else '.'
+    save_path = flags['dst']
 
     model_name, data = flags['model'], flags['data']
     params = torch.load('{0}/weights/baseline/{1}_{2}.pth'.format(abs_path, model_name, data), map_location = device)
 
+    default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/mini_imagenet/' if flags['server'] else './Save_parameters/mini_imagenet/'
+    if not os.path.isdir(os.path.join(default_path, save_path)) :
+            os.mkdir(os.path.join(default_path, save_path))
+
+    folder = 'tensor_board'
+    os.mkdir(os.path.join(default_path, save_path, folder))
+    ts_board = SummaryWriter(log_dir = os.path.join(default_path, save_path, folder))
 
     # Model Selection
     if flags['model'] == 'resnet50' :
@@ -78,6 +87,10 @@ def drive(args) :
                 gain_model.model.optimizer.step()
                 
                 train_acc = (torch.sum(pred == train_target.data).item()*(100.0 / batch_size))
+                ts_board.add_scalar('Loss/total_loss', total_loss.item(), i * n_train_batchs + train_iter)
+                ts_board.add_scalar('Loss/cl_loss', loss_cl.item(), i * n_train_batchs + train_iter)
+                ts_board.add_scalar('Loss/am_loss', loss_am.item(), i * n_train_batchs + train_iter)
+                
                 print('loss_total : {:.4f} \t loss_cl : {:.4f} \t loss_am : {:.4f} \t accuracy : {:.4f}%'.format(total_loss, loss_cl, loss_am, train_acc))
 
             with torch.enable_grad() :
