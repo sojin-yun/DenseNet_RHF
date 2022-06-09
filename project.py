@@ -71,14 +71,14 @@ def drive(args) :
 
                 if device != None : train_data, train_target = train_data.to(device), train_target.to(device)
                 
-                total_loss, loss_cl, loss_am, Ac, pred = gain_model(train_data, train_target)
+                total_loss, loss_cl, loss_am, _, pred = gain_model(train_data, train_target)
 
                 total_loss.backward()
 
                 gain_model.model.optimizer.step()
                 
                 train_acc = (torch.sum(pred == train_target.data).item()*(100.0 / batch_size))
-                print(total_loss)
+                print('loss_total : {:.4f} \t loss_cl : {:.4f} \t loss_am : {:.4f}'.format(total_loss, loss_cl, loss_am))
 
             with torch.enable_grad() :
 
