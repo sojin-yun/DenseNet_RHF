@@ -56,7 +56,7 @@ def drive(args) :
         model_params.update(params)
         cam_model.load_state_dict(model_params)
         print('Pretrained weights are loaded.')
-        gain_model = GAIN(device, cam_model, 492)
+        #gain_model = GAIN(device, cam_model, 492)
 
 
     #cam_model, gain_model = cam_model.to(device), gain_model.to(device)
