@@ -59,34 +59,64 @@ class GAIN(nn.Module):
         Ac = F.upsample_bilinear(Ac, size=images.size()[2:])
         return output_cl, loss_cl, Ac, predictions
 
-    def softmask(self, Ac, images):
-        Ac_min = torch.amin(Ac, dim = (1, 2, 3), keepdim=True)
-        Ac_max = torch.amax(Ac, dim = (1, 2, 3), keepdim=True)
-        Ac_min = Ac.min()
-        Ac_max = Ac.max()
-        try:
-            scaled_ac = (Ac - Ac_min) / (Ac_max - Ac_min)
-        except ZeroDivisionError:
-            scaled_ac = torch.zeros_like(Ac)
-        mask = torch.sigmoid(self.omega * (scaled_ac - self.sigma))
+    # def softmask(self, Ac, images):
+    #     Ac_min = torch.amin(Ac, dim = (1, 2, 3), keepdim=True)
+    #     Ac_max = torch.amax(Ac, dim = (1, 2, 3), keepdim=True)
+    #     Ac_min = Ac.min()
+    #     Ac_max = Ac.max()
+    #     try:
+    #         scaled_ac = (Ac - Ac_min) / (Ac_max - Ac_min)
+    #     except ZeroDivisionError:
+    #         scaled_ac = torch.zeros_like(Ac)
+    #     mask = torch.sigmoid(self.omega * (scaled_ac - self.sigma))
+    #     masked_image = images - images * mask
+    #     return masked_image
+
+    
+    # def forward(self, images, labels):
+    #     output_cl, loss_cl, Ac, preds = self.attention_map_forward(images, labels)
+
+    #     I_star = self.softmask(Ac, images) 
+    #     output_am = self.model(I_star)
+    #     self.model.zero_grad()
+    #     # ImageNet
+    #     # loss_am = torch.sum(torch.sigmoid(output_am), dim=(0,1), keepdim=False)
+    #     # loss_am /= len(labels)
+    #     # Lung
+    #     loss_am = torch.sum(torch.softmax(output_am), dim=(0,1), keepdim=False)
+    #     loss_am /= len(labels)
+    #     total_loss = loss_cl + self.alpha * loss_am
+    #     return total_loss, loss_cl, loss_am, Ac, preds
+
+    def softmask(self, Ac, images, preds):
+        
+        mask = torch.zeros_like(Ac)
+        mask[:] = torch.sigmoid(self.omega * (Ac - self.sigma))
+        for i in range(len(Ac)):
+            mask[i].mul_(preds[i])
         masked_image = images - images * mask
         return masked_image
 
     
     def forward(self, images, labels):
         output_cl, loss_cl, Ac, preds = self.attention_map_forward(images, labels)
-
-        I_star = self.softmask(Ac, images) 
-        output_am = self.model(I_star)
+        Ac_min = torch.amin(Ac, dim=(1, 2, 3), keepdim=True)
+        Ac_max = torch.amax(Ac, dim=(1, 2, 3), keepdim=True)
+        try:
+            Ac = (Ac-Ac_min) / (Ac_max - Ac_min)
+        except:
+            print("Ac scale error")
+            Ac = torch.zeros_like(Ac)
+        I_star= self.softmask(Ac, images, preds)  
         self.model.zero_grad()
-        # ImageNet
-        # loss_am = torch.sum(torch.sigmoid(output_am), dim=(0,1), keepdim=False)
-        # loss_am /= len(labels)
-        # Lung
-        loss_am = torch.sum(torch.softmax(output_am), dim=(0,1), keepdim=False)
-        loss_am /= len(labels)
-        total_loss = loss_cl + self.alpha * loss_am
-        return total_loss, loss_cl, loss_am, Ac, preds
+        output_am = self.model(I_star)
+        # del I_star
+        softmax = torch.nn.Softmax(dim=1)
+        output_am = softmax(output_am)
+        output_am = torch.sum(output_am, dim=0)
+        loss_am = output_am[1] / len(labels)
+        del output_cl, output_am
+        return loss_cl, loss_am, preds, Ac
 
         
 

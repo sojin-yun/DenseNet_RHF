@@ -120,8 +120,8 @@ def drive(args) :
                 # ts_board.add_scalar('Loss/train', t_loss.item(), i * n_train_batchs + train_iter)
 
 
-            #with torch.enable_grad() :
-            with torch.no_grad() :
+            with torch.enable_grad() :
+            #with torch.no_grad() :
 
                 gain_model.eval()
                 #cam_model.eval()
