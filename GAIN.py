@@ -115,6 +115,7 @@ class GAIN(nn.Module):
         output_am = softmax(output_am)
         output_am = torch.sum(output_am, dim=0)
         loss_am = output_am[1] / len(labels)
+        print(loss_am.shape)
         total_loss = loss_cl + self.alpha * loss_am
         return total_loss, loss_cl, loss_am, preds, Ac
 
