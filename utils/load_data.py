@@ -59,7 +59,7 @@ class CustomDataLoader() :
             ])
 
         valid_transformer = transforms.Compose([
-            #transforms.ToPILImage(),
+            transforms.ToPILImage(),
             transforms.Resize((self.image_size, self.image_size)),
             transforms.ToTensor(),
             transforms.Normalize(self.data_mean, self.data_std)
