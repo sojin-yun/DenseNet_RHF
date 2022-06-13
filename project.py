@@ -89,13 +89,12 @@ def drive(args) :
 
                 if device != None : train_data, train_target = train_data.to(device), train_target.to(device)
                 
-                total_loss, loss_cl, loss_am, _, pred = gain_model(train_data, train_target)
+                total_loss, loss_cl, loss_am, pred, _ = gain_model(train_data, train_target)
 
                 total_loss.backward()
 
                 gain_model.model.optimizer.step()
 
-                print(pred.shape)
                 
                 train_acc += (torch.sum(pred == train_target.data).item()*(100.0 / batch_size))
                 ts_board.add_scalar('train/total_loss', total_loss.item(), i * n_train_batchs + train_iter)
