@@ -136,7 +136,7 @@ def drive(args) :
 
                     gain_model.model.optimizer.zero_grad()
 
-                    v_total_loss, v_loss_cl, v_loss_am, Ac, v_preds = gain_model(valid_data, valid_target)
+                    v_total_loss, v_loss_cl, v_loss_am, v_preds, _ = gain_model(valid_data, valid_target)
 
                     valid_acc += (torch.sum(v_preds == valid_target.data).item()*(100.0 / batch_size))
                     ts_board.add_scalar('valid/valid_total_loss', v_total_loss.item(), i * n_valid_batchs + valid_iter)
