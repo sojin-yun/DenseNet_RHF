@@ -94,6 +94,8 @@ def drive(args) :
                 total_loss.backward()
 
                 gain_model.model.optimizer.step()
+
+                print(pred.shape)
                 
                 train_acc += (torch.sum(pred == train_target.data).item()*(100.0 / batch_size))
                 ts_board.add_scalar('train/total_loss', total_loss.item(), i * n_train_batchs + train_iter)
