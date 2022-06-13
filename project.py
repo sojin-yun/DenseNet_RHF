@@ -29,7 +29,7 @@ def drive(args) :
     save_file = flags['file']
 
     model_name, data = flags['model'], flags['data']
-    params = torch.load('{0}/weights/baseline/{1}_{2}.pth'.format(abs_path, model_name, data), map_location = device)
+    #params = torch.load('{0}/weights/baseline/{1}_{2}.pth'.format(abs_path, model_name, data), map_location = device)
 
     default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/lung/' if flags['server'] else './Save_parameters/lung/'
     if not os.path.isdir(os.path.join(default_path, save_path)) :
