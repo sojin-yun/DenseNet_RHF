@@ -42,7 +42,7 @@ def drive(args) :
 
     # Model Selection
     if flags['model'] == 'resnet50' :
-        cam_model = ResNet_deeper(BasicBlock_deeper, [3, 4, 6, 3], 50, None, low_resolution = False)
+        cam_model = ResNet_deeper(BasicBlock_deeper, [3, 4, 6, 3], 2, None, low_resolution = False)
         # model_params = cam_model.state_dict()
         # model_params.update(params)
         # cam_model.load_state_dict(model_params)
@@ -51,7 +51,7 @@ def drive(args) :
 
 
     elif flags['model'] == 'densenet121' :
-        cam_model = DenseNet(Bottleneck, [6, 12, 24, 16], growth_rate=32, num_class = 50, low_resolution = False)
+        cam_model = DenseNet(Bottleneck, [6, 12, 24, 16], growth_rate=32, num_class = 2, low_resolution = False)
         # model_params = cam_model.state_dict()
         # model_params.update(params)
         # cam_model.load_state_dict(model_params)
@@ -99,6 +99,8 @@ def drive(args) :
                 ts_board.add_scalar('train/total_loss', total_loss.item(), i * n_train_batchs + train_iter)
                 ts_board.add_scalar('train/cl_loss', loss_cl.item(), i * n_train_batchs + train_iter)
                 ts_board.add_scalar('train/am_loss', loss_am.item(), i * n_train_batchs + train_iter)
+
+                print(loss_am, loss_cl)
 
                 # cam_model.optimizer.zero_grad()
 
