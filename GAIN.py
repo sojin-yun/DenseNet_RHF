@@ -80,11 +80,11 @@ class GAIN(nn.Module):
         output_am = self.model(I_star)
         self.model.zero_grad()
         # ImageNet
-        loss_am = torch.sum(torch.sigmoid(output_am), dim=(0,1), keepdim=False)
-        loss_am /= len(labels)
+        # loss_am = torch.sum(torch.sigmoid(output_am), dim=(0,1), keepdim=False)
+        # loss_am /= len(labels)
         # Lung
-        #loss_am = torch.sum(F.softmax(output_am), dim=(0,1), keepdim=False)
-        #loss_am /= len(labels)
+        loss_am = torch.sum(F.softmax(output_am), dim=(0,1), keepdim=False)
+        loss_am /= len(labels)
         total_loss = loss_cl + self.alpha * loss_am
         return total_loss, loss_cl, loss_am, Ac, preds
 

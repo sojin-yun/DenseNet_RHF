@@ -100,7 +100,7 @@ def drive(args) :
                 ts_board.add_scalar('train/cl_loss', loss_cl.item(), i * n_train_batchs + train_iter)
                 ts_board.add_scalar('train/am_loss', loss_am.item(), i * n_train_batchs + train_iter)
 
-                print(loss_am, loss_cl)
+                #print(loss_am, loss_cl)
 
                 # cam_model.optimizer.zero_grad()
 
