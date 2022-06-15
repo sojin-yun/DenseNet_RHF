@@ -129,6 +129,7 @@ def drive(args) :
 
         if int(baseline_pred) == int(gain_pred) and (int(target)==1):
 
+            mask_np = cv2.cvtColor(mask_np, cv2.COLOR_RGB2GRAY).astype(np.float32)
             print(cv2.countNonZero(mask_np))
             print(cv2.countNonZero(gain_ret))
             print(cv2.countNonZero(baseline_ret))
