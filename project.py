@@ -93,6 +93,7 @@ def drive(args) :
     grad_cam = GradCAM(model = cam_model, hooked_layer = 152, device = device, ensemble = False)
     grad_gain = GradCAM(model = gain_model.model, hooked_layer = 152, device = device, ensemble = False)
     upsample = nn.Upsample(size = 512, mode = 'bilinear', align_corners = False)
+    #inverse_norm = InverseNormalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
     inverse_norm = InverseNormalize((0.27, 0.27, 0.27), (0.309, 0.309, 0.309))
 
     # Use Pretrained Weights
@@ -114,7 +115,7 @@ def drive(args) :
         baseline_ret = upsample(baseline_ret.unsqueeze(0)).detach().cpu()
         baseline_ret = np.transpose(baseline_ret, (0, 2, 3, 1)).squeeze(0)
         
-        baseline_threshold = baseline_ret.max()*(0.3)
+        baseline_threshold = baseline_ret.max()*(0.5)
         baseline_ret = np.where(baseline_ret < baseline_threshold, 0., baseline_ret)
 
         #_, _, gain_ret, gain_pred = gain_model.attention_map_forward(data, target)
@@ -122,23 +123,23 @@ def drive(args) :
         gain_ret = upsample(gain_ret.unsqueeze(0)).detach().cpu()
         gain_ret = np.transpose(gain_ret, (0, 2, 3, 1)).squeeze(0)
         
-        gaine_threshold = gain_ret.max()*(0.3)
+        gaine_threshold = gain_ret.max()*(0.5)
         gain_ret = np.where(gain_ret < gaine_threshold, 0., gain_ret)
 
         if int(baseline_pred) == int(gain_pred) and (int(target)==1):
 
             figure = plt.figure(figsize = (12, 12))
             ax = figure.add_subplot(2, 3, 1)
-            ax.imshow(image_np*255)
+            ax.imshow(image_np)
             ax.set_title('Class-{}'.format(int(target)), fontsize = 20)
             ax.axis('off')
             ax = figure.add_subplot(2, 3, 2)
-            ax.imshow(image_np*255)
+            ax.imshow(image_np)
             ax.imshow(baseline_ret, cmap = 'jet', alpha = 0.3)
             ax.set_title('Baseline', fontsize = 20)
             ax.axis('off')
             ax = figure.add_subplot(2, 3, 3)
-            ax.imshow(image_np*255)
+            ax.imshow(image_np)
             ax.imshow(gain_ret, cmap = 'jet', alpha = 0.3)
             ax.set_title('GAIN', fontsize = 20)
             ax.axis('off')
