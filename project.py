@@ -92,8 +92,8 @@ def drive(args) :
 
     grad_cam = GradCAM(model = cam_model, hooked_layer = 152, device = device, ensemble = False)
     grad_gain = GradCAM(model = gain_model.model, hooked_layer = 152, device = device, ensemble = False)
-    upsample = nn.Upsample(size = 224, mode = 'bilinear', align_corners = False)
-    inverse_norm = InverseNormalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+    upsample = nn.Upsample(size = 512, mode = 'bilinear', align_corners = False)
+    inverse_norm = InverseNormalize((0.27, 0.27, 0.27), (0.309, 0.309, 0.309))
 
     # Use Pretrained Weights
     print('Training Start')
@@ -125,20 +125,20 @@ def drive(args) :
         gaine_threshold = gain_ret.max()*(0.3)
         gain_ret = np.where(gain_ret < gaine_threshold, 0., gain_ret)
 
-        if int(baseline_pred) == int(gain_pred) :
+        if int(baseline_pred) == int(gain_pred) and (int(target)==1):
 
             figure = plt.figure(figsize = (12, 12))
             ax = figure.add_subplot(2, 3, 1)
-            ax.imshow(image_np)
+            ax.imshow(image_np*255)
             ax.set_title('Class-{}'.format(int(target)), fontsize = 20)
             ax.axis('off')
             ax = figure.add_subplot(2, 3, 2)
-            ax.imshow(image_np)
+            ax.imshow(image_np*255)
             ax.imshow(baseline_ret, cmap = 'jet', alpha = 0.3)
             ax.set_title('Baseline', fontsize = 20)
             ax.axis('off')
             ax = figure.add_subplot(2, 3, 3)
-            ax.imshow(image_np)
+            ax.imshow(image_np*255)
             ax.imshow(gain_ret, cmap = 'jet', alpha = 0.3)
             ax.set_title('GAIN', fontsize = 20)
             ax.axis('off')
