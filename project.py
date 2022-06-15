@@ -91,8 +91,8 @@ def drive(args) :
     # cam_model, gain_model = cam_model.to(device), gain_model.to(device)
     # #cam_model = cam_model.to(device)
 
-    grad_cam = GradCAM(model = cam_model, hooked_layer = 492, device = device, ensemble = False)
-    grad_gain = GradCAM(model = gain_model.model, hooked_layer = 492, device = device, ensemble = False)
+    grad_cam = GradCAM(model = cam_model, hooked_layer = 152, device = device, ensemble = False)
+    grad_gain = GradCAM(model = gain_model.model, hooked_layer = 152, device = device, ensemble = False)
     upsample = nn.Upsample(size = 512, mode = 'bilinear', align_corners = False)
     #inverse_norm = InverseNormalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
     inverse_norm = InverseNormalize((0.27, 0.27, 0.27), (0.309, 0.309, 0.309))
