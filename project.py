@@ -134,27 +134,34 @@ def drive(args) :
 
         if (int(baseline_pred) == int(target)) and (int(target)==1):
             
-            cam_cnt += 1
-
-            mask_np = cv2.cvtColor(mask_np, cv2.COLOR_RGB2GRAY).astype(np.float32)
+            try :
+                mask_np = cv2.cvtColor(mask_np, cv2.COLOR_RGB2GRAY).astype(np.float32)
+            except :
+                continue
             mask_cnt = cv2.countNonZero(mask_np)
 
             cam_cnt = cv2.countNonZero(baseline_ret)
             cam_intersect = cv2.countNonZero(cv2.bitwise_and(mask_np, baseline_ret))
             cam_dice = 2 * (cam_intersect / (mask_cnt + cam_cnt))
             cam_total_dice += cam_dice
+            
+            cam_cnt += 1
 
         if (int(gain_pred) == int(target)) and (int(target)==1):
             
-            gain_cnt += 1
 
-            mask_np = cv2.cvtColor(mask_np, cv2.COLOR_RGB2GRAY).astype(np.float32)
+            try :
+                mask_np = cv2.cvtColor(mask_np, cv2.COLOR_RGB2GRAY).astype(np.float32)
+            except :
+                continue
             mask_cnt = cv2.countNonZero(mask_np)
 
             gain_cnt = cv2.countNonZero(gain_ret)
             gain_intersect = cv2.countNonZero(cv2.bitwise_and(mask_np, gain_ret))
             gain_dice = 2 * (gain_intersect / (mask_cnt + gain_cnt))
             gain_total_dice += gain_dice
+            
+            gain_cnt += 1
         
     print('gain : ', gain_total_dice)
     print('cam : ', cam_total_dice)
