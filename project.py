@@ -128,7 +128,7 @@ def drive(args) :
 
         if int(baseline_pred) == int(gain_pred) and (int(target)==1):
 
-            figure = plt.figure(figsize = (12, 12))
+            figure = plt.figure(figsize = (12, 8))
             ax = figure.add_subplot(2, 3, 1)
             ax.imshow(image_np)
             ax.set_title('Class-{}'.format(int(target)), fontsize = 20)
