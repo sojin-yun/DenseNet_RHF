@@ -103,7 +103,10 @@ def drive(args) :
     best_valid_score = 0.
     best_epoch =  0
 
-    cnt = 0
+    cam_cnt = 0
+    gain_cnt = 0
+    cam_total_dice = 0.
+    gain_total_dice = 0.
 
     for idx, (data, target, mask) in enumerate(tqdm(valid_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01)) :
 
@@ -129,9 +132,9 @@ def drive(args) :
         gaine_threshold = gain_ret.max()*(0.5)
         gain_ret = np.where(gain_ret < gaine_threshold, 0., gain_ret)
 
-        if int(baseline_pred) == int(gain_pred) and (int(target)==1):
+        if (int(baseline_pred) == int(target)) and (int(target)==1):
             
-            cnt += 1
+            cam_cnt += 1
 
             mask_np = cv2.cvtColor(mask_np, cv2.COLOR_RGB2GRAY).astype(np.float32)
             mask_cnt = cv2.countNonZero(mask_np)
@@ -139,12 +142,22 @@ def drive(args) :
             cam_cnt = cv2.countNonZero(baseline_ret)
             cam_intersect = cv2.countNonZero(cv2.bitwise_and(mask_np, baseline_ret))
             cam_dice = 2 * (cam_intersect / (mask_cnt + cam_cnt))
-            print(cam_dice)
+            cam_total_dice += cam_dice
+
+        if (int(gain_pred) == int(target)) and (int(target)==1):
+            
+            gain_cnt += 1
+
+            mask_np = cv2.cvtColor(mask_np, cv2.COLOR_RGB2GRAY).astype(np.float32)
+            mask_cnt = cv2.countNonZero(mask_np)
 
             gain_cnt = cv2.countNonZero(gain_ret)
             gain_intersect = cv2.countNonZero(cv2.bitwise_and(mask_np, gain_ret))
             gain_dice = 2 * (gain_intersect / (mask_cnt + gain_cnt))
-            print(gain_dice)
+            gain_total_dice += gain_dice
+        
+    print('gain : ', gain_total_dice)
+    print('cam : ', cam_total_dice)
 
         #     figure = plt.figure(figsize = (12, 8))
         #     ax = figure.add_subplot(2, 3, 1)
