@@ -163,8 +163,8 @@ def drive(args) :
             
             gain_cnt += 1
         
-    print('gain : ', gain_total_dice)
-    print('cam : ', cam_total_dice)
+    print('gain : ', gain_total_dice / gain_cnt)
+    print('cam : ', cam_total_dice / cam_cnt)
 
         #     figure = plt.figure(figsize = (12, 8))
         #     ax = figure.add_subplot(2, 3, 1)
