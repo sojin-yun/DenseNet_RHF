@@ -127,13 +127,13 @@ def drive(args) :
         gaine_threshold = gain_ret.max()*(0.5)
         gain_ret = np.where(gain_ret < gaine_threshold, 0., gain_ret)
 
-        print(cv2.countNonZero(mask_np))
-        print(cv2.countNonZero(gain_ret))
-        print(cv2.countNonZero(baseline_ret))
-        intersect = cv2.bitwise_and(mask_np, baseline_ret)
-        print(cv2.countNonZero(intersect))
+        if int(baseline_pred) == int(gain_pred) and (int(target)==1):
 
-        # if int(baseline_pred) == int(gain_pred) and (int(target)==1):
+            print(cv2.countNonZero(mask_np))
+            print(cv2.countNonZero(gain_ret))
+            print(cv2.countNonZero(baseline_ret))
+            intersect = cv2.bitwise_and(mask_np, baseline_ret)
+            print(cv2.countNonZero(intersect))
 
         #     figure = plt.figure(figsize = (12, 8))
         #     ax = figure.add_subplot(2, 3, 1)
