@@ -103,6 +103,8 @@ def drive(args) :
     best_valid_score = 0.
     best_epoch =  0
 
+    cnt = 0
+
     for idx, (data, target, mask) in enumerate(tqdm(valid_loader, desc="{:17s}".format('Evaluation State'), mininterval=0.01)) :
 
         if flags['device'] != 'cpu' : data, target = data.to(device), target.to(device)
@@ -128,17 +130,19 @@ def drive(args) :
         gain_ret = np.where(gain_ret < gaine_threshold, 0., gain_ret)
 
         if int(baseline_pred) == int(gain_pred) and (int(target)==1):
+            
+            cnt += 1
 
             mask_np = cv2.cvtColor(mask_np, cv2.COLOR_RGB2GRAY).astype(np.float32)
             mask_cnt = cv2.countNonZero(mask_np)
 
             cam_cnt = cv2.countNonZero(baseline_ret)
-            cam_intersect = cv2.bitwise_and(mask_np, baseline_ret)
+            cam_intersect = cv2.countNonZero(cv2.bitwise_and(mask_np, baseline_ret))
             cam_dice = 2 * (cam_intersect / (mask_cnt + cam_cnt))
             print(cam_dice)
 
             gain_cnt = cv2.countNonZero(gain_ret)
-            gain_intersect = cv2.bitwise_and(mask_np, gain_ret)
+            gain_intersect = cv2.countNonZero(cv2.bitwise_and(mask_np, gain_ret))
             gain_dice = 2 * (gain_intersect / (mask_cnt + gain_cnt))
             print(gain_dice)
 
