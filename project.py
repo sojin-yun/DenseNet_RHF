@@ -157,7 +157,7 @@ def drive(args) :
             ax.set_title('GAIN', fontsize = 20)
             ax.axis('off')
             #plt.show()
-            plt.savefig('./export/gain_lung_resnet50/{}.png'.format(str(idx)))
+            plt.savefig('/home/NAS_mount/sjlee/RHF/export/gain_lung_resnet50/{}.png'.format(str(idx)))
             plt.close()
             # break
 
