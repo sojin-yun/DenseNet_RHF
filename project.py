@@ -35,8 +35,8 @@ def drive(args) :
 
     model_name, data = flags['model'], flags['data']
     #params = torch.load('{0}/weights/baseline/{1}_{2}.pth'.format(abs_path, model_name, data), map_location = device)
-    cam_params = torch.load('{0}/weights/evaluation/densenet121_cam_lung.pt'.format(abs_path), map_location = device)['state_dict']
-    gain_params = torch.load('{0}/weights/evaluation/densenet121_gain_lung.pt'.format(abs_path), map_location = device)['state_dict']
+    cam_params = torch.load('{0}/weights/evaluation/resnet50_cam_lung.pt'.format(abs_path), map_location = device)['state_dict']
+    gain_params = torch.load('{0}/weights/evaluation/resnet50_gain_lung.pt'.format(abs_path), map_location = device)['state_dict']
 
     default_path = '/home/NAS_mount/sjlee/RHF/Save_parameters/lung/' if flags['server'] else './Save_parameters/lung/'
     if not os.path.isdir(os.path.join(default_path, save_path)) :
