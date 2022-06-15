@@ -130,11 +130,17 @@ def drive(args) :
         if int(baseline_pred) == int(gain_pred) and (int(target)==1):
 
             mask_np = cv2.cvtColor(mask_np, cv2.COLOR_RGB2GRAY).astype(np.float32)
-            print(cv2.countNonZero(mask_np))
-            print(cv2.countNonZero(gain_ret))
-            print(cv2.countNonZero(baseline_ret))
-            intersect = cv2.bitwise_and(mask_np, baseline_ret)
-            print(cv2.countNonZero(intersect))
+            mask_cnt = cv2.countNonZero(mask_np)
+
+            cam_cnt = cv2.countNonZero(baseline_ret)
+            cam_intersect = cv2.bitwise_and(mask_np, baseline_ret)
+            cam_dice = 2 * (cam_intersect / (mask_cnt + cam_cnt))
+            print(cam_dice)
+
+            gain_cnt = cv2.countNonZero(gain_ret)
+            gain_intersect = cv2.bitwise_and(mask_np, gain_ret)
+            gain_dice = 2 * (gain_intersect / (mask_cnt + gain_cnt))
+            print(gain_dice)
 
         #     figure = plt.figure(figsize = (12, 8))
         #     ax = figure.add_subplot(2, 3, 1)
