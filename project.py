@@ -16,6 +16,7 @@ from utils.image_process import InverseNormalize
 from utils.grad_cam import GradCAM
 import numpy as np
 import matplotlib.pyplot as plt
+import cv2
 
 def drive(args) :
 
@@ -126,41 +127,47 @@ def drive(args) :
         gaine_threshold = gain_ret.max()*(0.5)
         gain_ret = np.where(gain_ret < gaine_threshold, 0., gain_ret)
 
-        if int(baseline_pred) == int(gain_pred) and (int(target)==1):
+        print(cv2.countNonZero(mask_np))
+        print(cv2.countNonZero(gain_ret))
+        print(cv2.countNonZero(baseline_ret))
+        intersect = cv2.bitwise_and(mask_np, baseline_ret)
+        print(cv2.countNonZero(intersect))
 
-            figure = plt.figure(figsize = (12, 8))
-            ax = figure.add_subplot(2, 3, 1)
-            ax.imshow(image_np)
-            ax.set_title('Cancer', fontsize = 20)
-            ax.axis('off')
-            ax = figure.add_subplot(2, 3, 2)
-            ax.imshow(image_np)
-            ax.imshow(baseline_ret, cmap = 'jet', alpha = 0.3)
-            ax.set_title('Baseline', fontsize = 20)
-            ax.axis('off')
-            ax = figure.add_subplot(2, 3, 3)
-            ax.imshow(image_np)
-            ax.imshow(gain_ret, cmap = 'jet', alpha = 0.3)
-            ax.set_title('GAIN', fontsize = 20)
-            ax.axis('off')
-            ax = figure.add_subplot(2, 3, 4)
-            ax.imshow(mask_np)
-            ax.set_title('Cancer', fontsize = 20)
-            ax.axis('off')
-            ax = figure.add_subplot(2, 3, 5)
-            ax.imshow(mask_np)
-            ax.imshow(baseline_ret, cmap = 'jet', alpha = 0.3)
-            ax.set_title('Baseline', fontsize = 20)
-            ax.axis('off')
-            ax = figure.add_subplot(2, 3, 6)
-            ax.imshow(mask_np)
-            ax.imshow(gain_ret, cmap = 'jet', alpha = 0.3)
-            ax.set_title('GAIN', fontsize = 20)
-            ax.axis('off')
-            #plt.show()
-            plt.savefig('/home/NAS_mount/sjlee/RHF/export/gain_lung_densenet121/{}.png'.format(str(idx)))
-            plt.close()
-            # break
+        # if int(baseline_pred) == int(gain_pred) and (int(target)==1):
+
+        #     figure = plt.figure(figsize = (12, 8))
+        #     ax = figure.add_subplot(2, 3, 1)
+        #     ax.imshow(image_np)
+        #     ax.set_title('Cancer', fontsize = 20)
+        #     ax.axis('off')
+        #     ax = figure.add_subplot(2, 3, 2)
+        #     ax.imshow(image_np)
+        #     ax.imshow(baseline_ret, cmap = 'jet', alpha = 0.3)
+        #     ax.set_title('Baseline', fontsize = 20)
+        #     ax.axis('off')
+        #     ax = figure.add_subplot(2, 3, 3)
+        #     ax.imshow(image_np)
+        #     ax.imshow(gain_ret, cmap = 'jet', alpha = 0.3)
+        #     ax.set_title('GAIN', fontsize = 20)
+        #     ax.axis('off')
+        #     ax = figure.add_subplot(2, 3, 4)
+        #     ax.imshow(mask_np)
+        #     ax.set_title('Cancer', fontsize = 20)
+        #     ax.axis('off')
+        #     ax = figure.add_subplot(2, 3, 5)
+        #     ax.imshow(mask_np)
+        #     ax.imshow(baseline_ret, cmap = 'jet', alpha = 0.3)
+        #     ax.set_title('Baseline', fontsize = 20)
+        #     ax.axis('off')
+        #     ax = figure.add_subplot(2, 3, 6)
+        #     ax.imshow(mask_np)
+        #     ax.imshow(gain_ret, cmap = 'jet', alpha = 0.3)
+        #     ax.set_title('GAIN', fontsize = 20)
+        #     ax.axis('off')
+        #     #plt.show()
+        #     plt.savefig('/home/NAS_mount/sjlee/RHF/export/gain_lung_densenet121/{}.png'.format(str(idx)))
+        #     plt.close()
+        #     # break
 
     # for i in range(epoch) :
 
