@@ -134,70 +134,70 @@ def drive(args) :
 
         if (int(baseline_pred) == int(target)) and (int(target)==1):
             
-            try :
-                mask_np = cv2.cvtColor(mask_np, cv2.COLOR_RGB2GRAY).astype(np.float32)
-            except :
-                continue
-            mask_cnt = cv2.countNonZero(mask_np)
+    #         try :
+    #             mask_np = cv2.cvtColor(mask_np, cv2.COLOR_RGB2GRAY).astype(np.float32)
+    #         except :
+    #             continue
+    #         mask_cnt = cv2.countNonZero(mask_np)
 
-            cam_cnt = cv2.countNonZero(baseline_ret)
-            cam_intersect = cv2.countNonZero(cv2.bitwise_and(mask_np, baseline_ret))
-            cam_dice = 2 * (cam_intersect / (mask_cnt + cam_cnt))
-            cam_total_dice += cam_dice
+    #         cam_cnt = cv2.countNonZero(baseline_ret)
+    #         cam_intersect = cv2.countNonZero(cv2.bitwise_and(mask_np, baseline_ret))
+    #         cam_dice = 2 * (cam_intersect / (mask_cnt + cam_cnt))
+    #         cam_total_dice += cam_dice
             
-            cam_cnt += 1
+    #         cam_cnt += 1
 
-        if (int(gain_pred) == int(target)) and (int(target)==1):
+    #     if (int(gain_pred) == int(target)) and (int(target)==1):
             
 
-            try :
-                mask_np = cv2.cvtColor(mask_np, cv2.COLOR_RGB2GRAY).astype(np.float32)
-            except :
-                continue
-            mask_cnt = cv2.countNonZero(mask_np)
+    #         try :
+    #             mask_np = cv2.cvtColor(mask_np, cv2.COLOR_RGB2GRAY).astype(np.float32)
+    #         except :
+    #             continue
+    #         mask_cnt = cv2.countNonZero(mask_np)
 
-            gain_cnt = cv2.countNonZero(gain_ret)
-            gain_intersect = cv2.countNonZero(cv2.bitwise_and(mask_np, gain_ret))
-            gain_dice = 2 * (gain_intersect / (mask_cnt + gain_cnt))
-            gain_total_dice += gain_dice
+    #         gain_cnt = cv2.countNonZero(gain_ret)
+    #         gain_intersect = cv2.countNonZero(cv2.bitwise_and(mask_np, gain_ret))
+    #         gain_dice = 2 * (gain_intersect / (mask_cnt + gain_cnt))
+    #         gain_total_dice += gain_dice
             
-            gain_cnt += 1
+    #         gain_cnt += 1
         
-    print('gain : ', gain_total_dice / gain_cnt)
-    print('cam : ', cam_total_dice / cam_cnt)
+    # print('gain : ', gain_total_dice / gain_cnt)
+    # print('cam : ', cam_total_dice / cam_cnt)
 
-        #     figure = plt.figure(figsize = (12, 8))
-        #     ax = figure.add_subplot(2, 3, 1)
-        #     ax.imshow(image_np)
-        #     ax.set_title('Cancer', fontsize = 20)
-        #     ax.axis('off')
-        #     ax = figure.add_subplot(2, 3, 2)
-        #     ax.imshow(image_np)
-        #     ax.imshow(baseline_ret, cmap = 'jet', alpha = 0.3)
-        #     ax.set_title('Baseline', fontsize = 20)
-        #     ax.axis('off')
-        #     ax = figure.add_subplot(2, 3, 3)
-        #     ax.imshow(image_np)
-        #     ax.imshow(gain_ret, cmap = 'jet', alpha = 0.3)
-        #     ax.set_title('GAIN', fontsize = 20)
-        #     ax.axis('off')
-        #     ax = figure.add_subplot(2, 3, 4)
-        #     ax.imshow(mask_np)
-        #     ax.set_title('Cancer', fontsize = 20)
-        #     ax.axis('off')
-        #     ax = figure.add_subplot(2, 3, 5)
-        #     ax.imshow(mask_np)
-        #     ax.imshow(baseline_ret, cmap = 'jet', alpha = 0.3)
-        #     ax.set_title('Baseline', fontsize = 20)
-        #     ax.axis('off')
-        #     ax = figure.add_subplot(2, 3, 6)
-        #     ax.imshow(mask_np)
-        #     ax.imshow(gain_ret, cmap = 'jet', alpha = 0.3)
-        #     ax.set_title('GAIN', fontsize = 20)
-        #     ax.axis('off')
-        #     #plt.show()
-        #     plt.savefig('/home/NAS_mount/sjlee/RHF/export/gain_lung_densenet121/{}.png'.format(str(idx)))
-        #     plt.close()
+            figure = plt.figure(figsize = (12, 8))
+            ax = figure.add_subplot(2, 3, 1)
+            ax.imshow(image_np)
+            ax.set_title('Cancer', fontsize = 20)
+            ax.axis('off')
+            ax = figure.add_subplot(2, 3, 2)
+            ax.imshow(image_np)
+            ax.imshow(baseline_ret, cmap = 'jet', alpha = 0.3)
+            ax.set_title('Baseline', fontsize = 20)
+            ax.axis('off')
+            ax = figure.add_subplot(2, 3, 3)
+            ax.imshow(image_np)
+            ax.imshow(gain_ret, cmap = 'jet', alpha = 0.3)
+            ax.set_title('GAIN', fontsize = 20)
+            ax.axis('off')
+            ax = figure.add_subplot(2, 3, 4)
+            ax.imshow(mask_np)
+            ax.set_title('Cancer', fontsize = 20)
+            ax.axis('off')
+            ax = figure.add_subplot(2, 3, 5)
+            ax.imshow(mask_np)
+            ax.imshow(baseline_ret, cmap = 'jet', alpha = 0.3)
+            ax.set_title('Baseline', fontsize = 20)
+            ax.axis('off')
+            ax = figure.add_subplot(2, 3, 6)
+            ax.imshow(mask_np)
+            ax.imshow(gain_ret, cmap = 'jet', alpha = 0.3)
+            ax.set_title('GAIN', fontsize = 20)
+            ax.axis('off')
+            #plt.show()
+            plt.savefig('/home/NAS_mount/sjlee/RHF/export/demo/{}.png'.format(str(idx)))
+            plt.close()
         #     # break
 
     # for i in range(epoch) :
