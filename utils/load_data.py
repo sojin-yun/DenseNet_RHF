@@ -48,6 +48,12 @@ class CustomDataLoader() :
                 transforms.ToTensor(),
                 transforms.Normalize(self.data_mean, self.data_std),
             ])
+            valid_transformer = transforms.Compose([
+                transforms.ToPILImage(),
+                transforms.Resize((self.image_size, self.image_size)),
+                transforms.ToTensor(),
+                transforms.Normalize(self.data_mean, self.data_std)
+            ])
         else :
             train_transformer = transforms.Compose([
                 transforms.Resize((self.image_size, self.image_size)),
@@ -57,13 +63,11 @@ class CustomDataLoader() :
                 transforms.Normalize(self.data_mean, self.data_std),
                 #RandomInversion()
             ])
-
-        valid_transformer = transforms.Compose([
-            transforms.ToPILImage(),
-            transforms.Resize((self.image_size, self.image_size)),
-            transforms.ToTensor(),
-            transforms.Normalize(self.data_mean, self.data_std)
-        ])
+            valid_transformer = transforms.Compose([
+                transforms.Resize((self.image_size, self.image_size)),
+                transforms.ToTensor(),
+                transforms.Normalize(self.data_mean, self.data_std)
+            ])
 
         return train_transformer, valid_transformer
 
