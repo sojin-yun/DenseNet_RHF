@@ -33,11 +33,11 @@ class GAIN(nn.Module):
 
     def hook(self, grad):   #backward hook
         self.backward_result = grad     
-        
     
 
     def attention_map_forward(self, images, labels):
         #generate gradcam
+        self.model.eval()
         output_cl = self.model(images)
         Sc = 0.
         _, predictions = torch.max(output_cl, 1)
