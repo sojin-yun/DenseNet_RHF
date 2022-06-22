@@ -18,6 +18,7 @@ from model.baseline.squeezenet import SqueezeNet, Fire, _squeezenet
 from model.baseline.vit import VisionTransformer
 from model.baseline.rensenet import RenseNet, BasicBlock_Rense, Transition_Rense
 from model.baseline.switched_rensenet import switched_RenseNet, BasicBlock_sRense, Transition_sRense
+from model.baseline.efficientnet import EfficientNet
 
 class Select_Model :
     def __init__(self, args, device = 'cpu') :
@@ -143,6 +144,9 @@ class Select_Model :
 
         elif model == 'srensenet' :
             return switched_RenseNet(BasicBlock_sRense, [3, 4, 6, 3], device = self.device, num_class = self.numclasses)
+
+        elif model == 'efficientnet' :
+            return EfficientNet(num_classes = self.numclasses, width_coef=1.0, depth_coef=1.0, scale=1.0,dropout=0.2, se_scale=4)
 
         else :
             assert True, 'ModelTypeError : model type is not implemented. please check and try again.'
