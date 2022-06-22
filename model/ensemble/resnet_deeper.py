@@ -43,7 +43,7 @@ class BasicBlock_ensemble_deeper(nn.Module):
             nn.Upsample(scale_factor=self.stride, mode = 'bilinear', align_corners=False)
             # nn.ConvTranspose2d(midplanes, midplanes, 3, 2, 1, 1),
             # nn.ReLU()
-        )
+            )
     
 
     def _copy_weight(self) :

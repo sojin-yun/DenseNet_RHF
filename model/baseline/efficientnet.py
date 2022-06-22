@@ -171,7 +171,7 @@ class EfficientNet(nn.Module):
             Swish()
         ) 
 
-        self.avgpool = nn.AdaptiveAvgPool2d((1,1))
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.dropout = nn.Dropout(p=dropout)
         self.linear = nn.Linear(channels[8], num_classes)
 
