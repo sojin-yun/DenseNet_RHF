@@ -96,8 +96,8 @@ class MBConv_ensemble(nn.Module):
             x_no_strided = self.ext_bn(x_no_strided)
             x_no_strided = self.ext_swish(x_no_strided)
             
-            x_strided = self.upsample(x_strided)
-            x_strided = self.relu(x_strided)
+            x_stride = self.upsample(x_stride)
+            x_stride = self.relu(x_stride)
             self.boundary = torch.abs(x_no_strided - x_stride)
 
         x_residual = self.residual(x)
