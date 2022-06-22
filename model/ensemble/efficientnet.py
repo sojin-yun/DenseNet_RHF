@@ -313,7 +313,6 @@ class EfficientNet_ensemble(nn.Module):
         for m in self.modules():
             if isinstance(m, MBConv_ensemble):
                 if m.stride == 2:
-                    print(m.boundary.shape)
                     boundary_maps.append(m.boundary)
         return boundary_maps
 
