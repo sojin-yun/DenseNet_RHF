@@ -216,6 +216,9 @@ class EfficientNet_ensemble(nn.Module):
 
         self.device = device
 
+        self.boundary_fc = nn.Linear(boundary_layers[3], num_classes)
+        self.ensemble_fc = nn.Linear(channels[8] + boundary_layers[3], num_classes)
+
         self.boundary_features, self.compression_conv = self._make_boundary_conv(boundary_layers = boundary_layers)
         self.boundary_features, self.compression_conv = nn.ModuleList(self.boundary_features), nn.ModuleList(self.compression_conv)
 
@@ -292,7 +295,7 @@ class EfficientNet_ensemble(nn.Module):
         ensemble = ensemble.view(ensemble.size(0), -1)
         ensemble = self.ensemble_fc(ensemble)
 
-        return x
+        return x, b, ensemble
 
 
     def _make_Block(self, block, repeats, in_channels, out_channels, kernel_size, stride, se_scale):

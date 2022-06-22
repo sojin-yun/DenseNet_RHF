@@ -95,7 +95,7 @@ class Select_Model :
             return switched_RenseNet_ensemble(BasicBlock_sRense_ensemble, [3, 4, 6, 3], [30, 39, 55], device = self.device, num_class = self.numclasses)
 
         elif model == 'efficientnet' :
-            return EfficientNet_ensemble([30, 39, 55], num_classes = self.numclasses, width_coef=1.0, depth_coef=1.0, scale=1.0,dropout=0.2, se_scale=4, device = self.device)
+            return EfficientNet_ensemble([96, 144, 240, 672], num_classes = self.numclasses, width_coef=1.0, depth_coef=1.0, scale=1.0,dropout=0.2, se_scale=4, device = self.device)
         
         else :
             assert True, 'ModelTypeError : model type is not implemented. please check and try again.'
