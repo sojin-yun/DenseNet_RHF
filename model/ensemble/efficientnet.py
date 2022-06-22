@@ -214,6 +214,8 @@ class EfficientNet_ensemble(nn.Module):
         self.dropout = nn.Dropout(p=dropout)
         self.linear = nn.Linear(channels[8], num_classes)
 
+        self.device = device
+
         self.boundary_features, self.compression_conv = self._make_boundary_conv(boundary_layers = boundary_layers)
         self.boundary_features, self.compression_conv = nn.ModuleList(self.boundary_features), nn.ModuleList(self.compression_conv)
 
