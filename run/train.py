@@ -99,7 +99,7 @@ class TrainingEnsemble :
         # for non-pretrained
         #backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight = 1.0, 0.2, 0.2
         # for pre-trained
-        backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight = 1.0, 0.3, 0.3
+        backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight = 0.3, 1.0, 1.0
         loss_info = 'Loss Information - Backbone_loss : {0} | Boundary_loss : {1} | Ensemble_loss : {2}\n\n'.format(backbone_loss_weight, boundary_loss_weight, ensemble_loss_weight)
         print(loss_info)
         f.write(loss_info)
